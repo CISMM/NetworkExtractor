@@ -1,0 +1,4 @@
+2008-04-14  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Added ITK libraries to do some basic
+   processing.
