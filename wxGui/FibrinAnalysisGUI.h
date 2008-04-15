@@ -1,8 +1,11 @@
 #include <wx/wx.h>
 #include <wx/image.h>
 #include <wx/splitter.h>
-
 #include "wxVTKRenderWindowInteractor.h"
+
+#include "itkImageSeriesReader.h"
+#include "itkVTKImageExport.h"
+#include "itkVTKImageExport.h"
 
 #include "vtkConeSource.h"
 #include "vtkPolyDataMapper.h"
@@ -11,6 +14,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 #include "vtkInteractorStyleSwitch.h"
+
 
 #ifndef _FIBRIN_ANALYSIS_GUI_H_
 #define _FIBRIN_ANALYSIS_GUI_H_
@@ -40,13 +44,25 @@ public:
 
 protected:
 
+  typedef unsigned short PixelType;
+  static const unsigned int     Dimension = 3;
+  typedef itk::Image<PixelType, Dimension> ImageType;
+  typedef itk::ImageSeriesReader<ImageType> SeriesReaderType;
+  typedef itk::VTKImageExport<ImageType> ExporterType;
+
+  ExporterType::Pointer m_exporter;
+
   wxMenuBar* m_menuBar;
   wxStatusBar* m_statusBar;
   wxVTKRenderWindowInteractor* m_rwiView;
+  
+
 
   DECLARE_EVENT_TABLE();
 
   void CreateWidgets();
+
+  void LoadAndDisplayImage();
 
 private:
 

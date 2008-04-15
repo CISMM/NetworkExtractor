@@ -1,0 +1,7 @@
+2008-04-14  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Added header file to list of source files
+   so it will show up in the VisualStudio project.
+   
+   * FibrinAnalysisGUI.h, .cxx: Added a basic method to load and
+   volume render a stack of TIFF images.

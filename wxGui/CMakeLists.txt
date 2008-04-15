@@ -1,7 +1,7 @@
 PROJECT (gui)
 
 SET (Gui_SRCS
-    FibrinAnalysisGUI.cxx
+    FibrinAnalysisGUI.h FibrinAnalysisGUI.cxx
 )
 
 # A library, so others can use the GUI tools
