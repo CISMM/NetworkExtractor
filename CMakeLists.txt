@@ -54,7 +54,7 @@ LINK_DIRECTORIES(${wxWidgets_LIBRARY_DIRS})
 
 # We need to include the binary directory here because nanoCommon
 # is outside the build tree.
-ADD_SUBDIRECTORY(${nanoCommonPath}/cpp "${FibrinAnalysis_BINARY_DIR}")
+ADD_SUBDIRECTORY(${nanoCommonPath}/cpp "${FibrinAnalysis_BINARY_DIR}/nanoCommon")
 
 #######################################
 # Personal filter library and support classes.

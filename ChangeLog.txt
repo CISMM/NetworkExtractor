@@ -1,0 +1,6 @@
+2008-04-14  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Added a 'nanoCommon' subdirectory in the
+   build directory where all the nanoCommon files will go.
+   This will prevent any directories in nanoCommon from
+   clobbering directories in this project, or vice versa.
