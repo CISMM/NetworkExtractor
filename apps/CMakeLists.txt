@@ -15,5 +15,5 @@ ENDIF (WIN32)
 
 INCLUDE_DIRECTORIES(../wxGui)
 
-ADD_EXECUTABLE(FibrinAnalysis ${GUI_EXE} FibrinAnalysisApp.cxx)
+ADD_EXECUTABLE(FibrinAnalysis ${GUI_EXE} MACOSX_BUNDLE FibrinAnalysisApp.cxx)
 TARGET_LINK_LIBRARIES(FibrinAnalysis FibrinAnalysisGui nanoWx nanoVTKView vtksys vtkCommon vtkFiltering vtkGraphics vtkHybrid vtkImaging vtkRendering vtkVolumeRendering itksys ITKCommon ITKBasicFilters ITKIO)
