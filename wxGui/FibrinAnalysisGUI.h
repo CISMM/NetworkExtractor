@@ -4,7 +4,9 @@
 #include "wxVTKRenderWindowInteractor.h"
 
 #include "itkImageSeriesReader.h"
-#include "itkVTKImageExport.h"
+#include "itkSymmetricSecondRankTensor.h"
+#include "itkHessianRecursiveGaussianImageFilter.h"
+#include "itkHessian3DToVesselnessMeasureImageFilter.h"
 #include "itkVTKImageExport.h"
 
 #include "vtkConeSource.h"
@@ -29,7 +31,12 @@ class FibrinAnalysisGUI : public wxFrame {
 public:
 
   enum IDs {
-    MENU_EXIT      = 1000,
+    MENU_FILE_IMPORT = 1000,
+    MENU_FILE_OPEN,
+    MENU_FILE_CLOSE,
+    MENU_FILE_SAVE,
+    MENU_FILE_SAVE_AS,
+    MENU_FILE_EXIT
   };
 
   FibrinAnalysisGUI(wxWindow* parent, int id, const wxString& title, 
@@ -39,8 +46,13 @@ public:
 
   virtual bool Destroy();
 
-  void OnCloseWindow(wxCloseEvent& event);
+  void OnImport(wxCommandEvent& event);
+  void OnOpen(wxCommandEvent& event);
+  void OnClose(wxCommandEvent& event);
+  void OnSave(wxCommandEvent& event);
+  void OnSaveAs(wxCommandEvent& event);
   void OnExit(wxCommandEvent& event);
+  void OnCloseWindow(wxCloseEvent& event);
 
 protected:
 
@@ -48,6 +60,9 @@ protected:
   static const unsigned int     Dimension = 3;
   typedef itk::Image<PixelType, Dimension> ImageType;
   typedef itk::ImageSeriesReader<ImageType> SeriesReaderType;
+  typedef itk::SymmetricSecondRankTensor<double, 3> HessianType;
+  typedef itk::HessianRecursiveGaussianImageFilter<ImageType> HessianFilterType;
+  typedef itk::Hessian3DToVesselnessMeasureImageFilter<PixelType> VesselnessFilterType;
   typedef itk::VTKImageExport<ImageType> ExporterType;
 
   ExporterType::Pointer m_exporter;
@@ -55,8 +70,6 @@ protected:
   wxMenuBar* m_menuBar;
   wxStatusBar* m_statusBar;
   wxVTKRenderWindowInteractor* m_rwiView;
-  
-
 
   DECLARE_EVENT_TABLE();
 

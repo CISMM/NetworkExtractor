@@ -1,3 +1,12 @@
+2008-04-19  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAnalysisGUI.h: Added headers for computing Hessian matrices
+   at every pixel. Changed names of enums representing menu items.
+   
+   * FibrinAnalysisGUI.cxx: Added Hessian matrix filter and an experiment
+   with "vesselness" filter that finds tubular structures in the image.
+   Added handlers for new menu items.
+
 2008-04-14  Cory Quammen <cquammen@cs.unc.edu>
 
    * CMakeLists.txt: Added header file to list of source files

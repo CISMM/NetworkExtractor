@@ -12,6 +12,10 @@
 #include "vtkVolumeProperty.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkColorTransferFunction.h"
+#include "vtkImageData.h"
+#include "vtkContourFilter.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkActor.h"
 
 using nano::std2wx;
 
@@ -31,8 +35,13 @@ bool FibrinAnalysisApp::OnInit() {
 
 
 BEGIN_EVENT_TABLE(FibrinAnalysisGUI, wxFrame)
+  EVT_MENU(MENU_FILE_IMPORT,  FibrinAnalysisGUI::OnImport)
+  EVT_MENU(MENU_FILE_OPEN,    FibrinAnalysisGUI::OnOpen)
+  EVT_MENU(MENU_FILE_CLOSE,   FibrinAnalysisGUI::OnClose)
+  EVT_MENU(MENU_FILE_SAVE,    FibrinAnalysisGUI::OnSave)
+  EVT_MENU(MENU_FILE_SAVE_AS, FibrinAnalysisGUI::OnSaveAs)
+  EVT_MENU(MENU_FILE_EXIT,    FibrinAnalysisGUI::OnExit)
   EVT_CLOSE(FibrinAnalysisGUI::OnCloseWindow)
-  EVT_MENU(MENU_EXIT, FibrinAnalysisGUI::OnExit)
 END_EVENT_TABLE();
 
 
@@ -55,20 +64,6 @@ FibrinAnalysisGUI::FibrinAnalysisGUI(wxWindow* parent, int id, const wxString& t
   m_rwiView->SetInteractorStyle(iStyle);
   iStyle->Delete();
 
-  //vtkConeSource* coneSource = vtkConeSource::New();
-  //coneSource->SetResolution(16);
-
-  //vtkPolyDataMapper* mapper = vtkPolyDataMapper::New();
-  //mapper->SetInputConnection(coneSource->GetOutputPort());
-  //coneSource->Delete();
-  //
-  //vtkActor* actor = vtkActor::New();
-  //actor->SetMapper(mapper);
-  //mapper->Delete();
-
-  //m_renderer->AddActor(actor);
-  //actor->Delete();
-
   this->LoadAndDisplayImage();
   
 }
@@ -79,7 +74,15 @@ void FibrinAnalysisGUI::CreateWidgets() {
   SetMenuBar(m_menuBar);
   
   wxMenu* menuFile = new wxMenu();
-  menuFile->Append(MENU_EXIT, wxT("E&xit"), wxT("Quit FibrinAnalysis"), wxITEM_NORMAL);
+  menuFile->Append(MENU_FILE_IMPORT, wxT("Import"), wxT("Import image files"), wxITEM_NORMAL);
+  menuFile->AppendSeparator();
+  menuFile->Append(MENU_FILE_OPEN, wxT("&Open\tCtrl+O"), wxT("Open files"), wxITEM_NORMAL);
+  menuFile->Append(MENU_FILE_CLOSE, wxT("Close"), wxT("Close"), wxITEM_NORMAL);
+  menuFile->AppendSeparator();
+  menuFile->Append(MENU_FILE_SAVE, wxT("&Save\tCtrl+S"), wxT("Save"), wxITEM_NORMAL);
+  menuFile->Append(MENU_FILE_SAVE_AS, wxT("Save as...\tCtrl+Shift+S"), wxT("Save as..."), wxITEM_NORMAL);
+  menuFile->AppendSeparator();
+  menuFile->Append(MENU_FILE_EXIT, wxT("E&xit"), wxT("Quit FibrinAnalysis"), wxITEM_NORMAL);
   m_menuBar->Append(menuFile, wxT("&File"));
   
   m_statusBar = CreateStatusBar(1, 0);
@@ -92,22 +95,28 @@ void FibrinAnalysisGUI::LoadAndDisplayImage() {
   fileNames->SetSeriesFormat("D:\\cquammen\\nano\\wolberg\\thick_stack\\tiff_stack_from_lsm\\utset.080305rc1%04d.tif");
   fileNames->SetStartIndex(1);
   fileNames->SetIncrementIndex(1);
-  fileNames->SetEndIndex(100);
+  fileNames->SetEndIndex(50);
 
   SeriesReaderType::Pointer seriesReader = SeriesReaderType::New();
   seriesReader->SetFileNames(fileNames->GetFileNames());
   seriesReader->Update();
   
+  // Set up Hessian filter in preparation for extracting principal directions of curvature
+  HessianFilterType::Pointer hessianFilter = HessianFilterType::New();
+  hessianFilter->SetInput(seriesReader->GetOutput());
+
+  VesselnessFilterType::Pointer vesselnessFilter = VesselnessFilterType::New();
+  vesselnessFilter->SetInput(hessianFilter->GetOutput());
+  vesselnessFilter->Update();
+
   m_exporter = ExporterType::New();
-  m_exporter->SetInput(seriesReader->GetOutput());
+  m_exporter->SetInput(vesselnessFilter->GetOutput());
   m_exporter->Update();
 
-  ImageType::Pointer image = seriesReader->GetOutput();
-
+  ImageType::Pointer image = vesselnessFilter->GetOutput();
   std::ostringstream msg("");
   ImageType::RegionType region = image->GetLargestPossibleRegion();
   msg << std::string("Dimensions: ") << region.GetSize()[0] << ", " << region.GetSize()[1] << ", " << region.GetSize()[2];
-  m_statusBar->SetStatusText(std2wx(msg.str()));
 
   vtkImageImport* imageImporter = vtkImageImport::New();
   imageImporter->SetUpdateInformationCallback(m_exporter->GetUpdateInformationCallback());
@@ -125,48 +134,56 @@ void FibrinAnalysisGUI::LoadAndDisplayImage() {
 
   vtkVolumeTextureMapper3D *textureMapper = vtkVolumeTextureMapper3D::New();
   textureMapper->SetInputConnection(imageImporter->GetOutputPort());
+  imageImporter->Delete();
+  imageImporter->Update();
 
-  vtkVolume *volume = vtkVolume::New();
-  volume->SetMapper(textureMapper);
-  textureMapper->Delete();
+  double *range = imageImporter->GetOutput()->GetScalarRange();
+  msg << ": " << range[0] << ", " << range[1];
+  m_statusBar->SetStatusText(std2wx(msg.str()));
 
-  vtkPiecewiseFunction *opacityMap = vtkPiecewiseFunction::New();
-  opacityMap->AddSegment(0.0, 0.0, 10.0, 0.0);
-  opacityMap->AddSegment(10.0, 0.0, 25.0, 1.0);
-  opacityMap->AddSegment(25.0, 1.0, 255.0, 1.0);
+  //vtkVolume *volume = vtkVolume::New();
+  //volume->SetMapper(textureMapper);
+  //textureMapper->Delete();
 
-  vtkColorTransferFunction *tfunc = vtkColorTransferFunction::New();
-  tfunc->AddRGBSegment(0.0, 1.0, 1.0, 1.0, 255.0, 1.0, 1.0, 1.0);
+  //vtkPiecewiseFunction *opacityMap = vtkPiecewiseFunction::New();
+  ////opacityMap->AddSegment(0.0, 0.0, 10.0, 0.0);
+  ////opacityMap->AddSegment(10.0, 0.0, 25.0, 1.0);
+  ////opacityMap->AddSegment(25.0, 1.0, 255.0, 1.0);
+  //opacityMap->AddSegment(0.0, 0.0, 5.0, 0.0);
+  //opacityMap->AddSegment(5.0, 0.0, 10.0, 1.0);
+  //opacityMap->AddSegment(10.0, 1.0, 255.0, 1.0);
 
-  vtkVolumeProperty *vProp = vtkVolumeProperty::New();
-  vProp->SetScalarOpacity(opacityMap);
-  opacityMap->Delete();
-  vProp->SetColor(tfunc);
-  tfunc->Delete();
-  vProp->SetInterpolationTypeToLinear();
-  vProp->ShadeOn();
+  //vtkColorTransferFunction *tfunc = vtkColorTransferFunction::New();
+  //tfunc->AddRGBSegment(0.0, 1.0, 1.0, 1.0, 255.0, 1.0, 1.0, 1.0);
 
-  volume->SetProperty(vProp);
-  vProp->Delete();
+  //vtkVolumeProperty *vProp = vtkVolumeProperty::New();
+  //vProp->SetScalarOpacity(opacityMap);
+  //opacityMap->Delete();
+  //vProp->SetColor(tfunc);
+  //tfunc->Delete();
+  //vProp->SetInterpolationTypeToLinear();
+  //vProp->ShadeOn();
 
-  m_renderer->AddVolume(volume);
-  volume->Delete();
+  //volume->SetProperty(vProp);
+  //vProp->Delete();
 
-  //typedef itk::ImageFileReader<ImageType>  ReaderType;
-  //ReaderType::Pointer reader = ReaderType::New();
+  //m_renderer->AddVolume(volume);
+  //volume->Delete();
 
-  //const std::string fileName = "D:\\cquammen\\nano\\wolberg\\thick_stack\\tiff_stack_from_lsm\\utset.080305rc10001.tif";
-  //reader->SetFileName(fileName);
-  //reader->Update();
+  vtkContourFilter *contourer = vtkContourFilter::New();
+  contourer->SetInputConnection(imageImporter->GetOutputPort());
+  contourer->SetNumberOfContours(1);
+  contourer->SetValue(0, 5.0);
+
+  vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
+  mapper->SetInputConnection(contourer->GetOutputPort());
+  mapper->ScalarVisibilityOff();
   
-  //ImageType::Pointer image = reader->GetOutput();
+  vtkActor *actor = vtkActor::New();
+  actor->SetMapper(mapper);
 
-  //std::ostringstream msg("");
-  //ImageType::RegionType region = image->GetLargestPossibleRegion();
-  //msg << std::string("Dimensions: ") << region.GetSize()[0] << ", " << region.GetSize()[1];
-  //
+  m_renderer->AddActor(actor);
 
-  //m_statusBar->SetStatusText(std2wx(msg.str()));
 }
 
 
@@ -208,11 +225,36 @@ bool FibrinAnalysisGUI::Destroy() {
 }
 
 
-void FibrinAnalysisGUI::OnCloseWindow(wxCloseEvent &event) {
+void FibrinAnalysisGUI::OnImport(wxCommandEvent& event) {
+  m_statusBar->SetStatusText(wxT("Imported image files"));
+}
+
+
+void FibrinAnalysisGUI::OnOpen(wxCommandEvent& event) {
+  m_statusBar->SetStatusText(wxT("Opened file"));
+}
+
+
+void FibrinAnalysisGUI::OnClose(wxCommandEvent& event) {
+  m_statusBar->SetStatusText(wxT("Closed file"));
+}
+
+
+void FibrinAnalysisGUI::OnSave(wxCommandEvent& event) {
+  m_statusBar->SetStatusText(wxT("Saved file"));
+}
+
+
+void FibrinAnalysisGUI::OnSaveAs(wxCommandEvent& event) {
+  m_statusBar->SetStatusText(wxT("Saved file as"));
+}
+
+
+void FibrinAnalysisGUI::OnExit(wxCommandEvent& event) {
   this->Destroy();
 }
 
 
-void FibrinAnalysisGUI::OnExit(wxCommandEvent &event) {
+void FibrinAnalysisGUI::OnCloseWindow(wxCloseEvent& event) {
   this->Destroy();
 }
