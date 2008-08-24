@@ -1,4 +1,14 @@
 2008-08-24  Cory Quammen <cquammen@cs.unc.edu>
 
+    * shapePlusCurvedness.m: Junction finding method that looks for pixels
+    with curvedness greater than 4 and shape index 0.1 of -0.5, the shape
+    index of a light-on-dark cylinder. Works terribly.
+
+    * shapePlusK2.m: Junction finding method that looks for pixels with
+    shape index greater than a minimum threshold and shape index quite
+    different from the shape index of a cylinder. Also works terribly.
+
+2008-08-24  Cory Quammen <cquammen@cs.unc.edu>
+
    * Initial check-in of all files used in the FibrinAnalysis MATLAB
    test-bed.
