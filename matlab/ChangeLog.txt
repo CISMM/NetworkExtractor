@@ -1,3 +1,14 @@
+2008-08-25  Cory Quammen <cquammen@cs.unc.edu>
+
+    * findSkeletonJunctions.m: Finds junctions via template matching in a
+    3x3 neighborhood surrounding a pixel on a skeleton.
+    
+    * rightRotate.m: Rotates a matrix 90 degrees to the right. Useful for 
+    rotating template images, for example.
+
+    * skeletonize.m: Script to load in 2D fibrin image, calculate curvatures,
+	 mask according to curvature, skeletonize mask, and identify junctions.
+
 2008-08-24  Cory Quammen <cquammen@cs.unc.edu>
 
     * fibrinGUI.m, .fig: Fixed a bug where principal direction arrows were
