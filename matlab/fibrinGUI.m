@@ -22,7 +22,7 @@ function varargout = fibrinGUI(varargin)
 
 % Edit the above text to modify the response to help fibrinGUI
 
-% Last Modified by GUIDE v2.5 13-May-2008 16:39:30
+% Last Modified by GUIDE v2.5 24-Aug-2008 18:52:00
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -59,6 +59,7 @@ handles.output = hObject;
 handles.showMaskedImage = 0;
 handles.invertMask      = 0;
 handles.showJunctions   = 0;
+handles.showSkeleton    = 0;
 handles.junctionAlgorithm = 'shape + curvedness';
 
 % Update handles structure
@@ -100,6 +101,33 @@ handles.displayImage = handles.image;
 handles.maskMin = min(min(handles.displayImage));
 handles.maskMax = max(max(handles.displayImage));
 guidata(hObject, handles);
+
+
+% --------------------------------------------------------------------
+function saveMaskImage_Callback(hObject, eventdata, handles)
+% hObject    handle to saveMaskImage (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+maskMin = handles.maskMin;
+maskMax = handles.maskMax;
+aboveMinImage = handles.displayImage >= maskMin;
+belowMaxImage = handles.displayImage <= maskMax;
+maskImage = aboveMinImage .* belowMaxImage;
+
+fileSpec = {'*.jpg;*.gif;*.tif;*.png','All Image Files'};
+titleString = 'Save Image File';
+[filename pathname filterindex] = uiputfile(fileSpec, titleString);
+if filename ~= 0
+    filePath = sprintf('%s%s', pathname, filename);
+    imwrite(maskImage, filePath);
+end
+guidata(hObject, handles);
+
+% --------------------------------------------------------------------
+function saveSkeletonImage_Callback(hObject, eventdata, handles)
+% hObject    handle to saveSkeletonImage (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 
 
 % --- Outputs from this function are returned to the command line.
@@ -232,6 +260,15 @@ else
 end
 axes(handles.imageAxes)
 imagescale(displayImage, handles.brightnessFactor);
+
+if handles.showSkeleton ~= 0
+   % Skeletonize the mask and show the results.
+   skeleton = bwmorph(maskImage, 'skel', Inf);
+   hold on;
+   imagescale(skeleton);
+   hold off;
+end
+
 guidata(hObject, handles);
 
 % Update histogram
@@ -391,6 +428,18 @@ handles = refreshImage(hObject, handles);
 guidata(hObject, handles);
 
 
+% --- Executes on button press in skeletonizeMask.
+function skeletonizeMask_Callback(hObject, eventdata, handles)
+% hObject    handle to skeletonizeMask (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of skeletonizeMask
+handles.showSkeleton = get(hObject, 'Value');
+refreshImage(hObject, handles);
+guidata(hObject, handles)
+
+
 % --- Executes on button press in overlayCheckbox.
 function overlayCheckbox_Callback(hObject, eventdata, handles)
 % hObject    handle to overlayCheckbox (see GCBO)
@@ -401,6 +450,7 @@ function overlayCheckbox_Callback(hObject, eventdata, handles)
 if get(hObject, 'Value') == 1
     handles = refreshImage(hObject, handles);
     maskIndices = handles.inverseMaskIndices;
+    axes(handles.imageAxes);
     hold on;
     px = handles.px;
     py = handles.py;
@@ -413,7 +463,6 @@ else
 end
 
 guidata(hObject, handles);
-
 
 
 % --------------------------------------------------------------------
@@ -516,6 +565,3 @@ else
 end
 
 guidata(hObject, handles);
-
-
-

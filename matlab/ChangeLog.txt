@@ -1,5 +1,15 @@
 2008-08-24  Cory Quammen <cquammen@cs.unc.edu>
 
+    * fibrinGUI.m, .fig: Fixed a bug where principal direction arrows were
+    being drawn on the histogram axes instead of the image axes. Added menu
+    option to export image masks created by thresholding an image above and
+    below a minimum and maximum value, respectively.
+
+    * removeSmallIslands.m: Cleans up a binary image by removing connected
+    components consisting of fewer than n pixels.
+
+2008-08-24  Cory Quammen <cquammen@cs.unc.edu>
+
     * shapePlusCurvedness.m: Junction finding method that looks for pixels
     with curvedness greater than 4 and shape index 0.1 of -0.5, the shape
     index of a light-on-dark cylinder. Works terribly.
