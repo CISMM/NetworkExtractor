@@ -36,14 +36,6 @@ for frame=0:frames
     figure(f);
     f = f + 1;
     imagescale(skel);
-
-    % Identify junctions.
-    %junctionFilter = ones(3);
-    %junctionConv = conv2(skel, junctionFilter, 'same');
-
-    % Create a candidate junction point mask.
-    %junctions = zeros(size(junctionConv));
-    %junctions(junctionConv > 3) = 1;
     
     junctions = findSkeletonJunctions(skel);
     
@@ -69,7 +61,7 @@ for frame=0:frames
     hold on;
     plot(jx, jy, 'gs');
 
-    % Save a copy of cleaned skeleton image.
-    skelOrig = skel;
-
+    % Verify junctions.
+    [positions cardinalities] = optimizeJunctions(data, [jx' jy'], 4, false);
+    
 end

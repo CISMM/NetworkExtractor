@@ -1,3 +1,20 @@
+2008-09-03  Cory Quammen <cquammen@cs.unc.edu>
+
+	* lineOrientationResponse.m: New function for calculating the response
+	of a line filter as it rotates about a range of angles.
+	
+	* optimizeJunctions.m: New function that will verify intersections in
+	images of fibrin networks and optimize their positions. Returns the 
+	verified junction positions and the cardinality of the junction.
+	
+	* orientedGaussianLine.m: New function that computes an image of a 
+	Gaussian line tilted by an angle about the axis normal to the image plane. 
+	The anchor point of the line is always centered within the center pixel 
+	of the generated image.
+	
+	* skeletonize.m: Script for computing the skeletonization of 2D fibrin
+	network images.
+
 2008-08-25  Cory Quammen <cquammen@cs.unc.edu>
 
     * findSkeletonJunctions.m: Finds junctions via template matching in a
