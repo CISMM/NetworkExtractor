@@ -1,3 +1,16 @@
+2008-09-14  Cory Quammen <cquammen@cs.unc.edu>
+
+   * branchAngles.m: New file with a function that returns a set of
+   peak responses and the angles that produced those responses to an 
+   oriented line filter.
+   
+   * orientedLineFilterResponse.m: Computes the response of a
+   line filter placed at a given location and orientation in an image.
+   
+   * trace.m: Main function for tracing 2D networks in images.
+   
+   * traceOne.m: Traces one fiber in an image.
+
 2008-09-03  Cory Quammen <cquammen@cs.unc.edu>
 
 	* lineOrientationResponse.m: New function for calculating the response
