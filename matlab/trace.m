@@ -44,36 +44,47 @@ rightBound = size(I) - floor(size(f)/2);
 % Start tracing along the mesh.
 xs = [];
 ys = [];
-xNew = []; % Queue for new branch points to traverse.
-yNew = [];
-thetaNew = [];
-for i=1:length(branchTheta)
-    % Move one step away from the starting point so that we don't get
-    % caught going down the same branch twice.
-    x = startX + stepSize*cos(branchTheta(i));
-    y = startY + stepSize*sin(branchTheta(i));
-    [xs ys xn yn tn] = traceOne(I, x, y, xs, ys, radius, ...
-        branchTheta(i), sigma, stepSize, leftBound, rightBound);
-    xNew = [xNew xn];
-    yNew = [yNew yn];
-    thetaNew = [thetaNew tn];
-end
+xNew = startX*ones(size(branchTheta)); % Queue for new branch points to traverse.
+yNew = startY*ones(size(branchTheta));
+thetaNew = branchTheta;
 
-% Start traversal of identified branches
+% Start traversal of branches
 maxI = length(xNew);
 i = 1;
-while (i < maxI)
-    % Move one step away from the starting point so that we don't get
-    % caught going down the same branch twice.
-    x = startX + stepSize*cos(thetaNew(i));
-    y = startY + stepSize*sin(thetaNew(i));
+while (i <= maxI)
+    % Plot starting point.
+    hold on;
+    plot(xNew(i), yNew(i), 'r.');
+    hold off;
     
-    [xs ys xn yn tn] = traceOne(I, xNew(i), yNew(i), xs, ys, radius, ...
+    x = xNew(i);
+    y = yNew(i);
+    
+    [xt yt tt] = traceOne(I, x, y, xs, ys, radius, ...
         thetaNew(i), sigma, stepSize, leftBound, rightBound);
-    xNew = [xNew xn];
-    yNew = [yNew yn];
-    thetaNew = [thetaNew tn];
+    xs = [xs xt];
+    ys = [ys yt];
+    
+    [bx by bt] = findBranches(I, xt, yt, tt, radius, sigma);
+    bxR = bx + 5*cos(bt);
+    byR = by + 5*sin(bt);
+    plot(bx, by, 'ys');
+    for b=1:length(bxR)
+         plot([bx(b) bxR(b)], [by(b) byR(b)], 'b');
+    end
+     
+    % Plot lines connecting branch points.
+    %if (sum(size(xt)) > 0)
+    %    plot([x bx xt(end)], [y by yt(end)], 'w-');
+    %end
+    
+    xNew = [xNew bx];
+    yNew = [yNew by];
+    thetaNew = [thetaNew bt];
     
     maxI = length(xNew);
     i = i + 1;
+    pause;
 end
+
+%plot(xs, ys, 'r.');

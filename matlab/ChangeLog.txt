@@ -1,3 +1,17 @@
+2008-09-15  Cory Quammen <cquammen@cs.unc.edu>
+
+   * findBranches.m: New function that searches along the sample points
+   identified along a tube and looks for likely branch points.
+   
+   * trace.m: Revamped quite a bit, now pushes candidate tube starting
+   points onto a FIFO queue and traces out tubes from these starting
+   points. Separated out tube tracing from branch identification to make
+   things a little clearer.
+   
+   * traceOne.m: Factored out some repeated code segments. Also, now
+   plots sample points on the trace in bunches of 10 instead of one at
+   a time to speed up trace visualization.
+
 2008-09-14  Cory Quammen <cquammen@cs.unc.edu>
 
    * branchAngles.m: New file with a function that returns a set of
