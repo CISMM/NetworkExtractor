@@ -13,16 +13,16 @@ branchResponse = zeros(1, length(xs));
 % Since we are starting at a branch point and possible ending at a point
 % on the network, we shouldn't identify branches near the start or end of
 % the tube.
-for i=7:length(xs)-6
+for i=1:length(xs)
     
     x = xs(i);
     y = ys(i);
     theta = thetas(i);
     
     [a1 r1] = ...
-        branchAngles(I, x, y, theta-0.9*pi, theta-0.1*pi, radius, sigma);
+        branchAngles(I, x, y, theta-0.75*pi, theta-0.25*pi, 0, radius, sigma);
     [a2 r2] = ...
-        branchAngles(I, x, y, theta+0.1*pi, theta+0.9*pi, radius, sigma);
+        branchAngles(I, x, y, theta+0.25*pi, theta+0.75*pi, 0, radius, sigma);
     angles = [a1 a2];
     responses = [r1 r2];
     

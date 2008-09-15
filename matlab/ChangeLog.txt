@@ -1,5 +1,18 @@
 2008-09-15  Cory Quammen <cquammen@cs.unc.edu>
 
+   * findBranches.m: Removed restriction that branch points can't be 
+   found at the ends of tubes.
+   
+   * generateNetworkTestCases.m: Script that generates a set of network
+   test cases that represent challenges for the current tracing algorithm.
+   
+   * trace.m: Fixed up to pass new parameter expected by branchAngles.
+   
+   * traceOne.m: Fixed bug in code that finds largest response to oriented
+   line probe.
+
+2008-09-15  Cory Quammen <cquammen@cs.unc.edu>
+
    * findBranches.m: New function that searches along the sample points
    identified along a tube and looks for likely branch points.
    

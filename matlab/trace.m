@@ -20,7 +20,7 @@ startX = floor(startX);
 startY = floor(startY);
 
 % Scan around for a starting direction
-branchTheta = branchAngles(I, startX, startY, 0, 2*pi, radius, sigma);
+branchTheta = branchAngles(I, startX, startY, 0, 2*pi, 1, radius, sigma);
 
 % Plot the lines of angles with best response on the image.
 figure(1);
@@ -84,7 +84,7 @@ while (i <= maxI)
     
     maxI = length(xNew);
     i = i + 1;
-    pause;
+    %pause;
 end
 
 %plot(xs, ys, 'r.');

@@ -27,17 +27,17 @@ for step=1:1000
     % Find potential branches at this point, excluding the branch from
     % which we arrived.
     [branchTheta branchResponse weakestResponse] = ...
-        branchAngles(I, x, y, theta-0.25*pi, theta+0.25*pi, radius, sigma);
+        branchAngles(I, x, y, theta-0.25*pi, theta+0.25*pi, 0, radius, sigma);
 
     if (length(branchTheta) < 1)
         break;
     end
 
     % Pick the strongest next direction, making sure we don't go backwards.
-    [branchTheta indices] = sort(branchTheta);
+    [branchResponse indices] = sort(branchResponse);
+    branchTheta(indices) = branchTheta;
     theta = branchTheta(end);
-    branchResponse(indices) = branchResponse;
-
+    
     % Test for stopping criteria heuristics. Use ratio of branch response
     % to weakest response to determine if there is a preferred direction.
     if (branchResponse(end) / weakestResponse < 1.025)
