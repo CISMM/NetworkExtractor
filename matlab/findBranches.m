@@ -19,23 +19,29 @@ for i=1:length(xs)
     y = ys(i);
     theta = thetas(i);
     
-    [a1 r1] = ...
+    [a1 r1 w1] = ...
         branchAngles(I, x, y, theta-0.75*pi, theta-0.25*pi, 0, radius, sigma);
-    [a2 r2] = ...
+    [a2 r2 w2] = ...
         branchAngles(I, x, y, theta+0.25*pi, theta+0.75*pi, 0, radius, sigma);
     angles = [a1 a2];
     responses = [r1 r2];
+    weakestResponse = min(w1, w2);
     
     if (length(angles) == 0)
         continue;
     end
     
-    [angles idx] = sort(angles);
-    responses = responses(idx);
+    % Find maximum response.
+    [maxResponse idx] = max(responses);
+    maxAngle = angles(idx);
+    
+    if (weakestResponse / maxResponse > (1.0 / 1.025))
+        continue;
+    end
     
     % Keep top angle from the search.
-    branchAngle(i)    = angles(end);
-    branchResponse(i) = responses(end);
+    branchResponse(i) = maxResponse;
+    branchAngle(i)    = maxAngle;
 end
 
 % Now search through the branch responses and identify local peaks.

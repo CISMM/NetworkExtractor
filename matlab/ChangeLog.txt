@@ -1,3 +1,24 @@
+2008-09-16  Cory Quammen <cquammen@cs.unc.edu>
+
+   * branchAngles.m: Added parameter to indicate whether branch angle
+   search should be cyclic. Fixed bug where branch at theta=0 isn't
+   identified.
+   
+   * findBranches.m: Made search for strongest branch response more
+   efficient.
+   
+   * G2sp.m: 2D Gaussian filter generator that takes a sub-pixel offset.
+   
+   * generateNetworkTestCases.m: Added a curved line test case.
+   
+   * optimizePosition.m: Corrector method that optimizes the sample
+   position on the tube.
+   
+   * trace.m: Added optimization of initialization point provided by
+   user.
+   
+   * traceOne.m: Added optimization of stepping position during tracing.
+
 2008-09-15  Cory Quammen <cquammen@cs.unc.edu>
 
    * findBranches.m: Removed restriction that branch points can't be 

@@ -23,24 +23,26 @@ for step=1:1000
         withinValidImageRegion(x, y, leftBound, rightBound))
         return;
     end
+    
+    % Optimize position along vector perpendicular to the search direction.
+    [x y] = optimizePosition(I, x, y, theta, stepSize, sigma);
 
-    % Find potential branches at this point, excluding the branch from
-    % which we arrived.
+    % Check that there is more tube to trace.
     [branchTheta branchResponse weakestResponse] = ...
-        branchAngles(I, x, y, theta-0.25*pi, theta+0.25*pi, 0, radius, sigma);
-
+        branchAngles(I, x, y, theta-0.25*pi, theta+0.25*pi, 0, ...
+        radius, sigma);
+    
     if (length(branchTheta) < 1)
         break;
     end
 
     % Pick the strongest next direction, making sure we don't go backwards.
-    [branchResponse indices] = sort(branchResponse);
-    branchTheta(indices) = branchTheta;
-    theta = branchTheta(end);
+    [maxResponse idx] = max(branchResponse);
+    theta = branchTheta(idx);
     
     % Test for stopping criteria heuristics. Use ratio of branch response
     % to weakest response to determine if there is a preferred direction.
-    if (branchResponse(end) / weakestResponse < 1.025)
+    if (maxResponse / weakestResponse < 1.025)
         failTriesLeft = failTriesLeft - 1;
         if (failTriesLeft == 0)
             break;

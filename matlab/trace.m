@@ -22,6 +22,10 @@ startY = floor(startY);
 % Scan around for a starting direction
 branchTheta = branchAngles(I, startX, startY, 0, 2*pi, 1, radius, sigma);
 
+% Optimize starting position.
+[startX startY] = optimizePosition(I, startX, startY, branchTheta(1), ...
+    stepSize, sigma);
+
 % Plot the lines of angles with best response on the image.
 figure(1);
 hold on;
