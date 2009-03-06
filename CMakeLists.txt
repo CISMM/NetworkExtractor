@@ -42,19 +42,19 @@ LINK_DIRECTORIES(${VTK_LIBRARY_DIRS})
 # nanoCommon stuff, including 
 # wxWidgets and extensions
 ###################################
-SET (nanoCommonPath ../nanoCommon)
-INCLUDE (${nanoCommonPath}/cpp/wxvtk/LocalUsewxWidgets.cmake)
-INCLUDE (${CMAKE_ROOT}/Modules/UsewxWidgets.cmake)
-INCLUDE_DIRECTORIES(
-    ${wxWidgets_INCLUDES}
-    ${nanoCommonPath}/cpp/wx
-    ${nanoCommonPath}/cpp/wxvtk
-)
-LINK_DIRECTORIES(${wxWidgets_LIBRARY_DIRS})
+#SET (nanoCommonPath ../nanoCommon)
+#INCLUDE (${nanoCommonPath}/cpp/wxvtk/LocalUsewxWidgets.cmake)
+#INCLUDE (${CMAKE_ROOT}/Modules/UsewxWidgets.cmake)
+#INCLUDE_DIRECTORIES(
+#    ${wxWidgets_INCLUDES}
+#    ${nanoCommonPath}/cpp/wx
+#    ${nanoCommonPath}/cpp/wxvtk
+#)
+#LINK_DIRECTORIES(${wxWidgets_LIBRARY_DIRS})
 
 # We need to include the binary directory here because nanoCommon
 # is outside the build tree.
-ADD_SUBDIRECTORY(${nanoCommonPath}/cpp "${FibrinAnalysis_BINARY_DIR}/nanoCommon")
+#ADD_SUBDIRECTORY(${nanoCommonPath}/cpp "${FibrinAnalysis_BINARY_DIR}/nanoCommon")
 
 #######################################
 # Personal filter library and support classes.
@@ -64,15 +64,16 @@ ADD_SUBDIRECTORY(${nanoCommonPath}/cpp "${FibrinAnalysis_BINARY_DIR}/nanoCommon"
 #######################################
 INCLUDE_DIRECTORIES (
     ${FibrinAnalysis_SOURCE_DIR}/apps)
-ADD_SUBDIRECTORY(apps)
+#ADD_SUBDIRECTORY(apps)
 
 #######################################
 # Windowing components
 #######################################
-INCLUDE_DIRECTORIES (
-    ${FibrinAnalysis_SOURCE_DIR}/wxGui
-)
-ADD_SUBDIRECTORY(wxGui)
+#INCLUDE_DIRECTORIES (
+#    ${FibrinAnalysis_SOURCE_DIR}/wxGui
+#)
+#ADD_SUBDIRECTORY(wxGui)
+ADD_SUBDIRECTORY(qtGui)
 
 #######################################
 # Testing components
