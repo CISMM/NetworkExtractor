@@ -1,0 +1,7 @@
+2009-03-08  Cory Quammen <cquammen@cs.unc.edu>
+
+   * Added io and filters subdirectories that contain source code
+   for corresponding libraries.
+   
+   * Types.h: Added a header defining common types used in the
+   library.
