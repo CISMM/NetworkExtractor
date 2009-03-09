@@ -59,11 +59,13 @@ LINK_DIRECTORIES(${VTK_LIBRARY_DIRS})
 #######################################
 # Personal filter library and support classes.
 #
-# GenericApplication is split up into several logical groups.
+# FibrinAnalysis is split up into several logical groups.
 # apps      - a place for various applications related to the main application
 #######################################
 INCLUDE_DIRECTORIES (
-    ${FibrinAnalysis_SOURCE_DIR}/apps)
+    ${FibrinAnalysis_SOURCE_DIR}/lib
+    ${FibrinAnalysis_SOURCE_DIR}/lib/filters
+    ${FibrinAnalysis_SOURCE_DIR}/lib/io)
 #ADD_SUBDIRECTORY(apps)
 
 #######################################
@@ -74,6 +76,7 @@ INCLUDE_DIRECTORIES (
 #)
 #ADD_SUBDIRECTORY(wxGui)
 ADD_SUBDIRECTORY(qtGui)
+ADD_SUBDIRECTORY(lib)
 
 #######################################
 # Testing components

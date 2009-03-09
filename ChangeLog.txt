@@ -1,3 +1,8 @@
+2009-03-08  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Added 'lib' project subdirectory. Added include
+   directories for lib/io and lib/filters.
+
 2009-03-06  Cory Quammen <cquammen@cs.unc.edu>
 
    * CMakeLists.txt: Commented out wxWidgets stuff. Replaced with
