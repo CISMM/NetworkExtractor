@@ -59,6 +59,8 @@ TARGET_LINK_LIBRARIES( FibrinAnalysisQt
   ITKCommon
   ITKBasicFilters
   ITKIO
+  faFilter
+  faIO
 )
 
 

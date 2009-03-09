@@ -1,3 +1,13 @@
+2009-03-08  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Added faIO and faFilters library dependencies.
+   
+   * FibrinAppQt.h, .cxx: Added support for loading VTK image files
+   and creating isosurfaces from them.
+   
+   * FibrinAppQt.ui: Added widgets for displaying image information
+   and for changing the isovalue.
+
 2009-03-06  Cory Quammen <cquammen@cs.unc.edu>
 
    * Initial checking of source files with a simple GUI

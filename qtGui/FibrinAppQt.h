@@ -1,14 +1,14 @@
 #ifndef _FIBRIN_APP_QT_H_
 #define _FIBRIN_APP_QT_H_
 
-#include "qmainwindow.h"
 #include "ui_FibrinAppQT.h"
+#include "Types.h"
+
+#include "qmainwindow.h"
 
 // Forward class declarations
-class vtkCylinderSource;
+class vtkContourFilter;
 class vtkPolyDataMapper;
-class vtkExodusReader;
-class vtkDataSetMapper;
 class vtkActor;
 class vtkRenderer;
 
@@ -19,24 +19,32 @@ class FibrinAppQt : public QMainWindow, private Ui_MainWindow
 
 public:
 
-    // Constructor/Destructor
-    FibrinAppQt(QWidget* parent = 0);
-    ~FibrinAppQt() {};
+  // Constructor/Destructor
+  FibrinAppQt(QWidget* parent = 0);
+  ~FibrinAppQt() {};
 
 public slots:
 
-     virtual void fileOpen();
-     virtual void fileExit();
+  virtual void fileOpenImage();
+  virtual void fileOpenView();
+  virtual void fileSaveView();
+  virtual void fileExit();
+
+  virtual void applyButtonHandler();
 
 protected:
 
 protected slots:
 
 private:
-     vtkCylinderSource* source;
-     vtkPolyDataMapper* mapper;
-     vtkActor* actor;
-     vtkRenderer* ren;
+
+  UShort3DImageType::Pointer imageData;
+  UShort3DExporterType::Pointer exporter;
+
+  vtkContourFilter* contourer;
+  vtkPolyDataMapper* mapper;
+  vtkActor* actor;
+  vtkRenderer* ren;
    
 };
 
