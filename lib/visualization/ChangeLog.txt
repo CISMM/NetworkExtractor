@@ -1,0 +1,10 @@
+2009-03-11  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Initial check-in.
+   
+   * IsosurfaceVisualizationPipeline.h,.cxx: Pipeline for rendering
+   isosurfaces from image data.
+   
+   * VisualizationPipeline.h,.cxx: Base class for visualizatiion
+   pipelines.
+   
