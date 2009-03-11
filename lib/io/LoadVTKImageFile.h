@@ -5,20 +5,26 @@
 
 #include <itkVTKImageIO.h>
 #include <itkImageFileReader.h>
+#include <itkDefaultConvertPixelTraits.h>
 
-#include "Types.h"
-
+template <class TOutputImage,
+          class ConvertPixelTraits=itk::DefaultConvertPixelTraits< 
+                   ITK_TYPENAME TOutputImage::IOPixelType > >
 class LoadVTKImageFile {
+
+  typedef itk::ImageFileReader<typename TOutputImage> ImageReaderType;
 
 public:
   LoadVTKImageFile();
   virtual ~LoadVTKImageFile();
 
-  UShort3DImageType::Pointer LoadFile(std::string& fileName);
+  typename TOutputImage::Pointer LoadFile(std::string& fileName);
 
 protected:
-  UShort3DImageReaderType::Pointer imageReader;
+  typename ImageReaderType::Pointer imageReader;
 
 };
+
+#include "LoadVTKImageFile.cxx"
 
 #endif // _LOAD_VTK_IMAGE_FILE_H_
