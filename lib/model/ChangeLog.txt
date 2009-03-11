@@ -1,0 +1,7 @@
+2009-03-11  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Initial check-in.
+   
+   * DataModel.h,.cxx: New class that encapsulates all data
+   and data-related processing. Model in the 
+   model-view-controller paradigm.
