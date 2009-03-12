@@ -1,5 +1,13 @@
 2009-03-11  Cory Quammen <cquammen@cs.unc.edu>
 
+   * DataModel.h: Removed dirty bit stuff because it doesn't
+   really make sense to have it. Added filter for performing
+   thinning on image intensity thresholds. Made sure
+   GetSpacing and GetDimensions don't crash if image data
+   hasn't been set.
+
+2009-03-11  Cory Quammen <cquammen@cs.unc.edu>
+
    * CMakeLists.txt: Initial check-in.
    
    * DataModel.h,.cxx: New class that encapsulates all data

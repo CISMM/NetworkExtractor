@@ -10,6 +10,7 @@ class vtkAlgorithmOutput;
 
 #include "LoadVTKImageFile.h"
 #include "ITKImageToVTKImage.h"
+#include "IntensityThresholdThinningFilter.h"
 
 // This is the data model for the Fibrin Analysis library.
 template <class TImage>
@@ -20,15 +21,12 @@ class DataModel {
     VESSELNESS_THRESHOLD
   } ThresholdMethod;
 
+  typedef IntensityThresholdThinningFilter<TImage, TImage> IntensityThinningFilterType;
   typedef itk::MinimumMaximumImageCalculator<typename TImage> MinMaxType;
 
 public:
   DataModel();
   virtual ~DataModel();
-
-  void SetDirty();
-  void SetClean();
-  bool IsDirty();
 
   void LoadImageFile(std::string fileName);
 
@@ -54,7 +52,11 @@ protected:
 
   ThresholdMethod thresholdMethod;
 
+  typename IntensityThinningFilterType* intensityThinningFilter;
+
   typename MinMaxType::Pointer minMaxFilter;
+
+
 
   ITKImageToVTKImage<TImage>* itkToVtkFilter;
 

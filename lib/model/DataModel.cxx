@@ -7,41 +7,19 @@
 template <class TImage>
 DataModel<TImage>
 ::DataModel() {
-  dirtyBit = true;
-  imageData = NULL;
+  this->imageData = NULL;
 
-  minMaxFilter = MinMaxType::New();
-  itkToVtkFilter = new ITKImageToVTKImage<TImage>();
+  this->intensityThinningFilter = new IntensityThinningFilterType();
+  this->minMaxFilter = MinMaxType::New();
+  this->itkToVtkFilter = new ITKImageToVTKImage<TImage>();
 }
 
 
 template <class TImage>
 DataModel<TImage>
 ::~DataModel() {
-}
-
-
-template <class TImage>
-void
-DataModel<TImage>
-::SetDirty() {
-  this->dirtyBit = true;
-}
-
-
-template <class TImage>
-void
-DataModel<TImage>
-::SetClean() {
-  this->dirtyBit = false;
-}
-
-
-template <class TImage>
-bool
-DataModel<TImage>
-::IsDirty() {
-  return this->dirtyBit;
+  delete this->intensityThinningFilter;
+  delete this->itkToVtkFilter;
 }
 
 
@@ -57,8 +35,6 @@ DataModel<TImage>
   // Connect this image data to the various pipelines.
   this->minMaxFilter->SetImage(this->imageData);
   this->minMaxFilter->Compute();
-
-  this->SetDirty();
 }
 
 
@@ -107,6 +83,13 @@ template <class TImage>
 void
 DataModel<TImage>
 ::GetDimensions(int dimensions[3]) {
+  if (!this->GetImageData()) {
+    dimensions[0] = 0;
+    dimensions[1] = 0;
+    dimensions[2] = 0;
+    return;
+  }
+
   UShort3DImageType::RegionType region 
       = this->GetImageData()->GetLargestPossibleRegion();
   itk::Size<3> size = region.GetSize();
@@ -121,6 +104,13 @@ template <class TImage>
 void
 DataModel<TImage>
 ::GetSpacing(double spacing[3]) {
+  if (!this->GetImageData()) {
+    spacing[0] = 0;
+    spacing[1] = 0;
+    spacing[2] = 0;
+    return;
+  }
+
   itk::Vector<double> thisSpacing = this->GetImageData()->GetSpacing();
   spacing[0] = thisSpacing[0];
   spacing[1] = thisSpacing[1];
