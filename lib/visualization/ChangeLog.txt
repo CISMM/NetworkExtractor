@@ -1,5 +1,15 @@
 2009-03-11  Cory Quammen <cquammen@cs.unc.edu>
 
+   * CMakeLists.txt: Added source files.
+   
+   * OutlineVisualizationPipeline.h,.cxx: New pipeline generating
+   an outline around a dataset.
+   
+   * VisualizationPipeline.h,.cxx: Added member variable pointing
+   to the input data. Added method GetInputConnection.
+
+2009-03-11  Cory Quammen <cquammen@cs.unc.edu>
+
    * CMakeLists.txt: Initial check-in.
    
    * IsosurfaceVisualizationPipeline.h,.cxx: Pipeline for rendering

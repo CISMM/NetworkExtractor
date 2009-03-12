@@ -1,9 +1,11 @@
 #ifndef _VISUALIZATION_PIPELINE_H_
 #define _VISUALIZATION_PIPELINE_H_
 
-class vtkAlgorithm;
-class vtkAlgorithmOutput;
-class vtkRenderer;
+#include <vtkAlgorithm.h>
+#include <vtkOutlineFilter.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkActor.h>
+
 
 class VisualizationPipeline {
 
@@ -12,12 +14,14 @@ public:
   virtual ~VisualizationPipeline();
 
   void SetInputConnection(vtkAlgorithmOutput* input);
+  vtkAlgorithmOutput* GetInputConnection();
 
   virtual void AddToRenderer(vtkRenderer* renderer) = 0;
   
 protected:
-  vtkAlgorithm* inputAlgorithm;
+  vtkAlgorithmOutput* input;
 
+  vtkAlgorithm* inputAlgorithm;
   void SetInputAlgorithm(vtkAlgorithm* algorithm);
   
 };
