@@ -1,3 +1,20 @@
+2009-03-11  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Added source for Visualization class. Added
+   faVisualization library dependency.
+   
+   * FibrinAppQt.h,.cxx: Added handlers for new GUI widgets. Moved
+   the visualization-specific stuff from here to the Visualization
+   class. Lots of changes to handle updated GUI elements. Improved
+   separation of initialization, event handling, and updating of
+   the GUI.
+   
+   * FibrinAppQt.ui: Replaced separate text entry fields displaying
+   info about the image with a single table of properties.
+   
+   * Visualization.h,.cxx: New class for handling all VTK-related
+   visualization stuff.
+
 2009-03-08  Cory Quammen <cquammen@cs.unc.edu>
 
    * CMakeLists.txt: Added faIO and faFilters library dependencies.

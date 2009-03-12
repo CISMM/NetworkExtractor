@@ -15,6 +15,7 @@ ENDIF(QT_USE_FILE)
 SET (QtGuiSrcs
   Main.cxx
   FibrinAppQt.cxx
+  Visualization.cxx
 )
 
 # Use the include path and library for Qt that is used by VTK.
@@ -61,6 +62,7 @@ TARGET_LINK_LIBRARIES( FibrinAnalysisQt
   ITKIO
   faFilter
   faIO
+  faVisualization
 )
 
 
