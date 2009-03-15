@@ -1,5 +1,4 @@
 SET(ioSrc
-  LoadVTKImageFile.cxx
   ITKImageToVTKImage.cxx
 )
 
