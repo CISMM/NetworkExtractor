@@ -7,18 +7,24 @@
 template <class TImage>
 DataModel<TImage>
 ::DataModel() {
+  this->fiberDiameter = 1.0f;
   this->imageData = NULL;
 
-  this->intensityThinningFilter = new IntensityThinningFilterType();
   this->minMaxFilter = MinMaxType::New();
+  
+  // Vesselness filters.
+  this->hessianFilter = HessianFilterType::New();
+  this->vesselnessFilter = VesselnessFilterType::New();
+  
   this->itkToVtkFilter = new ITKImageToVTKImage<TImage>();
+
+  this->progressCallback = NULL;
 }
 
 
 template <class TImage>
 DataModel<TImage>
 ::~DataModel() {
-  delete this->intensityThinningFilter;
   delete this->itkToVtkFilter;
 }
 
@@ -27,14 +33,47 @@ template <class TImage>
 void
 DataModel<TImage>
 ::LoadImageFile(std::string fileName) {
-  LoadVTKImageFile<TImage> *loader = new LoadVTKImageFile<TImage>();
-  this->imageData = loader->LoadFile(fileName);
-  this->SetImageData(this->imageData);
-  delete loader;
+  FileReaderType::Pointer reader = FileReaderType::New();
+  reader->SetFileName(fileName.c_str());
+  reader->Update();
+  this->SetImageData(reader->GetOutput());
 
   // Connect this image data to the various pipelines.
   this->minMaxFilter->SetImage(this->imageData);
   this->minMaxFilter->Compute();
+}
+
+
+template <class TImage>
+void
+DataModel<TImage>
+::SaveImageFile(std::string fileName) {
+  FileWriterType::Pointer writer = FileWriterType::New();
+  writer->SetInput(this->vesselnessFilter->GetOutput());
+  writer->SetFileName(fileName.c_str());
+  writer->Update();
+  writer->Write(); 
+}
+
+
+template <class TImage>
+void
+DataModel<TImage>
+::SetFiberDiameter(double diameter) {
+  if (diameter != this->fiberDiameter) {
+    this->fiberDiameter = diameter;
+
+    // Set sigma on the Hessian filter.
+    this->hessianFilter->SetSigma(0.5*diameter);
+  }
+}
+
+
+template <class TImage>
+double
+DataModel<TImage>
+::GetFiberDiameter() {
+  return this->fiberDiameter;
 }
 
 
@@ -66,7 +105,7 @@ DataModel<TImage>
 template <class TImage>
 double
 DataModel<TImage>
-::GetMinimumImageIntensity() {
+::GetFilteredDataMinimum() {
   return minMaxFilter->GetMinimum();
 }
 
@@ -74,7 +113,7 @@ DataModel<TImage>
 template <class TImage>
 double
 DataModel<TImage>
-::GetMaximumImageIntensity() {
+::GetFilteredDataMaximum() {
   return minMaxFilter->GetMaximum();
 }
 
@@ -121,18 +160,57 @@ DataModel<TImage>
 template <class TImage>
 void
 DataModel<TImage>
-::SetThresholdMethodToIntensity() {
-  this->thresholdMethod = INTENSITY_THRESHOLD;
-  this->SetDirty();
+::SetFilterToNone() {
+
+  if (this->imageData) {
+    this->minMaxFilter->SetImage(this->imageData);
+    this->minMaxFilter->Compute();
+    
+    this->itkToVtkFilter->SetInput(this->imageData);
+  }
 }
 
 
 template <class TImage>
 void
 DataModel<TImage>
-::SetThresholdMethodToVesselness() {
-  this->thresholdMethod = VESSELNESS_THRESHOLD;
-  this->SetDirty();
+::SetFilterToVesselness() {
+
+  if (this->imageData) {
+    itk::MemberCommand<DataModel<TImage>>::Pointer progressCommand 
+      = itk::MemberCommand<DataModel<TImage>>::New();
+    progressCommand->SetCallbackFunction(this, &DataModel<TImage>::UpdateProgress);
+    this->hessianFilter->AddObserver(itk::ProgressEvent(), progressCommand);
+    this->hessianFilter->SetInput(this->imageData);
+
+    this->vesselnessFilter->AddObserver(itk::ProgressEvent(), progressCommand);
+    this->vesselnessFilter->SetInput(hessianFilter->GetOutput());
+    this->vesselnessFilter->Update();
+    this->minMaxFilter->SetImage(this->vesselnessFilter->GetOutput());
+    this->minMaxFilter->Compute();
+
+    this->itkToVtkFilter->SetInput(this->vesselnessFilter->GetOutput());
+  }
+}
+
+
+template <class TImage>
+void
+DataModel<TImage>
+::SetProgressCallback(ProgressCallback callback) {
+  this->progressCallback = callback;
+}
+
+
+template <class TImage>
+void
+DataModel<TImage>
+::UpdateProgress(itk::Object* object, const itk::EventObject& event) {
+  itk::ProcessObject* processObject = dynamic_cast<itk::ProcessObject*>(object);
+  if (this->progressCallback) {
+    this->progressCallback(processObject->GetProgress());
+    std::cout << processObject->GetNameOfClass() << std::endl;
+  }
 }
 
 

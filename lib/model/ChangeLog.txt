@@ -1,3 +1,15 @@
+2009-03-15  Cory Quammen <cquammen@cs.unc.edu>
+
+   * DataModel.h,.cxx: Added vesselness filter. This includes
+   the ability to set a fiber diameter parameter (scale
+   of the image derivative operators). Added a method to
+   invoke when progress in an ITK filter is made. This in
+   turn can call a callback set from the client application,
+   allowing a progress bar to be updated in the UI. Switched
+   to using ITK ImageFileReader instead of my own wrapper that
+   wasn't really needed. Added method to save a filtered image
+   (e.g., the results of the vesselness filter).
+
 2009-03-11  Cory Quammen <cquammen@cs.unc.edu>
 
    * DataModel.h: Removed dirty bit stuff because it doesn't
