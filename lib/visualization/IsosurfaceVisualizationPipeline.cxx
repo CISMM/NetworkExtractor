@@ -23,6 +23,7 @@ IsosurfaceVisualizationPipeline
   this->isoMapper = vtkPolyDataMapper::New();
   this->isoMapper->SetInputConnection(this->inputAlgorithm->GetOutputPort());
   this->isoMapper->ScalarVisibilityOff();
+  this->isoMapper->ImmediateModeRenderingOn();
 
   this->isoActor = vtkActor::New();
   this->isoActor->SetMapper(this->isoMapper);
@@ -54,4 +55,25 @@ double
 IsosurfaceVisualizationPipeline
 ::GetIsoValue() {
   return this->isoValue;
+}
+
+
+vtkAlgorithmOutput*
+IsosurfaceVisualizationPipeline
+::GetIsosurfaceOutputPort() {
+  return this->isoContourer->GetOutputPort();
+}
+
+
+void
+IsosurfaceVisualizationPipeline
+::FastRenderingOn() {
+  this->isoMapper->ImmediateModeRenderingOff();
+}
+
+
+void
+IsosurfaceVisualizationPipeline
+::FastRenderingOff() {
+  this->isoMapper->ImmediateModeRenderingOn();
 }

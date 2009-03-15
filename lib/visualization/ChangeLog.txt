@@ -1,3 +1,9 @@
+2009-03-15  Cory Quammen <cquammen@cs.unc.edu>
+
+   * IsosurfaceVisualizationPipeline.h,.cxx: Added method to
+   fetch vtkPolyData from the isosurface. Added FastRenderingOn/Off
+   methods to deal with very large isosurfaces.
+
 2009-03-11  Cory Quammen <cquammen@cs.unc.edu>
 
    * CMakeLists.txt: Added source files.

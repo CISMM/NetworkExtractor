@@ -20,6 +20,11 @@ public:
   void SetIsoValue(double isoValue);
   double GetIsoValue();
 
+  vtkAlgorithmOutput* GetIsosurfaceOutputPort();
+
+  void FastRenderingOn();
+  void FastRenderingOff();
+
 protected:
   double isoValue;
 
