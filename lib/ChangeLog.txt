@@ -1,3 +1,7 @@
+2009-03-15  Cory Quammen <cquammen@cs.unc.edu>
+
+   * Types.h: Added 3D float image type.
+
 2009-03-11  Cory Quammen <cquammen@cs.unc.edu>
 
    * CMakeLists.txt: Added model and visualization subdirectories.
