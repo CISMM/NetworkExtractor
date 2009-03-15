@@ -1,3 +1,17 @@
+2009-03-15  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAppQt.h,.cxx,.ui: Added menu command handlers for saving
+   filtered image data, saving a snapshot of the render window,
+   saving an animation of the current scene rotating 360 degrees, 
+   saving the isosurface geometry in .vtk format, and resetting the
+   default view. Added a progress callback to update the progress 
+   bar in the GUI. Added support for loading LSM images (ITK
+   supports this!). Added handling of checkbox that tells whether
+   fast rendering should be used (display lists).
+   
+   * Visualization.h,.cxx: Added methods for retrieving the isosurface
+   poly data and setting fast/slow rendering. 
+
 2009-03-11  Cory Quammen <cquammen@cs.unc.edu>
 
    * CMakeLists.txt: Added source for Visualization class. Added

@@ -72,3 +72,34 @@ Visualization
 ::GetIsoValue() {
   return this->isoVisualization->GetIsoValue();
 }
+
+
+vtkAlgorithmOutput*
+Visualization
+::GetIsosurfaceOutputPort() {
+  return this->isoVisualization->GetIsosurfaceOutputPort();
+}
+
+
+void
+Visualization
+::SetFastIsosurfaceRendering(bool toggle) {
+  if (toggle)
+    FastIsosurfaceRenderingOn();
+  else
+    FastIsosurfaceRenderingOff();
+}
+
+
+void
+Visualization
+::FastIsosurfaceRenderingOn() {
+  this->isoVisualization->FastRenderingOn();
+}
+
+
+void
+Visualization
+::FastIsosurfaceRenderingOff() {
+  this->isoVisualization->FastRenderingOff();
+}

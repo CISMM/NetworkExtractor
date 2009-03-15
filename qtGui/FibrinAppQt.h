@@ -19,16 +19,28 @@ class FibrinAppQt : public QMainWindow, private Ui_MainWindow
 
 public:
 
+  static const std::string NO_FILTER_STRING;
+  static const std::string VESSELNESS_FILTER_STRING;
+
   // Constructor/Destructor
   FibrinAppQt(QWidget* parent = 0);
   virtual ~FibrinAppQt();
 
+  void UpdateProgress(float progress) const;
+
 public slots:
 
   virtual void fileOpenImage();
-  virtual void fileOpenView();
-  virtual void fileSaveView();
+  virtual void fileSaveFilteredImage();
+  virtual void fileSavePicture();
+  virtual void fileSaveRotationAnimation();
+  virtual void fileSaveGeometry();
+
   virtual void fileExit();
+
+  virtual void viewResetView();
+  virtual void viewOpenView();
+  virtual void viewSaveView();
 
   virtual void isoValueEditHandler(QString text);
   virtual void isoValueSliderHandler(int value);
@@ -38,7 +50,7 @@ public slots:
   virtual void applyButtonHandler();
 
 protected:
-  DataModel<UShort3DImageType>* dataModel;
+  DataModel<Float3DImageType>* dataModel;
   Visualization* visualization;
 
   void refreshUI();

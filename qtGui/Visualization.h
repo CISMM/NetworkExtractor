@@ -23,6 +23,12 @@ public:
   void SetIsoValue(double isoValue);
   double GetIsoValue();
 
+  vtkAlgorithmOutput* GetIsosurfaceOutputPort();
+
+  void SetFastIsosurfaceRendering(bool toggle);
+  void FastIsosurfaceRenderingOn();
+  void FastIsosurfaceRenderingOff();
+
 protected:
   bool showOutline;
 
