@@ -1,3 +1,25 @@
+2009-03-17  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Added source files.
+
+   * itk/: Added itk subdirectory for ITK subclasses.
+
+   * itkEigenValues3DToVesselnessMeasureImage.h, .cxx: New class to compute a 
+   vesselness measure from an image of eigen values. The eigen value image is 
+   assumed to come from itkHessian3DEigenAnalysisImageFilter. Replicates
+   functionality in itkHessian3DToVesselnessMeasureImageFilter, but requires
+   the eigen value image as input. This seems redundant, but I need a class
+   that computes the eigen vectors for the junctionness computation
+   (forthcoming), and no existing class does this. Instead of computing the 
+   eigen values inside the existing itkHessian3DToVesselnessMeasureImageFilter 
+   class and then computing the eigen vectors again for the junctionness measure,
+   I want to calculate the eigen values and vectors just once and then feed them
+   into subsequent filters that compute vesselness and junctionness.
+   
+   * itkHessian3DEigenAnalysisImageFilter.h, .cxx: Computes eigen values
+   (curvatures) and eigen vectors (principal directions of curvature) from an
+   input Hessian image.
+
 2009-03-08  Cory Quammen <cquammen@cs.unc.edu>
 
    * Initial check-in of source files.
