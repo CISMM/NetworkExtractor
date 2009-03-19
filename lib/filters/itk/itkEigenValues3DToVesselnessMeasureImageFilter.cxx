@@ -3,8 +3,8 @@
   Program:   Insight Segmentation & Registration Toolkit
   Module:    $RCSfile: itkEigenValues3DToVesselnessMeasureImageFilter.cxx,v $
   Language:  C++
-  Date:      $Date: 2009/03/17 17:07:42 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009/03/19 15:44:09 $
+  Version:   $Revision: 1.2 $
 
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
@@ -36,7 +36,7 @@ EigenValues3DToVesselnessMeasureImageFilter< TEigenValueImage, TOutputImage >
 template < class TEigenValueImage, class TOutputImage >
 void
 EigenValues3DToVesselnessMeasureImageFilter< TEigenValueImage, TOutputImage >
-::GenerateData()
+::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, int threadId)
 {
   itkDebugMacro(<< "EigenValues3DToVesselnessMeasureImageFilter generating data");
 
@@ -46,18 +46,11 @@ EigenValues3DToVesselnessMeasureImageFilter< TEigenValueImage, TOutputImage >
 
   OutputImagePointer outputPtr = this->GetOutput();
 
-  outputPtr->SetBufferedRegion( inputPtr->GetBufferedRegion() );
-
-  outputPtr->Allocate();
-
-  EigenValueImageRegionType region = outputPtr->GetRequestedRegion();
-
-  ImageRegionConstIteratorWithIndex<EigenValueImageType> inputIt( inputPtr, region );
-  
-  ImageRegionIteratorWithIndex<OutputImageType> outputIt( outputPtr, region );
+  ImageRegionConstIteratorWithIndex<EigenValueImageType> inputIt( inputPtr, outputRegionForThread );
+  ImageRegionIteratorWithIndex<OutputImageType> outputIt( outputPtr, outputRegionForThread );
 
   // Support progress methods/callbacks
-  ProgressReporter progress(this, 0, region.GetNumberOfPixels());
+  ProgressReporter progress(this, threadId, outputRegionForThread.GetNumberOfPixels());
 
   inputIt.GoToBegin();
   outputIt.GoToBegin();

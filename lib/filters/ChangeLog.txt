@@ -1,3 +1,19 @@
+2009-03-19  Cory Quammen <cquammen@cs.unc.edu>
+
+   * itk/itkEigenValues3DToVesselnessMeasureImageFilter.h,.cxx: 
+   Made the class multithreaded. Turns out to be easy to do in ITK.
+   Removed image allocation in the data generation method. The superclass
+   takes care of this.
+   
+   * itk/itkHessian3DEigenAnalysisImageFilter.h,.cxx: Made this class
+   multithreaded. Overrode superclass method AllocateOutputs so that the 
+   right allocation takes place. The superclass implementation allocates
+   memory for just the one declared output type. When you have outputs
+   of different types, say a 3-tuple and a 9-tuple per pixel, you'll probably
+   declare one of these as *the* output type. Thus for the 9-tuple output,
+   the superclass AllocateOutputs allocates 3-tuples instead and Bad Things
+   Happen.
+
 2009-03-17  Cory Quammen <cquammen@cs.unc.edu>
 
    * CMakeLists.txt: Added source files.

@@ -3,8 +3,8 @@
   Program:   Insight Segmentation & Registration Toolkit
   Module:    $RCSfile: itkEigenValues3DToVesselnessMeasureImageFilter.h,v $
   Language:  C++
-  Date:      $Date: 2009/03/17 17:07:42 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009/03/19 15:44:09 $
+  Version:   $Revision: 1.2 $
 
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
@@ -68,7 +68,7 @@ protected:
   EigenValues3DToVesselnessMeasureImageFilter();
   virtual ~EigenValues3DToVesselnessMeasureImageFilter() {};
 
-  void GenerateData( void );
+  void ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, int threadId);
 
 private:
   EigenValues3DToVesselnessMeasureImageFilter(const Self&); // purposely not implemented

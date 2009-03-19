@@ -3,8 +3,8 @@
   Program:   Insight Segmentation & Registration Toolkit
   Module:    $RCSfile: itkHessian3DEigenAnalysisImageFilter.h,v $
   Language:  C++
-  Date:      $Date: 2009/03/17 17:07:42 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009/03/19 15:44:09 $
+  Version:   $Revision: 1.2 $
 
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
@@ -78,7 +78,9 @@ protected:
   Hessian3DEigenAnalysisImageFilter();
   virtual ~Hessian3DEigenAnalysisImageFilter() {};
 
-  void GenerateData( void );
+  virtual void AllocateOutputs();
+
+  void ThreadedGenerateData(const EigenValueImageRegionType& outputRegionForThread, int threadId);
 
 private:
   Hessian3DEigenAnalysisImageFilter(const Self&); // purposely not implemented
