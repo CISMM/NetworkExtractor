@@ -3,6 +3,9 @@
 
 #include "DataModel.h"
 
+#include <itkMetaDataObject.h>
+#include <itkMultiThreader.h>
+
 
 template <class TImage>
 DataModel<TImage>
@@ -11,14 +14,49 @@ DataModel<TImage>
   this->imageData = NULL;
 
   this->minMaxFilter = MinMaxType::New();
-  
+
   // Vesselness filters.
   this->hessianFilter = HessianFilterType::New();
+  //this->hessianFilter->ReleaseDataFlagOn();
+
+  this->eigenAnalysisFilter = HessianEigenAnalysisFilterType::New();
+  //this->eigenAnalysisFilter->ReleaseDataFlagOn();
+  this->eigenAnalysisFilter->SetInput(this->hessianFilter->GetOutput());
+  
   this->vesselnessFilter = VesselnessFilterType::New();
+  this->vesselnessFilter->SetInput(this->eigenAnalysisFilter->GetEigenValues());
   
   this->itkToVtkFilter = new ITKImageToVTKImage<TImage>();
-
   this->progressCallback = NULL;
+
+    // Hook up progress reporter for the filters.
+  itk::MemberCommand<DataModel<TImage>>::Pointer hessianFilterProgressCommand 
+    = itk::MemberCommand<DataModel<TImage>>::New();
+
+  itk::MemberCommand<DataModel<TImage>>::Pointer eigenAnalysisFilterProgressCommand 
+    = itk::MemberCommand<DataModel<TImage>>::New();
+
+  itk::MemberCommand<DataModel<TImage>>::Pointer vesselnessFilterProgressCommand 
+    = itk::MemberCommand<DataModel<TImage>>::New();
+
+  // Set the callback function for each of the progress reporters.
+  hessianFilterProgressCommand->SetCallbackFunction(this, &DataModel<TImage>::UpdateProgress);
+  eigenAnalysisFilterProgressCommand->SetCallbackFunction(this, &DataModel<TImage>::UpdateProgress);
+  vesselnessFilterProgressCommand->SetCallbackFunction(this, &DataModel<TImage>::UpdateProgress);
+  
+  // Attach a MetaDataObject with the name of the filter to each rilter.
+  itk::EncapsulateMetaData<std::string >(hessianFilter->GetMetaDataDictionary(),
+    "filterName", std::string("Hessian Filter"));
+  itk::EncapsulateMetaData<std::string >(eigenAnalysisFilter->GetMetaDataDictionary(),
+    "filterName", std::string("Eigen Analysis Filter"));
+  itk::EncapsulateMetaData<std::string >(vesselnessFilter->GetMetaDataDictionary(),
+    "filterName", std::string("Vesselness Filter"));
+
+  this->hessianFilter->AddObserver(itk::ProgressEvent(), hessianFilterProgressCommand);
+  this->eigenAnalysisFilter->AddObserver(itk::ProgressEvent(), eigenAnalysisFilterProgressCommand);
+  this->vesselnessFilter->AddObserver(itk::ProgressEvent(), vesselnessFilterProgressCommand);
+
+  itk::MultiThreader::SetGlobalMaximumNumberOfThreads(2);
 }
 
 
@@ -82,7 +120,11 @@ void
 DataModel<TImage>
 ::SetImageData(typename TImage::Pointer image) {
   this->imageData = image;
-  itkToVtkFilter->SetInput(image);
+
+  this->hessianFilter->SetInput(this->imageData);
+
+  // Set display volume to image data by default.
+  itkToVtkFilter->SetInput(this->imageData);
 }
 
 
@@ -176,21 +218,12 @@ void
 DataModel<TImage>
 ::SetFilterToVesselness() {
 
-  if (this->imageData) {
-    itk::MemberCommand<DataModel<TImage>>::Pointer progressCommand 
-      = itk::MemberCommand<DataModel<TImage>>::New();
-    progressCommand->SetCallbackFunction(this, &DataModel<TImage>::UpdateProgress);
-    this->hessianFilter->AddObserver(itk::ProgressEvent(), progressCommand);
-    this->hessianFilter->SetInput(this->imageData);
+  if (!this->imageData)
+    return;
 
-    this->vesselnessFilter->AddObserver(itk::ProgressEvent(), progressCommand);
-    this->vesselnessFilter->SetInput(hessianFilter->GetOutput());
-    this->vesselnessFilter->Update();
-    this->minMaxFilter->SetImage(this->vesselnessFilter->GetOutput());
-    this->minMaxFilter->Compute();
-
-    this->itkToVtkFilter->SetInput(this->vesselnessFilter->GetOutput());
-  }
+  this->minMaxFilter->SetImage(this->vesselnessFilter->GetOutput());
+  this->minMaxFilter->Compute();
+  this->itkToVtkFilter->SetInput(this->vesselnessFilter->GetOutput());
 }
 
 
@@ -208,8 +241,13 @@ DataModel<TImage>
 ::UpdateProgress(itk::Object* object, const itk::EventObject& event) {
   itk::ProcessObject* processObject = dynamic_cast<itk::ProcessObject*>(object);
   if (this->progressCallback) {
-    this->progressCallback(processObject->GetProgress());
-    std::cout << processObject->GetNameOfClass() << std::endl;
+    std::string filterName;
+    itk::ExposeMetaData(object->GetMetaDataDictionary(), "filterName", filterName);
+    std::string message("Running ");
+    message.append(filterName);
+    this->progressCallback(processObject->GetProgress(), message.c_str());
+    std::cout << message << ": " 
+      << processObject->GetProgress() << std::endl;
   }
 }
 

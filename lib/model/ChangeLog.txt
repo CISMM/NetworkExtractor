@@ -1,3 +1,18 @@
+2009-03-19  Cory Quammen <cquammen@cs.unc.edu>
+
+   * DataModel.h,.cxx: Changed output type of Hessian matrix 
+   filter to float instead of double to save memory. Swapped
+   in my version of the vesselness filter that uses my class 
+   for computing eigen values and eigen vectors of a Hessian 
+   matrix. Modified progress callback to take a character string 
+   so that you can report what is making progress, e.g. which 
+   image filter. Added a different progress observer for every image
+   filter so I can see which filter is executing and the progress
+   it is making. Changed the maximum number of threads to 2 to
+   increase performance on 4-core system (seems counterintuitive,
+   but that's how it is). Filter pipeline is now set up in the 
+   constructor instead of in the update handler method.
+   
 2009-03-15  Cory Quammen <cquammen@cs.unc.edu>
 
    * DataModel.h,.cxx: Added vesselness filter. This includes
