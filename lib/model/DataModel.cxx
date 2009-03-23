@@ -25,6 +25,10 @@ DataModel<TImage>
   
   this->vesselnessFilter = VesselnessFilterType::New();
   this->vesselnessFilter->SetInput(this->eigenAnalysisFilter->GetEigenValues());
+
+  this->junctionnessFilter = JunctionnessFilterType::New();
+  this->junctionnessFilter->SetEigenVectorInput(this->eigenAnalysisFilter->GetEigenVectors());
+  this->junctionnessFilter->SetVesselnessInput(this->vesselnessFilter->GetOutput());
   
   this->itkToVtkFilter = new ITKImageToVTKImage<TImage>();
   this->progressCallback = NULL;
@@ -39,11 +43,15 @@ DataModel<TImage>
   itk::MemberCommand<DataModel<TImage>>::Pointer vesselnessFilterProgressCommand 
     = itk::MemberCommand<DataModel<TImage>>::New();
 
+  itk::MemberCommand<DataModel<TImage>>::Pointer junctionnessFilterProgressCommand 
+    = itk::MemberCommand<DataModel<TImage>>::New();
+
   // Set the callback function for each of the progress reporters.
   hessianFilterProgressCommand->SetCallbackFunction(this, &DataModel<TImage>::UpdateProgress);
   eigenAnalysisFilterProgressCommand->SetCallbackFunction(this, &DataModel<TImage>::UpdateProgress);
   vesselnessFilterProgressCommand->SetCallbackFunction(this, &DataModel<TImage>::UpdateProgress);
-  
+  junctionnessFilterProgressCommand->SetCallbackFunction(this, &DataModel<TImage>::UpdateProgress);
+
   // Attach a MetaDataObject with the name of the filter to each rilter.
   itk::EncapsulateMetaData<std::string >(hessianFilter->GetMetaDataDictionary(),
     "filterName", std::string("Hessian Filter"));
@@ -51,10 +59,13 @@ DataModel<TImage>
     "filterName", std::string("Eigen Analysis Filter"));
   itk::EncapsulateMetaData<std::string >(vesselnessFilter->GetMetaDataDictionary(),
     "filterName", std::string("Vesselness Filter"));
+  itk::EncapsulateMetaData<std::string >(junctionnessFilter->GetMetaDataDictionary(),
+    "filterName", std::string("Junctionness Filter"));
 
   this->hessianFilter->AddObserver(itk::ProgressEvent(), hessianFilterProgressCommand);
   this->eigenAnalysisFilter->AddObserver(itk::ProgressEvent(), eigenAnalysisFilterProgressCommand);
   this->vesselnessFilter->AddObserver(itk::ProgressEvent(), vesselnessFilterProgressCommand);
+  this->junctionnessFilter->AddObserver(itk::ProgressEvent(), junctionnessFilterProgressCommand);
 
   itk::MultiThreader::SetGlobalMaximumNumberOfThreads(2);
 }
@@ -221,9 +232,25 @@ DataModel<TImage>
   if (!this->imageData)
     return;
 
+  this->vesselnessFilter->Update();
   this->minMaxFilter->SetImage(this->vesselnessFilter->GetOutput());
   this->minMaxFilter->Compute();
   this->itkToVtkFilter->SetInput(this->vesselnessFilter->GetOutput());
+}
+
+
+template <class TImage>
+void
+DataModel<TImage>
+::SetFilterToJunctionness() {
+
+  if (!this->imageData)
+    return;
+
+  this->junctionnessFilter->Update();
+  this->minMaxFilter->SetImage(this->junctionnessFilter->GetOutput());
+  this->minMaxFilter->Compute();
+  this->itkToVtkFilter->SetInput(this->junctionnessFilter->GetOutput());
 }
 
 

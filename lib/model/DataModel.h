@@ -5,6 +5,7 @@
 
 #include <itkCommand.h>
 #include <itkEigenValues3DToVesselnessMeasureImageFilter.h>
+#include <itkEigenVectors3DToJunctionnessMeasureImageFilter.h>
 #include <itkEventObject.h>
 #include <itkFixedArray.h>
 #include <itkImage.h>
@@ -39,6 +40,7 @@ class DataModel {
   typedef typename itk::Image<EigenVectorType, 3> EigenVectorImageType;
   typedef itk::Hessian3DEigenAnalysisImageFilter<HessianImageType, EigenValueImageType, EigenVectorImageType> HessianEigenAnalysisFilterType;
   typedef itk::EigenValues3DToVesselnessMeasureImageFilter<EigenValueImageType, TImage> VesselnessFilterType;
+  typedef itk::EigenVectors3DToJunctionnessImageFilter<EigenVectorImageType, TImage> JunctionnessFilterType;
 
 public:
   DataModel();
@@ -65,6 +67,7 @@ public:
 
   void SetFilterToNone();
   void SetFilterToVesselness();
+  void SetFilterToJunctionness();
 
   void SetProgressCallback(ProgressCallback callback);
 
@@ -77,6 +80,7 @@ protected:
 
   typename HessianFilterType::Pointer hessianFilter;
   typename VesselnessFilterType::Pointer vesselnessFilter;
+  typename JunctionnessFilterType::Pointer junctionnessFilter;
   ITKImageToVTKImage<TImage>* itkToVtkFilter;
 
   void UpdateProgress(itk::Object* object, const itk::EventObject& event);

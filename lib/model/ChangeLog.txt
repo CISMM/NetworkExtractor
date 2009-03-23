@@ -1,3 +1,7 @@
+2009-03-22  Cory Quammen <cquammen@cs.unc.edu>
+
+   * DataModel.h,.cxx: Hooked in junctionness filter.
+
 2009-03-19  Cory Quammen <cquammen@cs.unc.edu>
 
    * DataModel.h,.cxx: Changed output type of Hessian matrix 
