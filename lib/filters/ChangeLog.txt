@@ -1,3 +1,9 @@
+2009-03-22  Cory Quammen <cquammen@cs.unc.edu>
+
+   * itk/itkEigenVectors3DToJunctionnessMeasureImageFilter.h,.cxx: New
+   class implementing a fiber junction detector. Implementation is currently
+   incomplete.
+
 2009-03-19  Cory Quammen <cquammen@cs.unc.edu>
 
    * itk/itkEigenValues3DToVesselnessMeasureImageFilter.h,.cxx: 
