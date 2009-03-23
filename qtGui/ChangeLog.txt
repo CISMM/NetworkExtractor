@@ -1,3 +1,14 @@
+2009-03-22  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAppQt.h,.cxx: Made the GUI aware of the junctionness
+   filter. Progress callback now takes a message to show so I can
+   see what filter is executing. Added ability to load stacks from
+   3D TIFs (ITK magically supports this, too).
+   
+   * Visualization.cxx: Added check in SetInputConnection to avoid
+   perturbing the visualization pipeline if the input to the 
+   isosurface is the same as the current input.
+
 2009-03-15  Cory Quammen <cquammen@cs.unc.edu>
 
    * FibrinAppQt.h,.cxx,.ui: Added menu command handlers for saving

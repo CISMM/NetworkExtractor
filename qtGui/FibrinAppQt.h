@@ -19,8 +19,10 @@ class FibrinAppQt : public QMainWindow, private Ui_MainWindow
 
 public:
 
-  static const std::string NO_FILTER_STRING;
-  static const std::string VESSELNESS_FILTER_STRING;
+  typedef std::string FilterType;
+  static const FilterType NO_FILTER_STRING;
+  static const FilterType VESSELNESS_FILTER_STRING;
+  static const FilterType JUNCTIONNESS_FILTER_STRING;
 
   // Constructor/Destructor
   FibrinAppQt(QWidget* parent = 0);
@@ -60,6 +62,8 @@ protected slots:
 private:
   QStandardItemModel* tableModel;
   vtkRenderer* ren;
+
+  FilterType filterType;
    
 };
 

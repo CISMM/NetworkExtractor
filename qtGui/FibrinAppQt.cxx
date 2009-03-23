@@ -20,25 +20,28 @@
 #include "IntensityThresholdThinningFilter.h"
 
 // Constants
-const std::string FibrinAppQt::NO_FILTER_STRING 
+const FibrinAppQt::FilterType FibrinAppQt::NO_FILTER_STRING 
   = tr("No filter");
-const std::string FibrinAppQt::VESSELNESS_FILTER_STRING 
+const FibrinAppQt::FilterType FibrinAppQt::VESSELNESS_FILTER_STRING 
   = tr("Vesselness");
+const FibrinAppQt::FilterType FibrinAppQt::JUNCTIONNESS_FILTER_STRING 
+  = tr("Junctionness");
 
 
-void ProgressCallback(float progress) {
+void ProgressCallback(float progress, const char* processName) {
   QWidgetList list = QApplication::allWidgets();
   
   // I'm sure there is an easier way to do this, but this works for now.
-  QProgressBar* progressBar = NULL;
   for (int i = 0; i < list.size(); i++) {
     QWidget* widget = list[i];
     if (widget->objectName().toStdString() == "progressBar") {
-      progressBar = dynamic_cast<QProgressBar*>(widget);
+      QProgressBar* progressBar = dynamic_cast<QProgressBar*>(widget);
+      progressBar->setValue(static_cast<int>(100 * progress));
+    } else if (widget->objectName().toStdString() == "statusbar") {
+      QStatusBar* statusbar = dynamic_cast<QStatusBar*>(widget);
+      statusbar->showMessage(QString(processName));
     }
   }
-
-  progressBar->setValue(static_cast<int>(100 * progress));
 }
 
 
@@ -46,6 +49,8 @@ void ProgressCallback(float progress) {
 FibrinAppQt::FibrinAppQt(QWidget* p) 
  : QMainWindow(p) {
   setupUi(this);
+
+  filterType = NO_FILTER_STRING;
 
   // QT/VTK interact
   this->ren = vtkRenderer::New();
@@ -79,6 +84,7 @@ FibrinAppQt::FibrinAppQt(QWidget* p)
 
   this->imageFilterComboBox->addItem(QString(NO_FILTER_STRING.c_str()));
   this->imageFilterComboBox->addItem(QString(VESSELNESS_FILTER_STRING.c_str()));
+  this->imageFilterComboBox->addItem(QString(JUNCTIONNESS_FILTER_STRING.c_str()));
 
   // Create and populate table model.
   this->tableModel = new QStandardItemModel(8, 2, this);
@@ -113,7 +119,7 @@ FibrinAppQt::~FibrinAppQt() {
 void FibrinAppQt::fileOpenImage() {
 
   // Locate file.
-  QString fileName = QFileDialog::getOpenFileName(this, "Open Image Data", "", "VTK Images (*.vtk);;LSM Images (*.lsm);;");
+  QString fileName = QFileDialog::getOpenFileName(this, "Open Image Data", "", "VTK Images (*.vtk);;LSM Images (*.lsm);;TIF Images (*.tif);;");
 
   // Now read the file
   if (fileName == "") {
@@ -290,10 +296,17 @@ void FibrinAppQt::applyButtonHandler() {
 void FibrinAppQt::refreshUI() {
   ///////////////// Update image filters ////////////////
   QString filterText = this->imageFilterComboBox->currentText();
-  if (filterText.toStdString() == NO_FILTER_STRING) {
-    this->dataModel->SetFilterToNone();
-  } else if (filterText.toStdString() == VESSELNESS_FILTER_STRING) {
-    this->dataModel->SetFilterToVesselness();
+  if (filterText.toStdString() != this->filterType) {
+    if (filterText.toStdString() == NO_FILTER_STRING) {
+      this->dataModel->SetFilterToNone();
+      this->filterType = NO_FILTER_STRING;
+    } else if (filterText.toStdString() == VESSELNESS_FILTER_STRING) {
+      this->dataModel->SetFilterToVesselness();
+      this->filterType = VESSELNESS_FILTER_STRING;
+    } else if (filterText.toStdString() == JUNCTIONNESS_FILTER_STRING) {
+      this->dataModel->SetFilterToJunctionness();
+      this->filterType = JUNCTIONNESS_FILTER_STRING;
+    }
   }
 
   ///////////////// Update GUI /////////////////

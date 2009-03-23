@@ -19,6 +19,8 @@ Visualization
 void
 Visualization
 ::SetInputConnection(vtkAlgorithmOutput* input) {
+  if (input == this->isoVisualization->GetInputConnection())
+    return;
   this->isoVisualization->SetInputConnection(input);
   this->outlineVisualization->SetInputConnection(input);
 }
