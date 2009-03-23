@@ -1,3 +1,8 @@
+2009-03-22  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Added library subdirectories to include search
+   path.
+
 2009-03-08  Cory Quammen <cquammen@cs.unc.edu>
 
    * CMakeLists.txt: Added 'lib' project subdirectory. Added include

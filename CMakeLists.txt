@@ -65,7 +65,10 @@ LINK_DIRECTORIES(${VTK_LIBRARY_DIRS})
 INCLUDE_DIRECTORIES (
     ${FibrinAnalysis_SOURCE_DIR}/lib
     ${FibrinAnalysis_SOURCE_DIR}/lib/filters
-    ${FibrinAnalysis_SOURCE_DIR}/lib/io)
+    ${FibrinAnalysis_SOURCE_DIR}/lib/filters/itk
+    ${FibrinAnalysis_SOURCE_DIR}/lib/io
+    ${FibrinAnalysis_SOURCE_DIR}/lib/model
+    ${FibrinAnalysis_SOURCE_DIR}/lib/visualization)
 #ADD_SUBDIRECTORY(apps)
 
 #######################################
