@@ -34,8 +34,8 @@ class DataModel {
   typedef itk::Image<HessianType, ::itk::GetImageDimension<TImage>::ImageDimension> HessianImageType;
   typedef itk::HessianRecursiveGaussianImageFilter<TImage, HessianImageType> HessianFilterType;
 
-  typedef itk::FixedArray<ComponentType, 3> EigenValueType;
-  typedef itk::Matrix<ComponentType, 3, 3>  EigenVectorType;
+  typedef itk::FixedArray<ComponentType, 3>       EigenValueType;
+  typedef itk::Vector<ComponentType, 3>           EigenVectorType;
   typedef typename itk::Image<EigenValueType, 3>  EigenValueImageType;
   typedef typename itk::Image<EigenVectorType, 3> EigenVectorImageType;
   typedef itk::Hessian3DEigenAnalysisImageFilter<HessianImageType, EigenValueImageType, EigenVectorImageType> HessianEigenAnalysisFilterType;
@@ -43,11 +43,16 @@ class DataModel {
   typedef itk::EigenVectors3DToJunctionnessImageFilter<EigenVectorImageType, TImage> JunctionnessFilterType;
 
 public:
+  typedef std::string FilterType;
+  static const FilterType NO_FILTER_STRING;
+  static const FilterType VESSELNESS_FILTER_STRING;
+  static const FilterType JUNCTIONNESS_FILTER_STRING;
+
   DataModel();
   virtual ~DataModel();
 
   void LoadImageFile(std::string fileName);
-  void SaveImageFile(std::string fileName);
+  void SaveImageFile(std::string fileName, std::string filterName);
 
   void SetFiberDiameter(double radius);
   double GetFiberDiameter();

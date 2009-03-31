@@ -1,3 +1,13 @@
+2009-03-30  Cory Quammen <cquammen@cs.unc.edu>
+
+   * DataModel.h,.cxx: Changed pixel type of the eigen vector
+   image computed by Hessian3DEigenAnalysisImageFilter to be a
+   single 3-element vector instead of a matrix holding all three
+   eigen vectors. I need only the one corresponding to the maximum
+   (minimum absolute) curvature. Moved constants for filter type
+   names here. Modified SaveImageFile to take the filter name
+   whose output should be saved.
+
 2009-03-22  Cory Quammen <cquammen@cs.unc.edu>
 
    * DataModel.h,.cxx: Hooked in junctionness filter.

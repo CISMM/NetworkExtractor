@@ -7,6 +7,19 @@
 #include <itkMultiThreader.h>
 
 
+// Constants
+template <class TImage>
+const typename DataModel<TImage>::FilterType typename DataModel<TImage>::NO_FILTER_STRING = std::string("No filter");
+
+template <class TImage>
+const typename DataModel<TImage>::FilterType typename DataModel<TImage>::VESSELNESS_FILTER_STRING 
+  = std::string("Vesselness");
+
+template <class TImage>
+const typename DataModel<TImage>::FilterType typename DataModel<TImage>::JUNCTIONNESS_FILTER_STRING 
+  = std::string("Junctionness");
+
+
 template <class TImage>
 DataModel<TImage>
 ::DataModel() {
@@ -96,9 +109,17 @@ DataModel<TImage>
 template <class TImage>
 void
 DataModel<TImage>
-::SaveImageFile(std::string fileName) {
+::SaveImageFile(std::string fileName, std::string filterName) {
   FileWriterType::Pointer writer = FileWriterType::New();
-  writer->SetInput(this->vesselnessFilter->GetOutput());
+  if (filterName == NO_FILTER_STRING)
+    writer->SetInput(this->imageData);
+  else if (filterName == VESSELNESS_FILTER_STRING)
+    writer->SetInput(this->vesselnessFilter->GetOutput());
+  else if (filterName == JUNCTIONNESS_FILTER_STRING)
+    writer->SetInput(this->junctionnessFilter->GetOutput());
+  else
+    return;
+
   writer->SetFileName(fileName.c_str());
   writer->Update();
   writer->Write(); 
@@ -114,6 +135,11 @@ DataModel<TImage>
 
     // Set sigma on the Hessian filter.
     this->hessianFilter->SetSigma(0.5*diameter);
+
+    // Set radius on junctionness filter. We'll set it to
+    // twice the diameter of the fibers to make sure we
+    // clear the fibers.
+    this->junctionnessFilter->SetRadius(diameter);
   }
 }
 
