@@ -1,3 +1,14 @@
+2009-03-30  Cory Quammen <cquammen@cs.unc.edu>
+
+   * itk/itkEigenVectors3DToJunctionnessMeasureImageFilter.h,.cxx: Added
+   initial implementation of the filter. Basically a type of matched filter for
+   source- or sink-like structures that have no directional sense (doesn't
+   matter which way the head of the vector is oriented). This should be
+   useful for identifying junction points.
+   
+   * itk/itkHessian3DEigenAnalysisImageFilter.cxx: Changed it so that
+   only one eigen vector is stored instead of all three.
+
 2009-03-22  Cory Quammen <cquammen@cs.unc.edu>
 
    * itk/itkEigenVectors3DToJunctionnessMeasureImageFilter.h,.cxx: New

@@ -3,8 +3,8 @@
   Program:   Insight Segmentation & Registration Toolkit
   Module:    $RCSfile: itkEigenVectors3DToJunctionnessMeasureImageFilter.cxx,v $
   Language:  C++
-  Date:      $Date: 2009/03/23 00:00:50 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009/03/31 02:56:02 $
+  Version:   $Revision: 1.2 $
 
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
@@ -19,20 +19,29 @@
 
 #include "itkEigenVectors3DToJunctionnessMeasureImageFilter.h"
 
-#include "itkConstNeighborhoodIterator.h"
 #include "itkImage.h"
-#include "itkImageRegionIterator.h"
-#include "itkNeighborhoodAlgorithm.h"
-#include "itkZeroFluxNeumannBoundaryCondition.h"
 #include "itkOffset.h"
 #include "itkProgressReporter.h"
+
+#include "itkVTKPolyDataWriter.h"
 
 namespace itk {
 
 template <class TEigenVectorImage, class TVesselnessImage, class TOutputImage>
 EigenVectors3DToJunctionnessImageFilter<TEigenVectorImage, TVesselnessImage, TOutputImage>
 ::EigenVectors3DToJunctionnessImageFilter() {
-  m_Radius.Fill(1);
+  this->m_Radius = 1.0;
+
+  this->m_SphereSampleSource = SphereSourceType::New();
+  this->m_SphereSampleSource->SetScale(1.0);
+  this->m_SphereSampleSource->SetResolution(3);
+  this->m_SphereSampleSource->Update();
+
+  this->m_VesselnessInterpolator = VesselnessInterpolatorType::New();
+//  this->m_VesselnessInterpolator->SetSplineOrder(4);
+
+  this->m_EigenVectorInterpolator = EigenVectorInterpolatorType::New();
+
 }
 
 
@@ -96,7 +105,8 @@ EigenVectors3DToJunctionnessImageFilter<TEigenVectorImage, TVesselnessImage, TOu
   eigenVectorRequestedRegion = eigenVectorPtr->GetRequestedRegion();
 
   // Pad the input requested region by the operator radius.
-  eigenVectorRequestedRegion.PadByRadius( m_Radius );
+  EigenVectorSizeType logicalRadius = this->GetLogicalRadius();
+  eigenVectorRequestedRegion.PadByRadius( logicalRadius );
 
   // Crop the input requested region at the input's largest possible region.
   if ( eigenVectorRequestedRegion.Crop(eigenVectorPtr->GetLargestPossibleRegion()) ) {
@@ -126,87 +136,124 @@ void
 EigenVectors3DToJunctionnessImageFilter<TEigenVectorImage, TVesselnessImage, TOutputImage>
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
                        int threadId) {
-  ZeroFluxNeumannBoundaryCondition<EigenVectorImageType> eigenVectorNbc;
-  ZeroFluxNeumannBoundaryCondition<VesselnessImageType> vesselnessNbc;
 
-  ConstNeighborhoodIterator<EigenVectorImageType> eigenVectorNbrIt;
-  ConstNeighborhoodIterator<VesselnessImageType> vesselnessNbrIt;
-  ImageRegionIterator<OutputImageType> outputIt;
+  EigenVectorImageConstPointer eigenVectorInput = this->GetEigenVectorInput();
+  VesselnessImageConstPointer  vesselnessInput = this->GetVesselnessInput();
+  OutputImagePointer output = this->GetOutput();
 
-  typename OutputImageType::Pointer output = this->GetOutput();
-  typename EigenVectorImageType::ConstPointer eigenVectorInput = 
-    this->GetEigenVectorInput();
-  typename VesselnessImageType::ConstPointer  vesselnessInput =
-    this->GetVesselnessInput();
+  // Set the input for the vesselness interpolator.
+  this->m_EigenVectorInterpolator->SetInputImage(eigenVectorInput);
+  this->m_VesselnessInterpolator->SetInputImage(vesselnessInput);
 
-  // Find the data set boundary "faces"
-  typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<EigenVectorImageType>::FaceListType faceList;
-  NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<EigenVectorImageType> bC;
-  faceList = bC(eigenVectorInput, outputRegionForThread, m_Radius);
+  // Reduce the iterator region by the logical size of the junction
+  // filter radius.
+  EigenVectorSizeType logicalRadius = this->GetLogicalRadius();
+  EigenVectorSizeType negativeOne;
+  negativeOne.Fill(-1.0);
 
-  typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<EigenVectorImageType>::FaceListType::iterator fit;
+  // Causes an underflow in unsigned representations, but that is okay
+  // because when this value is added to the whole region, an overflow
+  // will occur, bringing the region boundaries to sane values.
+  logicalRadius *= negativeOne;
 
-  // Get image origin and pixel spacing
-  itk::Vector<double> spacing = eigenVectorInput->GetSpacing();
-  EigenVectorImageType::PointType origin = eigenVectorInput->GetOrigin();
+  EigenVectorImageRegionType wholeRegion 
+    = eigenVectorInput->GetLargestPossibleRegion();
+  wholeRegion.PadByRadius(logicalRadius);
+  OutputImageRegionType croppedOutputRegionForThread = outputRegionForThread;
+  croppedOutputRegionForThread.Crop(wholeRegion);
 
-  // Suppor progress methods/callbacks
-  ProgressReporter progress(this, threadId, outputRegionForThread.GetNumberOfPixels());
+  EigenVectorConstIteratorWithIndex eigenVectorIt( eigenVectorInput, croppedOutputRegionForThread );
+  VesselnessConstIteratorWithIndex  vesselnessIt( vesselnessInput, croppedOutputRegionForThread );
+  OutputImageIteratorWithIndex      outputIt( output, croppedOutputRegionForThread );
 
-  // Process each of the boundary faces. These are N-d regions which border
-  // the edge of the buffer.
-  for (fit = faceList.begin(); fit != faceList.end(); ++fit) {
-    eigenVectorNbrIt = ConstNeighborhoodIterator<EigenVectorImageType>(m_Radius,
-      eigenVectorInput, *fit);
-    vesselnessNbrIt = ConstNeighborhoodIterator<VesselnessImageType>(m_Radius,
-      vesselnessInput, *fit);
+  // Support progress methods/callbacks
+  ProgressReporter progress(this, threadId, croppedOutputRegionForThread.GetNumberOfPixels());
 
-    unsigned int neighborhoodSize = eigenVectorNbrIt.Size();
-    outputIt = ImageRegionIterator<OutputImageType>(output, *fit);
-    eigenVectorNbrIt.OverrideBoundaryCondition(&eigenVectorNbc);
-    vesselnessNbrIt.OverrideBoundaryCondition(&vesselnessNbc);
-    eigenVectorNbrIt.GoToBegin();
-    vesselnessNbrIt.GoToBegin();
+  double threshold = 8.0;
 
-    NumericTraits<OutputPixelType>::RealType sum;
+  OutputRealType       sum;
+  for (eigenVectorIt.GoToBegin(), vesselnessIt.GoToBegin(), outputIt.GoToBegin();
+    !eigenVectorIt.IsAtEnd(); ++eigenVectorIt, ++vesselnessIt, ++outputIt) {
 
-    while (!eigenVectorNbrIt.IsAtEnd() ) {
+    sum = NumericTraits<OutputRealType>::Zero;
 
-      sum = NumericTraits<NumericTraits<OutputPixelType>::RealType>::Zero;
-      for (int i = 0; i < neighborhoodSize; ++i) {
-        // Get the eigen vector matrix.
-        EigenVectorPixelType eigenVectorMatrix = eigenVectorNbrIt.GetPixel(i);
+    // Skip this voxel if the vesselness value is below a threshold.
+    VesselnessPixelType voxelValue = vesselnessIt.Get();
+    if (voxelValue < threshold) { // arbitrary value, make this a setting
+      outputIt.Set(static_cast<OutputPixelType>(sum));
+      progress.CompletedPixel();
+      continue;
+    }
+  
+    // Get the location of the voxel. We'll use this to shift the sample points.
+    EigenVectorConstIteratorWithIndex::IndexType index = eigenVectorIt.GetIndex();
+    EigenVectorImageType::PointType voxelPoint;
+    eigenVectorInput->TransformIndexToPhysicalPoint(index, voxelPoint);
+    
+    // Iterate over directional samples
+    MeshType* mesh = this->m_SphereSampleSource->GetOutput();
+    for (unsigned long i = 0; i < mesh->GetNumberOfPoints(); i++) {
+      SphereSourceType::PointType point;
+      mesh->GetPoint(i, &point);
+      EigenVectorPixelType sampleDirection = EigenVectorPixelType();
 
-        // Compute spatial position of this neighbor pixel coordinates.
-        ConstNeighborhoodIterator<EigenVectorImageType>::IndexType nbrIndex
-          = eigenVectorNbrIt.GetIndex(i);
-        NumericTraits<OutputPixelType>::RealType pixelPosition[EigenVectorImageDimension];
-        for (int j = 0; j < EigenVectorImageDimension; ++j) {
-          pixelPosition[j] = (spacing[j]*nbrIndex[j]) + origin[j];
-        }
+      for (int j = 0; j < EigenVectorPixelType::Length; j++) {
+        // Store the vector of the sample.
+        sampleDirection[j] = point[j];
 
-        // Compute vector from center of the pixel to this neighbor pixel.
-        
-        // Take the absolute dot product of the eigen vector corresponding to the least
-        // principal curvature direction and the template direction
-
-        // Weight the absolute dot product with the vesselness measure.
-
-
-        sum += static_cast<OutputPixelType>(vesselnessNbrIt.GetPixel(i));
+        // Scale sample point by radius and shift according to voxel position.
+        point[j] = (point[j]*this->m_Radius) + voxelPoint[j];
       }
 
-      // Set value here.
-      outputIt.Set(static_cast<OutputPixelType>(sum));
+      // Get the interpolated vesselness value at the sample point.
+      OutputRealType vesselnessValue = m_VesselnessInterpolator->Evaluate(point);
+      if (vesselnessValue < threshold)
+        continue;
+      
+      // Take the absolute dot product of the eigen vector corresponding to the least
+      // principal curvature direction and the template direction.
+      EigenVectorInterpolatorType::OutputType interpolatedVector = m_EigenVectorInterpolator->Evaluate(point);
+      EigenVectorPixelType vectorValue;
+      for (int j = 0; j < EigenVectorPixelType::Length; j++) {
+        vectorValue[j] = interpolatedVector[j];
+      }
 
-      ++eigenVectorNbrIt;
-      ++vesselnessNbrIt;
-      ++outputIt;
-      progress.CompletedPixel();
+      // The * operator is overloaded to be the dot product operator below.
+      OutputRealType dot = vnl_math_abs(vectorValue * sampleDirection);
+
+      // Weight the absolute dot product with the vesselness measure.
+      //sum += vesselnessValue * dot;
+      sum += dot;
     }
+
+
+    // Set value here.
+    outputIt.Set(static_cast<OutputPixelType>(sum));
+
+    progress.CompletedPixel();
   }
 
 }
+
+
+template <class TEigenVectorImage, class TVesselnessImage, class TOutputImage>
+typename EigenVectors3DToJunctionnessImageFilter<TEigenVectorImage, TVesselnessImage, TOutputImage>::EigenVectorSizeType
+EigenVectors3DToJunctionnessImageFilter<TEigenVectorImage, TVesselnessImage, TOutputImage>
+::GetLogicalRadius() {
+
+  // Convert the radius from physical distance to logical
+  // coordinate distance.
+  EigenVectorSizeType logicalRadius;
+  typename EigenVectorImageType::ConstPointer eigenVectorInput = 
+    this->GetEigenVectorInput();
+  EigenVectorSpacingType imageSpacing = eigenVectorInput->GetSpacing();
+  for (int i = 0; i < EigenVectorImageType::ImageDimension; i++) {
+    logicalRadius[i] = ceil(m_Radius / imageSpacing[i]);
+  }
+
+  return logicalRadius;
+}
+
 
 } // end namespace itk
 

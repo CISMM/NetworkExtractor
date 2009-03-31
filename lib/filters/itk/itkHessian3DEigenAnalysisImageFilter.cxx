@@ -3,8 +3,8 @@
   Program:   Insight Segmentation & Registration Toolkit
   Module:    $RCSfile: itkHessian3DEigenAnalysisImageFilter.cxx,v $
   Language:  C++
-  Date:      $Date: 2009/03/19 15:44:09 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009/03/31 02:56:02 $
+  Version:   $Revision: 1.3 $
 
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
@@ -145,16 +145,22 @@ Hessian3DEigenAnalysisImageFilter<TInputImage, TEigenValueImage, TEigenVectorIma
   eigenVectorIt.GoToBegin();
 
   EigenValueImagePixelType eigenValues;
-  EigenVectorImagePixelType eigenVectors;
+  Matrix<EigenValueImagePixelType::ValueType, Self::ImageDimension, Self::ImageDimension> eigenVectorMatrix;
+  EigenVectorImagePixelType eigenVector;
 
   while ( !inputIt.IsAtEnd() ) {
     
     TInputImage::PixelType matrix = inputIt.Get();
 
-    matrix.ComputeEigenAnalysis(eigenValues, eigenVectors);
+    matrix.ComputeEigenAnalysis(eigenValues, eigenVectorMatrix);
+
+    // Save vector associated with largest eigen value (least negative value) here
+    for (int i = 0; i < Self::ImageDimension; i++) {
+      eigenVector[i] = eigenVectorMatrix[i][2];
+    }
 
     eigenValueIt.Set( eigenValues );
-    eigenVectorIt.Set( eigenVectors );
+    eigenVectorIt.Set( eigenVector );
 
     ++inputIt;
     ++eigenValueIt;
