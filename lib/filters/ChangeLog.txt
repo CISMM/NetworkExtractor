@@ -1,5 +1,10 @@
 2009-03-30  Cory Quammen <cquammen@cs.unc.edu>
 
+   * IntensityThresholdFilter.h,.cxx: Removed these files because they
+   aren't needed.
+
+2009-03-30  Cory Quammen <cquammen@cs.unc.edu>
+
    * itk/itkEigenVectors3DToJunctionnessMeasureImageFilter.h,.cxx: Added
    initial implementation of the filter. Basically a type of matched filter for
    source- or sink-like structures that have no directional sense (doesn't
