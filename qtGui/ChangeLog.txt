@@ -1,3 +1,8 @@
+2009-03-30  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAppQt.h,.cxx: Added DataModelType typedef for
+   convenience. Moved filter names from here to DataModel.h.
+
 2009-03-22  Cory Quammen <cquammen@cs.unc.edu>
 
    * FibrinAppQt.h,.cxx: Made the GUI aware of the junctionness

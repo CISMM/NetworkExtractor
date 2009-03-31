@@ -19,10 +19,8 @@ class FibrinAppQt : public QMainWindow, private Ui_MainWindow
 
 public:
 
-  typedef std::string FilterType;
-  static const FilterType NO_FILTER_STRING;
-  static const FilterType VESSELNESS_FILTER_STRING;
-  static const FilterType JUNCTIONNESS_FILTER_STRING;
+  // Convenience typedefs
+  typedef DataModel<Float3DImageType> DataModelType;
 
   // Constructor/Destructor
   FibrinAppQt(QWidget* parent = 0);
@@ -52,7 +50,7 @@ public slots:
   virtual void applyButtonHandler();
 
 protected:
-  DataModel<Float3DImageType>* dataModel;
+  DataModelType* dataModel;
   Visualization* visualization;
 
   void refreshUI();
@@ -63,7 +61,7 @@ private:
   QStandardItemModel* tableModel;
   vtkRenderer* ren;
 
-  FilterType filterType;
+  DataModelType::FilterType filterType;
    
 };
 

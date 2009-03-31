@@ -19,14 +19,6 @@
 
 #include "IntensityThresholdThinningFilter.h"
 
-// Constants
-const FibrinAppQt::FilterType FibrinAppQt::NO_FILTER_STRING 
-  = tr("No filter");
-const FibrinAppQt::FilterType FibrinAppQt::VESSELNESS_FILTER_STRING 
-  = tr("Vesselness");
-const FibrinAppQt::FilterType FibrinAppQt::JUNCTIONNESS_FILTER_STRING 
-  = tr("Junctionness");
-
 
 void ProgressCallback(float progress, const char* processName) {
   QWidgetList list = QApplication::allWidgets();
@@ -50,7 +42,7 @@ FibrinAppQt::FibrinAppQt(QWidget* p)
  : QMainWindow(p) {
   setupUi(this);
 
-  filterType = NO_FILTER_STRING;
+  filterType = DataModelType::NO_FILTER_STRING;
 
   // QT/VTK interact
   this->ren = vtkRenderer::New();
@@ -82,9 +74,9 @@ FibrinAppQt::FibrinAppQt(QWidget* p)
   // Instantiate visualization pipelines.
   this->visualization = new Visualization();
 
-  this->imageFilterComboBox->addItem(QString(NO_FILTER_STRING.c_str()));
-  this->imageFilterComboBox->addItem(QString(VESSELNESS_FILTER_STRING.c_str()));
-  this->imageFilterComboBox->addItem(QString(JUNCTIONNESS_FILTER_STRING.c_str()));
+  this->imageFilterComboBox->addItem(QString(DataModelType::NO_FILTER_STRING.c_str()));
+  this->imageFilterComboBox->addItem(QString(DataModelType::VESSELNESS_FILTER_STRING.c_str()));
+  this->imageFilterComboBox->addItem(QString(DataModelType::JUNCTIONNESS_FILTER_STRING.c_str()));
 
   // Create and populate table model.
   this->tableModel = new QStandardItemModel(8, 2, this);
@@ -158,7 +150,7 @@ void FibrinAppQt::fileSaveFilteredImage() {
   if (fileName == "")
     return;
 
-  this->dataModel->SaveImageFile(fileName.toStdString());
+  this->dataModel->SaveImageFile(fileName.toStdString(), this->filterType);
 
 }
 
@@ -297,15 +289,15 @@ void FibrinAppQt::refreshUI() {
   ///////////////// Update image filters ////////////////
   QString filterText = this->imageFilterComboBox->currentText();
   if (filterText.toStdString() != this->filterType) {
-    if (filterText.toStdString() == NO_FILTER_STRING) {
+    if (filterText.toStdString() == DataModelType::NO_FILTER_STRING) {
       this->dataModel->SetFilterToNone();
-      this->filterType = NO_FILTER_STRING;
-    } else if (filterText.toStdString() == VESSELNESS_FILTER_STRING) {
+      this->filterType = DataModelType::NO_FILTER_STRING;
+    } else if (filterText.toStdString() == DataModelType::VESSELNESS_FILTER_STRING) {
       this->dataModel->SetFilterToVesselness();
-      this->filterType = VESSELNESS_FILTER_STRING;
-    } else if (filterText.toStdString() == JUNCTIONNESS_FILTER_STRING) {
+      this->filterType = DataModelType::VESSELNESS_FILTER_STRING;
+    } else if (filterText.toStdString() == DataModelType::JUNCTIONNESS_FILTER_STRING) {
       this->dataModel->SetFilterToJunctionness();
-      this->filterType = JUNCTIONNESS_FILTER_STRING;
+      this->filterType = DataModelType::JUNCTIONNESS_FILTER_STRING;
     }
   }
 
