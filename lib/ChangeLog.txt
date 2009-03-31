@@ -1,3 +1,7 @@
+2009-03-30  Cory Quammen <cquammen@cs.unc.edu>
+
+   * Types.h: Made 3D float image type actually be floats.
+
 2009-03-15  Cory Quammen <cquammen@cs.unc.edu>
 
    * Types.h: Added 3D float image type.
