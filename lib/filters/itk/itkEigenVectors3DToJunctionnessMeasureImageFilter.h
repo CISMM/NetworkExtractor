@@ -3,8 +3,8 @@
   Program:   Insight Segmentation & Registration Toolkit
   Module:    $RCSfile: itkEigenVectors3DToJunctionnessMeasureImageFilter.h,v $
   Language:  C++
-  Date:      $Date: 2009/03/31 02:56:02 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009/04/08 14:29:52 $
+  Version:   $Revision: 1.3 $
 
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
@@ -109,13 +109,16 @@ public:
   typedef LinearInterpolateImageFunction<VesselnessImageType, float> VesselnessInterpolatorType;
   typedef typename VesselnessInterpolatorType::Pointer               VesselnessInterpolatorPointer;
 
-  /** Set the radius of the neighborhood used to compute the junctionness measure. */
+  /** Set/get the radius of the neighborhood used to compute the junctionness measure. */
   itkSetMacro(Radius, double);
-
-  /** Get the radius of the neighborhood used to compute the junctionness measure. */
   itkGetConstReferenceMacro(Radius, double);
 
-  /** Set/get the eigen vector input image. */
+  /** Set/get the vesselness measure above which the associated eigenvectors are 
+   considered by the junctionness probe. */
+  itkSetMacro(VesselnessThreshold, double);
+  itkGetConstReferenceMacro(VesselnessThreshold, double);
+
+  /** Set/get the eigenvector input image. */
   typename void SetEigenVectorInput(typename EigenVectorImageType::Pointer input);
   typename EigenVectorImageType::Pointer GetEigenVectorInput();
 
@@ -146,7 +149,12 @@ private:
   EigenVectors3DToJunctionnessImageFilter(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 
+  // Radius of junction probe filter
   double m_Radius;
+
+  // Vesselness measure above which the associated eigen vectors are 
+  // considered by the junctionness probe.
+  double m_VesselnessThreshold;
 
   SphereSourcePointer m_SphereSampleSource;
 

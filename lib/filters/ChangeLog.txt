@@ -1,3 +1,14 @@
+2009-04-08  Cory Quammen <cquammen@cs.unc.edu>
+
+   * itk/itkEigenVectors3DToJunctionnessMeasureImageFilter.h,.cxx:
+   Added vesselness threshold as a member variable. Added clearer
+   comments.
+   
+   * itk/Hessian3DEigenAnalysisImageFilter.cxx: Turns out eigenvectors
+   were stored in rows instead of columns, so I fixed that. Added comments.
+   
+   * ChangeLog.txt: Removed IntensityThresholdThinningFilter.cxx from source list.
+
 2009-03-30  Cory Quammen <cquammen@cs.unc.edu>
 
    * IntensityThresholdFilter.h,.cxx: Removed these files because they

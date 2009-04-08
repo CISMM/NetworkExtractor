@@ -1,5 +1,4 @@
 SET(filtersSrc
-  IntensityThresholdThinningFilter.cxx
   itk/itkEigenValues3DToVesselnessMeasureImageFilter.cxx
   itk/itkEigenVectors3DToJunctionnessMeasureImageFilter.cxx
   itk/itkHessian3DEigenAnalysisImageFilter.cxx

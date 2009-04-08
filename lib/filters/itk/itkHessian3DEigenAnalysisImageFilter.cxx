@@ -3,8 +3,8 @@
   Program:   Insight Segmentation & Registration Toolkit
   Module:    $RCSfile: itkHessian3DEigenAnalysisImageFilter.cxx,v $
   Language:  C++
-  Date:      $Date: 2009/03/31 02:56:02 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009/04/08 14:29:52 $
+  Version:   $Revision: 1.4 $
 
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
@@ -152,11 +152,14 @@ Hessian3DEigenAnalysisImageFilter<TInputImage, TEigenValueImage, TEigenVectorIma
     
     TInputImage::PixelType matrix = inputIt.Get();
 
+    // By default, matrix.ComputeEigenAnalysis sorts eigenvalues and 
+    // eigenvectors by eigenvalue in ascending order.
     matrix.ComputeEigenAnalysis(eigenValues, eigenVectorMatrix);
 
-    // Save vector associated with largest eigen value (least negative value) here
+    // Save vector associated with largest eigen value (least negative value) here.
+    // Vectors are stored in rows of the matrices.
     for (int i = 0; i < Self::ImageDimension; i++) {
-      eigenVector[i] = eigenVectorMatrix[i][2];
+      eigenVector[i] = eigenVectorMatrix[2][i];
     }
 
     eigenValueIt.Set( eigenValues );

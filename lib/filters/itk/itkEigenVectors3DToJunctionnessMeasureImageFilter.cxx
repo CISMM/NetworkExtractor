@@ -3,8 +3,8 @@
   Program:   Insight Segmentation & Registration Toolkit
   Module:    $RCSfile: itkEigenVectors3DToJunctionnessMeasureImageFilter.cxx,v $
   Language:  C++
-  Date:      $Date: 2009/03/31 02:56:02 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009/04/08 14:29:52 $
+  Version:   $Revision: 1.3 $
 
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
@@ -31,15 +31,15 @@ template <class TEigenVectorImage, class TVesselnessImage, class TOutputImage>
 EigenVectors3DToJunctionnessImageFilter<TEigenVectorImage, TVesselnessImage, TOutputImage>
 ::EigenVectors3DToJunctionnessImageFilter() {
   this->m_Radius = 1.0;
+  this->m_VesselnessThreshold = 1.0;
 
   this->m_SphereSampleSource = SphereSourceType::New();
   this->m_SphereSampleSource->SetScale(1.0);
   this->m_SphereSampleSource->SetResolution(3);
   this->m_SphereSampleSource->Update();
 
+  // Set up interpolators for the vesselness image and eigenvector image.
   this->m_VesselnessInterpolator = VesselnessInterpolatorType::New();
-//  this->m_VesselnessInterpolator->SetSplineOrder(4);
-
   this->m_EigenVectorInterpolator = EigenVectorInterpolatorType::New();
 
 }
@@ -146,7 +146,8 @@ EigenVectors3DToJunctionnessImageFilter<TEigenVectorImage, TVesselnessImage, TOu
   this->m_VesselnessInterpolator->SetInputImage(vesselnessInput);
 
   // Reduce the iterator region by the logical size of the junction
-  // filter radius.
+  // filter radius so we don't read outside the image boundaries. The
+  // junctionness measure will thus not be computed on the image boundaries.
   EigenVectorSizeType logicalRadius = this->GetLogicalRadius();
   EigenVectorSizeType negativeOne;
   negativeOne.Fill(-1.0);
@@ -162,31 +163,34 @@ EigenVectors3DToJunctionnessImageFilter<TEigenVectorImage, TVesselnessImage, TOu
   OutputImageRegionType croppedOutputRegionForThread = outputRegionForThread;
   croppedOutputRegionForThread.Crop(wholeRegion);
 
-  EigenVectorConstIteratorWithIndex eigenVectorIt( eigenVectorInput, croppedOutputRegionForThread );
-  VesselnessConstIteratorWithIndex  vesselnessIt( vesselnessInput, croppedOutputRegionForThread );
-  OutputImageIteratorWithIndex      outputIt( output, croppedOutputRegionForThread );
+  EigenVectorConstIteratorWithIndex eigenVectorIt( eigenVectorInput, outputRegionForThread );
+  VesselnessConstIteratorWithIndex  vesselnessIt( vesselnessInput, outputRegionForThread );
+  OutputImageIteratorWithIndex      outputIt( output, outputRegionForThread );
 
   // Support progress methods/callbacks
-  ProgressReporter progress(this, threadId, croppedOutputRegionForThread.GetNumberOfPixels());
+  ProgressReporter progress(this, threadId, outputRegionForThread.GetNumberOfPixels());
 
-  double threshold = 8.0;
-
+  // Iterate over all the pixels, computing the junctionness measure.
   OutputRealType       sum;
   for (eigenVectorIt.GoToBegin(), vesselnessIt.GoToBegin(), outputIt.GoToBegin();
     !eigenVectorIt.IsAtEnd(); ++eigenVectorIt, ++vesselnessIt, ++outputIt) {
 
     sum = NumericTraits<OutputRealType>::Zero;
 
-    // Skip this voxel if the vesselness value is below a threshold.
+    // Make she we are within legal bounds
+    EigenVectorConstIteratorWithIndex::IndexType index = eigenVectorIt.GetIndex();
+
+    // Skip this voxel if the vesselness value is below a threshold value or if we are
+    // outside the valid region.
     VesselnessPixelType voxelValue = vesselnessIt.Get();
-    if (voxelValue < threshold) { // arbitrary value, make this a setting
+    if (voxelValue < this->m_VesselnessThreshold || !croppedOutputRegionForThread.IsInside(index)) {
       outputIt.Set(static_cast<OutputPixelType>(sum));
       progress.CompletedPixel();
       continue;
     }
   
-    // Get the location of the voxel. We'll use this to shift the sample points.
-    EigenVectorConstIteratorWithIndex::IndexType index = eigenVectorIt.GetIndex();
+    // Get the spatial location of the voxel. We'll use this to shift the 
+    // sample points on the sampling sphere.
     EigenVectorImageType::PointType voxelPoint;
     eigenVectorInput->TransformIndexToPhysicalPoint(index, voxelPoint);
     
@@ -205,13 +209,15 @@ EigenVectors3DToJunctionnessImageFilter<TEigenVectorImage, TVesselnessImage, TOu
         point[j] = (point[j]*this->m_Radius) + voxelPoint[j];
       }
 
-      // Get the interpolated vesselness value at the sample point.
+      // Get the interpolated vesselness value at the sample point. If below the
+      // vesselness threshold, skip (equivalent to weight of zero).
       OutputRealType vesselnessValue = m_VesselnessInterpolator->Evaluate(point);
-      if (vesselnessValue < threshold)
+      if (vesselnessValue < this->m_VesselnessThreshold)
         continue;
       
-      // Take the absolute dot product of the eigen vector corresponding to the least
-      // principal curvature direction and the template direction.
+      // Take the absolute dot product of the eigen vector corresponding to the
+      // principal direction of maximal curvature (for bright structure on dark
+      // background) and the template direction.
       EigenVectorInterpolatorType::OutputType interpolatedVector = m_EigenVectorInterpolator->Evaluate(point);
       EigenVectorPixelType vectorValue;
       for (int j = 0; j < EigenVectorPixelType::Length; j++) {
@@ -222,7 +228,6 @@ EigenVectors3DToJunctionnessImageFilter<TEigenVectorImage, TVesselnessImage, TOu
       OutputRealType dot = vnl_math_abs(vectorValue * sampleDirection);
 
       // Weight the absolute dot product with the vesselness measure.
-      //sum += vesselnessValue * dot;
       sum += dot;
     }
 
