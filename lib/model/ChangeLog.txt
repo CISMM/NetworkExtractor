@@ -1,3 +1,11 @@
+2009-04-08  Cory Quammen <cquammen@cs.unc.edu>
+
+   * DataModel.h,.cxx: Added a local maxima finder image filter
+   to locate junctions. Added vector image type file writer to
+   expert eigenvectors for visualization. Added junctionness
+   spherical probe diameter member var and vesselness threshold
+   member var.
+
 2009-03-30  Cory Quammen <cquammen@cs.unc.edu>
 
    * DataModel.h,.cxx: Changed pixel type of the eigen vector

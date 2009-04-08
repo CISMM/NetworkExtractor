@@ -11,6 +11,7 @@
 #include <itkImage.h>
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
+#include <itkValuedRegionalMaximaImageFilter.h>
 #include <itkHessian3DEigenAnalysisImageFilter.h>
 #include <itkHessianRecursiveGaussianImageFilter.h>
 #include <itkMatrix.h>
@@ -27,8 +28,6 @@ class DataModel {
 
   typedef void (*ProgressCallback)(float, const char *);
   typedef float ComponentType;
-  typedef itk::ImageFileReader<TImage> FileReaderType;
-  typedef itk::ImageFileWriter<TImage> FileWriterType;
   typedef itk::MinimumMaximumImageCalculator<TImage> MinMaxType;
   typedef itk::SymmetricSecondRankTensor<ComponentType, ::itk::GetImageDimension<TImage>::ImageDimension> HessianType;
   typedef itk::Image<HessianType, ::itk::GetImageDimension<TImage>::ImageDimension> HessianImageType;
@@ -41,12 +40,18 @@ class DataModel {
   typedef itk::Hessian3DEigenAnalysisImageFilter<HessianImageType, EigenValueImageType, EigenVectorImageType> HessianEigenAnalysisFilterType;
   typedef itk::EigenValues3DToVesselnessMeasureImageFilter<EigenValueImageType, TImage> VesselnessFilterType;
   typedef itk::EigenVectors3DToJunctionnessImageFilter<EigenVectorImageType, TImage> JunctionnessFilterType;
+  typedef itk::ValuedRegionalMaximaImageFilter<TImage, TImage> JunctionnessLocalMaxFilterType;
+
+  typedef itk::ImageFileReader<TImage> ScalarFileReaderType;
+  typedef itk::ImageFileWriter<TImage> ScalarFileWriterType;
+  typedef itk::ImageFileWriter<EigenVectorImageType> VectorFileWriterType;
 
 public:
   typedef std::string FilterType;
   static const FilterType NO_FILTER_STRING;
   static const FilterType VESSELNESS_FILTER_STRING;
   static const FilterType JUNCTIONNESS_FILTER_STRING;
+  static const FilterType JUNCTIONNESS_LOCAL_MAX_FILTER_STRING;
 
   DataModel();
   virtual ~DataModel();
@@ -54,14 +59,29 @@ public:
   void LoadImageFile(std::string fileName);
   void SaveImageFile(std::string fileName, std::string filterName);
 
-  void SetFiberDiameter(double radius);
+  void SaveFiberOrientationImageFile(std::string fileName);
+
+  void SetFiberDiameter(double diameter);
   double GetFiberDiameter();
+
+  void SetJunctionProbeDiameter(double diameter);
+  double GetJunctionProbeDiameter();
+
+  void SetJunctionVesselnessThreshold(double threshold);
+  double GetJunctionVesselnessThreshold();
+
+  void SetJunctionnessLocalMaxHeight(double height);
+  double GetJunctionnessLocalMaxHeight();
 
   void SetImageData(typename TImage::Pointer image);
   typename TImage::Pointer GetImageData();
 
-  // Returns the VTK output port for the image data.
+  // Returns the VTK output port for the scalar image data.
   vtkAlgorithmOutput* GetOutputPort();
+
+  // Returns the VTK output port for the vector image data from the
+  // eigen vectors oriented along the cylinder axes of the fibers.
+  vtkAlgorithmOutput* GetVectorOutputPort();
 
   double GetFilteredDataMinimum();
   double GetFilteredDataMaximum();
@@ -73,6 +93,7 @@ public:
   void SetFilterToNone();
   void SetFilterToVesselness();
   void SetFilterToJunctionness();
+  void SetFilterToJunctionnessLocalMax();
 
   void SetProgressCallback(ProgressCallback callback);
 
@@ -86,7 +107,9 @@ protected:
   typename HessianFilterType::Pointer hessianFilter;
   typename VesselnessFilterType::Pointer vesselnessFilter;
   typename JunctionnessFilterType::Pointer junctionnessFilter;
-  ITKImageToVTKImage<TImage>* itkToVtkFilter;
+  typename JunctionnessLocalMaxFilterType::Pointer junctionnessLocalMaxFilter;
+  ITKImageToVTKImage<TImage>* scalarImageITKToVTKFilter;
+  ITKImageToVTKImage<EigenVectorImageType>* vectorImageITKToVTKFilter;
 
   void UpdateProgress(itk::Object* object, const itk::EventObject& event);
 
