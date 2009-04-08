@@ -75,6 +75,7 @@
     </property>
     <addaction name="actionOpenImage"/>
     <addaction name="actionSaveFilteredImage"/>
+    <addaction name="actionSaveFiberOrientationImage"/>
     <addaction name="separator"/>
     <addaction name="actionSavePicture"/>
     <addaction name="actionSaveRotationAnimation"/>
@@ -96,21 +97,21 @@
   </widget>
   <widget class="QDockWidget" name="imageAnalysisDockWidget">
    <property name="sizePolicy">
-    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
    <property name="minimumSize">
     <size>
-     <width>238</width>
-     <height>340</height>
+     <width>258</width>
+     <height>345</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
-     <width>238</width>
-     <height>360</height>
+     <width>524287</width>
+     <height>524287</height>
     </size>
    </property>
    <property name="features">
@@ -130,7 +131,7 @@
      <item>
       <widget class="QGroupBox" name="filterSettingsBox">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -143,7 +144,7 @@
        </property>
        <property name="maximumSize">
         <size>
-         <width>220</width>
+         <width>16777215</width>
          <height>16777215</height>
         </size>
        </property>
@@ -182,22 +183,62 @@
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>22</height>
+            <height>0</height>
            </size>
           </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <layout class="QFormLayout" name="formLayout">
            <property name="margin">
             <number>0</number>
            </property>
-           <item>
+           <item row="0" column="0">
             <widget class="QLabel" name="fiberDiameterLabel">
              <property name="text">
               <string>Fiber diameter (um):</string>
              </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
             </widget>
            </item>
-           <item>
-            <widget class="QLineEdit" name="fiberDiameterEdit"/>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="fiberDiameterEdit">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="junctionProbeDiameterLabel">
+             <property name="text">
+              <string>Junction probe diameter (um):</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLineEdit" name="junctionProbeDiameterEdit"/>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="junctionVesselnessThresholdLabel">
+             <property name="text">
+              <string>Junction vesselness threshold:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLineEdit" name="junctionVesselnessThresholdEdit"/>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="junctionnessLocalMaxHeightLabel">
+             <property name="text">
+              <string>Junctionness local max height:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QLineEdit" name="junctionnessLocalMaxHeightEdit"/>
            </item>
           </layout>
          </widget>
@@ -218,15 +259,15 @@
      <item>
       <widget class="QGroupBox" name="imageInformation">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
        <property name="maximumSize">
         <size>
-         <width>220</width>
-         <height>200</height>
+         <width>16777215</width>
+         <height>16777215</height>
         </size>
        </property>
        <property name="title">
@@ -268,15 +309,6 @@
           <attribute name="verticalHeaderHighlightSections">
            <bool>false</bool>
           </attribute>
-          <attribute name="verticalHeaderDefaultSectionSize">
-           <number>14</number>
-          </attribute>
-          <attribute name="horizontalHeaderStretchLastSection">
-           <bool>true</bool>
-          </attribute>
-          <attribute name="horizontalHeaderDefaultSectionSize">
-           <number>95</number>
-          </attribute>
          </widget>
         </item>
        </layout>
@@ -286,10 +318,22 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="displayDockWidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>258</width>
+     <height>232</height>
+    </size>
+   </property>
    <property name="maximumSize">
     <size>
-     <width>238</width>
-     <height>524287</height>
+     <width>16777215</width>
+     <height>16777215</height>
     </size>
    </property>
    <property name="features">
@@ -309,7 +353,7 @@
      <item>
       <widget class="QGroupBox" name="displayBox">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -322,8 +366,8 @@
        </property>
        <property name="maximumSize">
         <size>
-         <width>220</width>
-         <height>160</height>
+         <width>16777215</width>
+         <height>16777215</height>
         </size>
        </property>
        <property name="title">
@@ -482,6 +526,11 @@
   <action name="actionSaveFilteredImage">
    <property name="text">
     <string>Save Filtered Image...</string>
+   </property>
+  </action>
+  <action name="actionSaveFiberOrientationImage">
+   <property name="text">
+    <string>Save Fiber Orientation Image...</string>
    </property>
   </action>
  </widget>

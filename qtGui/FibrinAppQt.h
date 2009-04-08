@@ -32,6 +32,7 @@ public slots:
 
   virtual void fileOpenImage();
   virtual void fileSaveFilteredImage();
+  virtual void fileSaveFiberOrientationImage();
   virtual void fileSavePicture();
   virtual void fileSaveRotationAnimation();
   virtual void fileSaveGeometry();

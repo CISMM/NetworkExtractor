@@ -1,3 +1,10 @@
+2009-04-08  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAppQt.h,.cxx,.ui: Added filter type for finding the local
+   junctionness maxima. Added widgets for setting junction spherical
+   probe radius and vesselness threshold used in the junctionness
+   computation.
+
 2009-03-30  Cory Quammen <cquammen@cs.unc.edu>
 
    * FibrinAppQt.h,.cxx: Added DataModelType typedef for

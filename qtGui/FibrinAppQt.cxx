@@ -17,8 +17,6 @@
 
 #include <itkSize.h>
 
-#include "IntensityThresholdThinningFilter.h"
-
 
 void ProgressCallback(float progress, const char* processName) {
   QWidgetList list = QApplication::allWidgets();
@@ -51,6 +49,7 @@ FibrinAppQt::FibrinAppQt(QWidget* p)
   // Hook up menus signals to slots
   connect(actionOpenImage, SIGNAL(triggered()), this, SLOT(fileOpenImage()));
   connect(actionSaveFilteredImage, SIGNAL(triggered()), this, SLOT(fileSaveFilteredImage()));
+  connect(actionSaveFiberOrientationImage, SIGNAL(triggered()), this, SLOT(fileSaveFiberOrientationImage()));
   connect(actionSavePicture, SIGNAL(triggered()), this, SLOT(fileSavePicture()));
   connect(actionSaveRotationAnimation, SIGNAL(triggered()), this, SLOT(fileSaveRotationAnimation()));
   connect(actionSaveGeometry, SIGNAL(triggered()), this, SLOT(fileSaveGeometry()));
@@ -77,6 +76,7 @@ FibrinAppQt::FibrinAppQt(QWidget* p)
   this->imageFilterComboBox->addItem(QString(DataModelType::NO_FILTER_STRING.c_str()));
   this->imageFilterComboBox->addItem(QString(DataModelType::VESSELNESS_FILTER_STRING.c_str()));
   this->imageFilterComboBox->addItem(QString(DataModelType::JUNCTIONNESS_FILTER_STRING.c_str()));
+  this->imageFilterComboBox->addItem(QString(DataModelType::JUNCTIONNESS_LOCAL_MAX_FILTER_STRING.c_str()));
 
   // Create and populate table model.
   this->tableModel = new QStandardItemModel(8, 2, this);
@@ -152,6 +152,15 @@ void FibrinAppQt::fileSaveFilteredImage() {
 
   this->dataModel->SaveImageFile(fileName.toStdString(), this->filterType);
 
+}
+
+
+void FibrinAppQt::fileSaveFiberOrientationImage() {
+QString fileName = QFileDialog::getSaveFileName(this, "Save Fiber Orientation Image", "", "VTK (*.vtk);;");
+  if (fileName == "")
+    return;
+
+  this->dataModel->SaveFiberOrientationImageFile(fileName.toStdString());
 }
 
 
@@ -278,6 +287,15 @@ void FibrinAppQt::applyButtonHandler() {
   double fiberDiameter = fiberDiameterEdit->text().toDouble();
   this->dataModel->SetFiberDiameter(fiberDiameter);
 
+  double junctionProbeDiameter = junctionProbeDiameterEdit->text().toDouble();
+  this->dataModel->SetJunctionProbeDiameter(junctionProbeDiameter);
+
+  double junctionVesselnessThreshold = junctionVesselnessThresholdEdit->text().toDouble();
+  this->dataModel->SetJunctionVesselnessThreshold(junctionVesselnessThreshold);
+
+  double junctionnessLocalMaxHeight = junctionnessLocalMaxHeightEdit->text().toDouble();
+  this->dataModel->SetJunctionnessLocalMaxHeight(junctionnessLocalMaxHeight);
+
   // Read isovalue.
   double isoValue = isoValueEdit->text().toDouble();
   this->visualization->SetIsoValue(isoValue);
@@ -298,6 +316,9 @@ void FibrinAppQt::refreshUI() {
     } else if (filterText.toStdString() == DataModelType::JUNCTIONNESS_FILTER_STRING) {
       this->dataModel->SetFilterToJunctionness();
       this->filterType = DataModelType::JUNCTIONNESS_FILTER_STRING;
+    } else if (filterText.toStdString() == DataModelType::JUNCTIONNESS_LOCAL_MAX_FILTER_STRING) {
+      this->dataModel->SetFilterToJunctionnessLocalMax();
+      this->filterType = DataModelType::JUNCTIONNESS_LOCAL_MAX_FILTER_STRING;
     }
   }
 
@@ -306,6 +327,15 @@ void FibrinAppQt::refreshUI() {
 
   QString fiberDiameter = QString().sprintf(decimalFormat, this->dataModel->GetFiberDiameter());
   this->fiberDiameterEdit->setText(fiberDiameter);
+  
+  QString junctionProbeFilterDiameter = QString().sprintf(decimalFormat, this->dataModel->GetJunctionProbeDiameter());
+  this->junctionProbeDiameterEdit->setText(junctionProbeFilterDiameter);
+
+  QString junctionVesselnessThreshold = QString().sprintf(decimalFormat, this->dataModel->GetJunctionVesselnessThreshold());
+  this->junctionVesselnessThresholdEdit->setText(junctionVesselnessThreshold);
+
+  QString junctionnessLocalMaxHeight = QString().sprintf(decimalFormat, this->dataModel->GetJunctionnessLocalMaxHeight());
+  this->junctionnessLocalMaxHeightEdit->setText(junctionnessLocalMaxHeight);
 
   QString dataMin = QString().sprintf(decimalFormat, this->dataModel->GetFilteredDataMinimum());
   this->tableModel->item(0, 1)->setText(dataMin);
