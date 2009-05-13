@@ -30,25 +30,28 @@ public:
 
 public slots:
 
-  virtual void fileOpenImage();
-  virtual void fileSaveFilteredImage();
-  virtual void fileSaveFiberOrientationImage();
-  virtual void fileSavePicture();
-  virtual void fileSaveRotationAnimation();
-  virtual void fileSaveGeometry();
+  // Use Qt's auto-connect magic to tie GUI widgets to slots.
+  // Names of the methods must follow the naming convention
+  // on_<widget name>_<signal name>(<signal parameters>).
+  virtual void on_actionOpenImage_triggered();
+  virtual void on_actionSaveFilteredImage_triggered();
+  virtual void on_actionSaveFiberOrientationImage_triggered();
+  virtual void on_actionSavePicture_triggered();
+  virtual void on_actionSaveRotationAnimation_triggered();
+  virtual void on_actionSaveGeometry_triggered();
 
-  virtual void fileExit();
+  virtual void on_actionExit_triggered();
 
-  virtual void viewResetView();
-  virtual void viewOpenView();
-  virtual void viewSaveView();
+  virtual void on_actionResetView_triggered();
+  virtual void on_actionOpenView_triggered();
+  virtual void on_actionSaveView_triggered();
 
-  virtual void isoValueEditHandler(QString text);
-  virtual void isoValueSliderHandler(int value);
+  virtual void on_isoValueEdit_textEdited(QString text);
+  virtual void on_isoValueSlider_sliderMoved(int value);
 
-  virtual void showDataOutlineHandler(bool show);
+  virtual void on_showDataOutline_toggled(bool show);
 
-  virtual void applyButtonHandler();
+  virtual void on_applyButton_clicked();
 
 protected:
   DataModelType* dataModel;

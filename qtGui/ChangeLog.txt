@@ -1,5 +1,12 @@
 2009-05-13  Cory Quammen <cquammen@cs.unc.edu>
 
+   * FibrinAppQt.h,.cxx: Changed names of slots that respond to GUI
+   events so that Qt's moc performs the connection from widget to
+   slot automatically, that is, no explicit connect() function
+   call is needed.
+
+2009-05-13  Cory Quammen <cquammen@cs.unc.edu>
+
    * FibrinAppQt.cxx: Changed "vesselness" -> "fiberness".
    
    * FibrinAppQt.ui: Changed "vesselness" -> "fiberness". Removed

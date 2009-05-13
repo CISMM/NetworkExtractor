@@ -46,26 +46,6 @@ FibrinAppQt::FibrinAppQt(QWidget* p)
   this->ren = vtkRenderer::New();
   qvtkWidget->GetRenderWindow()->AddRenderer(ren);
 
-  // Hook up menus signals to slots
-  connect(actionOpenImage, SIGNAL(triggered()), this, SLOT(fileOpenImage()));
-  connect(actionSaveFilteredImage, SIGNAL(triggered()), this, SLOT(fileSaveFilteredImage()));
-  connect(actionSaveFiberOrientationImage, SIGNAL(triggered()), this, SLOT(fileSaveFiberOrientationImage()));
-  connect(actionSavePicture, SIGNAL(triggered()), this, SLOT(fileSavePicture()));
-  connect(actionSaveRotationAnimation, SIGNAL(triggered()), this, SLOT(fileSaveRotationAnimation()));
-  connect(actionSaveGeometry, SIGNAL(triggered()), this, SLOT(fileSaveGeometry()));
-  connect(actionExit, SIGNAL(triggered()), this, SLOT(fileExit()));
-
-  connect(actionResetView, SIGNAL(triggered()), this, SLOT(viewResetView()));
-  connect(actionOpenView, SIGNAL(triggered()), this, SLOT(viewOpenView()));
-  connect(actionSaveView, SIGNAL(triggered()), this, SLOT(viewSaveView()));
-
-  connect(isoValueEdit, SIGNAL(textEdited(QString)), this, SLOT(isoValueEditHandler(QString)));
-  connect(isoValueSlider, SIGNAL(sliderMoved(int)), this, SLOT(isoValueSliderHandler(int)));
-  
-  connect(showDataOutline, SIGNAL(toggled(bool)), this, SLOT(showDataOutlineHandler(bool)));
-
-  connect(applyButton, SIGNAL(clicked()), this, SLOT(applyButtonHandler()));
-
   // Instantiate data model.
   this->dataModel = new DataModel<Float3DImageType>();
   this->dataModel->SetProgressCallback(ProgressCallback);
@@ -108,7 +88,7 @@ FibrinAppQt::~FibrinAppQt() {
 
 
 // Action to be taken upon file open 
-void FibrinAppQt::fileOpenImage() {
+void FibrinAppQt::on_actionOpenImage_triggered() {
 
   // Locate file.
   QString fileName = QFileDialog::getOpenFileName(this, "Open Image Data", "", "VTK Images (*.vtk);;LSM Images (*.lsm);;TIF Images (*.tif);;");
@@ -145,7 +125,7 @@ void FibrinAppQt::fileOpenImage() {
 }
 
 
-void FibrinAppQt::fileSaveFilteredImage() {
+void FibrinAppQt::on_actionSaveFilteredImage_triggered() {
   QString fileName = QFileDialog::getSaveFileName(this, "Save Filtered Image", "", "VTK (*.vtk);;");
   if (fileName == "")
     return;
@@ -155,7 +135,7 @@ void FibrinAppQt::fileSaveFilteredImage() {
 }
 
 
-void FibrinAppQt::fileSaveFiberOrientationImage() {
+void FibrinAppQt::on_actionSaveFiberOrientationImage_triggered() {
 QString fileName = QFileDialog::getSaveFileName(this, "Save Fiber Orientation Image", "", "VTK (*.vtk);;");
   if (fileName == "")
     return;
@@ -164,7 +144,7 @@ QString fileName = QFileDialog::getSaveFileName(this, "Save Fiber Orientation Im
 }
 
 
-void FibrinAppQt::fileSavePicture() {
+void FibrinAppQt::on_actionSavePicture_triggered() {
   QString fileName = QFileDialog::getSaveFileName(this, "Save Picture", "", "PNG (*.png);;");
   if (fileName == "")
     return;
@@ -182,7 +162,7 @@ void FibrinAppQt::fileSavePicture() {
 }
 
 
-void FibrinAppQt::fileSaveRotationAnimation() {
+void FibrinAppQt::on_actionSaveRotationAnimation_triggered() {
   QString fileName = QFileDialog::getSaveFileName(this, "Save Rotation Animation", "", "PNG (*.png);;");
   if (fileName == "")
     return;
@@ -224,7 +204,7 @@ void FibrinAppQt::fileSaveRotationAnimation() {
 }
 
 
-void FibrinAppQt::fileSaveGeometry() {
+void FibrinAppQt::on_actionSaveGeometry_triggered() {
   QString fileName = QFileDialog::getSaveFileName(this, "Save Geometry", "", "VTK (*.vtk);;");
   if (fileName == "")
     return;
@@ -238,12 +218,12 @@ void FibrinAppQt::fileSaveGeometry() {
 }
 
 
-void FibrinAppQt::fileExit() {
+void FibrinAppQt::on_actionExit_triggered() {
   qApp->exit();
 }
 
 
-void FibrinAppQt::viewResetView() {
+void FibrinAppQt::on_actionResetView_triggered() {
   vtkCamera* camera = this->ren->GetActiveCamera();
   camera->SetFocalPoint(0, 0, 0);
   camera->SetPosition(0, 0, 1);
@@ -253,36 +233,36 @@ void FibrinAppQt::viewResetView() {
 }
 
 
-void FibrinAppQt::viewOpenView() {
+void FibrinAppQt::on_actionOpenView_triggered() {
   this->qvtkWidget->GetRenderWindow()->Render();
 
 }
 
 
-void FibrinAppQt::viewSaveView() {
+void FibrinAppQt::on_actionSaveView_triggered() {
 
 }
 
 
-void FibrinAppQt::isoValueEditHandler(QString text) {
+void FibrinAppQt::on_isoValueEdit_textEdited(QString text) {
   int value = static_cast<int>(text.toDouble());
   this->isoValueSlider->setValue(value);
 }
 
 
-void FibrinAppQt::isoValueSliderHandler(int value) {
+void FibrinAppQt::on_isoValueSlider_sliderMoved(int value) {
   QString text = QString().sprintf("%d", value);
   this->isoValueEdit->setText(text);
 }
 
 
-void FibrinAppQt::showDataOutlineHandler(bool show) {
+void FibrinAppQt::on_showDataOutline_toggled(bool show) {
   this->visualization->SetShowOutline(show);
   this->qvtkWidget->GetRenderWindow()->Render();
 }
 
 
-void FibrinAppQt::applyButtonHandler() {
+void FibrinAppQt::on_applyButton_clicked() {
   // Read fiber diameter.
   double fiberDiameter = fiberDiameterEdit->text().toDouble();
   this->dataModel->SetFiberDiameter(fiberDiameter);
