@@ -12,8 +12,8 @@ template <class TImage>
 const typename DataModel<TImage>::FilterType typename DataModel<TImage>::NO_FILTER_STRING = std::string("No filter");
 
 template <class TImage>
-const typename DataModel<TImage>::FilterType typename DataModel<TImage>::VESSELNESS_FILTER_STRING 
-  = std::string("Vesselness");
+const typename DataModel<TImage>::FilterType typename DataModel<TImage>::FIBERNESS_FILTER_STRING 
+  = std::string("Fiberness");
 
 template <class TImage>
 const typename DataModel<TImage>::FilterType typename DataModel<TImage>::JUNCTIONNESS_FILTER_STRING 
@@ -32,7 +32,7 @@ DataModel<TImage>
 
   this->minMaxFilter = MinMaxType::New();
 
-  // Vesselness filters.
+  // Fiberness filters.
   this->hessianFilter = HessianFilterType::New();
   //this->hessianFilter->ReleaseDataFlagOn();
 
@@ -40,12 +40,12 @@ DataModel<TImage>
   //this->eigenAnalysisFilter->ReleaseDataFlagOn();
   this->eigenAnalysisFilter->SetInput(this->hessianFilter->GetOutput());
   
-  this->vesselnessFilter = VesselnessFilterType::New();
-  this->vesselnessFilter->SetInput(this->eigenAnalysisFilter->GetEigenValues());
+  this->fibernessFilter = FibernessFilterType::New();
+  this->fibernessFilter->SetInput(this->eigenAnalysisFilter->GetEigenValues());
 
   this->junctionnessFilter = JunctionnessFilterType::New();
   this->junctionnessFilter->SetEigenVectorInput(this->eigenAnalysisFilter->GetEigenVectors());
-  this->junctionnessFilter->SetVesselnessInput(this->vesselnessFilter->GetOutput());
+  this->junctionnessFilter->SetVesselnessInput(this->fibernessFilter->GetOutput());
 
   this->junctionnessLocalMaxFilter = JunctionnessLocalMaxFilterType::New();
   this->junctionnessLocalMaxFilter->SetInput(this->junctionnessFilter->GetOutput());
@@ -62,7 +62,7 @@ DataModel<TImage>
   itk::MemberCommand<DataModel<TImage>>::Pointer eigenAnalysisFilterProgressCommand 
     = itk::MemberCommand<DataModel<TImage>>::New();
 
-  itk::MemberCommand<DataModel<TImage>>::Pointer vesselnessFilterProgressCommand 
+  itk::MemberCommand<DataModel<TImage>>::Pointer fibernessFilterProgressCommand 
     = itk::MemberCommand<DataModel<TImage>>::New();
 
   itk::MemberCommand<DataModel<TImage>>::Pointer junctionnessFilterProgressCommand 
@@ -74,7 +74,7 @@ DataModel<TImage>
   // Set the callback function for each of the progress reporters.
   hessianFilterProgressCommand->SetCallbackFunction(this, &DataModel<TImage>::UpdateProgress);
   eigenAnalysisFilterProgressCommand->SetCallbackFunction(this, &DataModel<TImage>::UpdateProgress);
-  vesselnessFilterProgressCommand->SetCallbackFunction(this, &DataModel<TImage>::UpdateProgress);
+  fibernessFilterProgressCommand->SetCallbackFunction(this, &DataModel<TImage>::UpdateProgress);
   junctionnessFilterProgressCommand->SetCallbackFunction(this, &DataModel<TImage>::UpdateProgress);
   junctionnessLocalMaxFilterProgressCommand->SetCallbackFunction(this, &DataModel<TImage>::UpdateProgress);
 
@@ -83,8 +83,8 @@ DataModel<TImage>
     "filterName", std::string("Hessian Filter"));
   itk::EncapsulateMetaData<std::string >(eigenAnalysisFilter->GetMetaDataDictionary(),
     "filterName", std::string("Eigen Analysis Filter"));
-  itk::EncapsulateMetaData<std::string >(vesselnessFilter->GetMetaDataDictionary(),
-    "filterName", std::string("Vesselness Filter"));
+  itk::EncapsulateMetaData<std::string >(fibernessFilter->GetMetaDataDictionary(),
+    "filterName", std::string("Fiberness Filter"));
   itk::EncapsulateMetaData<std::string >(junctionnessFilter->GetMetaDataDictionary(),
     "filterName", std::string("Junctionness Filter"));
   itk::EncapsulateMetaData<std::string>(junctionnessLocalMaxFilter->GetMetaDataDictionary(),
@@ -92,7 +92,7 @@ DataModel<TImage>
 
   this->hessianFilter->AddObserver(itk::ProgressEvent(), hessianFilterProgressCommand);
   this->eigenAnalysisFilter->AddObserver(itk::ProgressEvent(), eigenAnalysisFilterProgressCommand);
-  this->vesselnessFilter->AddObserver(itk::ProgressEvent(), vesselnessFilterProgressCommand);
+  this->fibernessFilter->AddObserver(itk::ProgressEvent(), fibernessFilterProgressCommand);
   this->junctionnessFilter->AddObserver(itk::ProgressEvent(), junctionnessFilterProgressCommand);
   this->junctionnessLocalMaxFilter->AddObserver(itk::ProgressEvent(), junctionnessLocalMaxFilterProgressCommand);
 
@@ -130,8 +130,8 @@ DataModel<TImage>
   ScalarFileWriterType::Pointer writer = ScalarFileWriterType::New();
   if (filterName == NO_FILTER_STRING)
     writer->SetInput(this->imageData);
-  else if (filterName == VESSELNESS_FILTER_STRING)
-    writer->SetInput(this->vesselnessFilter->GetOutput());
+  else if (filterName == FIBERNESS_FILTER_STRING)
+    writer->SetInput(this->fibernessFilter->GetOutput());
   else if (filterName == JUNCTIONNESS_FILTER_STRING)
     writer->SetInput(this->junctionnessFilter->GetOutput());
   else if (filterName == JUNCTIONNESS_LOCAL_MAX_FILTER_STRING)
@@ -200,7 +200,7 @@ DataModel<TImage>
 template <class TImage>
 void
 DataModel<TImage>
-::SetJunctionVesselnessThreshold(double threshold) {
+::SetJunctionFibernessThreshold(double threshold) {
   if (threshold != this->junctionnessFilter->GetVesselnessThreshold()) {
     this->junctionnessFilter->SetVesselnessThreshold(threshold);
   }
@@ -210,7 +210,7 @@ DataModel<TImage>
 template <class TImage>
 double
 DataModel<TImage>
-::GetJunctionVesselnessThreshold() {
+::GetJunctionFibernessThreshold() {
   return this->junctionnessFilter->GetVesselnessThreshold();
 }
 
@@ -345,15 +345,15 @@ DataModel<TImage>
 template <class TImage>
 void
 DataModel<TImage>
-::SetFilterToVesselness() {
+::SetFilterToFiberness() {
 
   if (!this->imageData)
     return;
 
-  this->vesselnessFilter->Update();
-  this->minMaxFilter->SetImage(this->vesselnessFilter->GetOutput());
+  this->fibernessFilter->Update();
+  this->minMaxFilter->SetImage(this->fibernessFilter->GetOutput());
   this->minMaxFilter->Compute();
-  this->scalarImageITKToVTKFilter->SetInput(this->vesselnessFilter->GetOutput());
+  this->scalarImageITKToVTKFilter->SetInput(this->fibernessFilter->GetOutput());
 }
 
 

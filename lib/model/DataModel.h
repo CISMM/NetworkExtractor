@@ -38,7 +38,7 @@ class DataModel {
   typedef typename itk::Image<EigenValueType, 3>  EigenValueImageType;
   typedef typename itk::Image<EigenVectorType, 3> EigenVectorImageType;
   typedef itk::Hessian3DEigenAnalysisImageFilter<HessianImageType, EigenValueImageType, EigenVectorImageType> HessianEigenAnalysisFilterType;
-  typedef itk::EigenValues3DToVesselnessMeasureImageFilter<EigenValueImageType, TImage> VesselnessFilterType;
+  typedef itk::EigenValues3DToVesselnessMeasureImageFilter<EigenValueImageType, TImage> FibernessFilterType;
   typedef itk::EigenVectors3DToJunctionnessImageFilter<EigenVectorImageType, TImage> JunctionnessFilterType;
   typedef itk::ValuedRegionalMaximaImageFilter<TImage, TImage> JunctionnessLocalMaxFilterType;
 
@@ -49,7 +49,7 @@ class DataModel {
 public:
   typedef std::string FilterType;
   static const FilterType NO_FILTER_STRING;
-  static const FilterType VESSELNESS_FILTER_STRING;
+  static const FilterType FIBERNESS_FILTER_STRING;
   static const FilterType JUNCTIONNESS_FILTER_STRING;
   static const FilterType JUNCTIONNESS_LOCAL_MAX_FILTER_STRING;
 
@@ -67,8 +67,8 @@ public:
   void SetJunctionProbeDiameter(double diameter);
   double GetJunctionProbeDiameter();
 
-  void SetJunctionVesselnessThreshold(double threshold);
-  double GetJunctionVesselnessThreshold();
+  void SetJunctionFibernessThreshold(double threshold);
+  double GetJunctionFibernessThreshold();
 
   void SetJunctionnessLocalMaxHeight(double height);
   double GetJunctionnessLocalMaxHeight();
@@ -91,7 +91,7 @@ public:
   void GetSpacing(double spacing[3]);
 
   void SetFilterToNone();
-  void SetFilterToVesselness();
+  void SetFilterToFiberness();
   void SetFilterToJunctionness();
   void SetFilterToJunctionnessLocalMax();
 
@@ -105,7 +105,7 @@ protected:
   typename HessianEigenAnalysisFilterType::Pointer eigenAnalysisFilter;
 
   typename HessianFilterType::Pointer hessianFilter;
-  typename VesselnessFilterType::Pointer vesselnessFilter;
+  typename FibernessFilterType::Pointer fibernessFilter;
   typename JunctionnessFilterType::Pointer junctionnessFilter;
   typename JunctionnessLocalMaxFilterType::Pointer junctionnessLocalMaxFilter;
   ITKImageToVTKImage<TImage>* scalarImageITKToVTKFilter;

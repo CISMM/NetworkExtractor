@@ -1,3 +1,7 @@
+2009-05-13  Cory Quammen <cquammen@cs.unc.edu>
+
+   * DataModel.h,.cxx: Changed "vesselness" -> "fiberness".
+
 2009-04-08  Cory Quammen <cquammen@cs.unc.edu>
 
    * DataModel.h,.cxx: Added a local maxima finder image filter
