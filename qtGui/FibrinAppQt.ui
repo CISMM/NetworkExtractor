@@ -193,7 +193,7 @@
            <item row="0" column="0">
             <widget class="QLabel" name="fiberDiameterLabel">
              <property name="text">
-              <string>Fiber diameter (um):</string>
+              <string>Estimated fiber diameter (um):</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -221,14 +221,14 @@
             <widget class="QLineEdit" name="junctionProbeDiameterEdit"/>
            </item>
            <item row="2" column="0">
-            <widget class="QLabel" name="junctionVesselnessThresholdLabel">
+            <widget class="QLabel" name="junctionFibernessThresholdLabel">
              <property name="text">
-              <string>Junction vesselness threshold:</string>
+              <string>Junction fiberness threshold:</string>
              </property>
             </widget>
            </item>
            <item row="2" column="1">
-            <widget class="QLineEdit" name="junctionVesselnessThresholdEdit"/>
+            <widget class="QLineEdit" name="junctionFibernessThresholdEdit"/>
            </item>
            <item row="3" column="0">
             <widget class="QLabel" name="junctionnessLocalMaxHeightLabel">
@@ -332,8 +332,8 @@
    </property>
    <property name="maximumSize">
     <size>
-     <width>16777215</width>
-     <height>16777215</height>
+     <width>524287</width>
+     <height>524287</height>
     </size>
    </property>
    <property name="features">
@@ -379,11 +379,6 @@
           <item>
            <property name="text">
             <string>Isosurface</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Volume Rendering</string>
            </property>
           </item>
          </widget>

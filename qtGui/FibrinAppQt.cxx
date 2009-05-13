@@ -74,7 +74,7 @@ FibrinAppQt::FibrinAppQt(QWidget* p)
   this->visualization = new Visualization();
 
   this->imageFilterComboBox->addItem(QString(DataModelType::NO_FILTER_STRING.c_str()));
-  this->imageFilterComboBox->addItem(QString(DataModelType::VESSELNESS_FILTER_STRING.c_str()));
+  this->imageFilterComboBox->addItem(QString(DataModelType::FIBERNESS_FILTER_STRING.c_str()));
   this->imageFilterComboBox->addItem(QString(DataModelType::JUNCTIONNESS_FILTER_STRING.c_str()));
   this->imageFilterComboBox->addItem(QString(DataModelType::JUNCTIONNESS_LOCAL_MAX_FILTER_STRING.c_str()));
 
@@ -290,8 +290,8 @@ void FibrinAppQt::applyButtonHandler() {
   double junctionProbeDiameter = junctionProbeDiameterEdit->text().toDouble();
   this->dataModel->SetJunctionProbeDiameter(junctionProbeDiameter);
 
-  double junctionVesselnessThreshold = junctionVesselnessThresholdEdit->text().toDouble();
-  this->dataModel->SetJunctionVesselnessThreshold(junctionVesselnessThreshold);
+  double junctionFibernessThreshold = junctionFibernessThresholdEdit->text().toDouble();
+  this->dataModel->SetJunctionFibernessThreshold(junctionFibernessThreshold);
 
   double junctionnessLocalMaxHeight = junctionnessLocalMaxHeightEdit->text().toDouble();
   this->dataModel->SetJunctionnessLocalMaxHeight(junctionnessLocalMaxHeight);
@@ -310,9 +310,9 @@ void FibrinAppQt::refreshUI() {
     if (filterText.toStdString() == DataModelType::NO_FILTER_STRING) {
       this->dataModel->SetFilterToNone();
       this->filterType = DataModelType::NO_FILTER_STRING;
-    } else if (filterText.toStdString() == DataModelType::VESSELNESS_FILTER_STRING) {
-      this->dataModel->SetFilterToVesselness();
-      this->filterType = DataModelType::VESSELNESS_FILTER_STRING;
+    } else if (filterText.toStdString() == DataModelType::FIBERNESS_FILTER_STRING) {
+      this->dataModel->SetFilterToFiberness();
+      this->filterType = DataModelType::FIBERNESS_FILTER_STRING;
     } else if (filterText.toStdString() == DataModelType::JUNCTIONNESS_FILTER_STRING) {
       this->dataModel->SetFilterToJunctionness();
       this->filterType = DataModelType::JUNCTIONNESS_FILTER_STRING;
@@ -331,8 +331,8 @@ void FibrinAppQt::refreshUI() {
   QString junctionProbeFilterDiameter = QString().sprintf(decimalFormat, this->dataModel->GetJunctionProbeDiameter());
   this->junctionProbeDiameterEdit->setText(junctionProbeFilterDiameter);
 
-  QString junctionVesselnessThreshold = QString().sprintf(decimalFormat, this->dataModel->GetJunctionVesselnessThreshold());
-  this->junctionVesselnessThresholdEdit->setText(junctionVesselnessThreshold);
+  QString junctionFibernessThreshold = QString().sprintf(decimalFormat, this->dataModel->GetJunctionFibernessThreshold());
+  this->junctionFibernessThresholdEdit->setText(junctionFibernessThreshold);
 
   QString junctionnessLocalMaxHeight = QString().sprintf(decimalFormat, this->dataModel->GetJunctionnessLocalMaxHeight());
   this->junctionnessLocalMaxHeightEdit->setText(junctionnessLocalMaxHeight);

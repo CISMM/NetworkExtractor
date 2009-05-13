@@ -1,3 +1,11 @@
+2009-05-13  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAppQt.cxx: Changed "vesselness" -> "fiberness".
+   
+   * FibrinAppQt.ui: Changed "vesselness" -> "fiberness". Removed
+   volume rendering option in display popup menu because the option
+   isn't implemented.
+
 2009-04-08  Cory Quammen <cquammen@cs.unc.edu>
 
    * FibrinAppQt.h,.cxx,.ui: Added filter type for finding the local
