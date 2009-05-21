@@ -3,7 +3,10 @@
 
 #include <string>
 
+#include <itkBinaryThresholdImageFilter.h>
+#include <itkCastImageFilter.h>
 #include <itkCommand.h>
+#include <itkConnectedComponentImageFilter.h>
 #include <itkEigenValues3DToVesselnessMeasureImageFilter.h>
 #include <itkEigenVectors3DToJunctionnessMeasureImageFilter.h>
 #include <itkEventObject.h>
@@ -11,12 +14,12 @@
 #include <itkImage.h>
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
-#include <itkValuedRegionalMaximaImageFilter.h>
 #include <itkHessian3DEigenAnalysisImageFilter.h>
 #include <itkHessianRecursiveGaussianImageFilter.h>
 #include <itkMatrix.h>
 #include <itkMinimumMaximumImageCalculator.h>
 #include <itkSymmetricSecondRankTensor.h>
+#include <itkValuedRegionalMaximaImageFilter.h>
 
 class vtkAlgorithmOutput;
 
@@ -41,15 +44,27 @@ class DataModel {
   typedef itk::EigenValues3DToVesselnessMeasureImageFilter<EigenValueImageType, TImage> FibernessFilterType;
   typedef itk::EigenVectors3DToJunctionnessImageFilter<EigenVectorImageType, TImage> JunctionnessFilterType;
   typedef itk::ValuedRegionalMaximaImageFilter<TImage, TImage> JunctionnessLocalMaxFilterType;
+  typedef itk::BinaryThresholdImageFilter<TImage, TImage> ThresholdFilterType;
+
+  typedef int ConnectedComponentOutputType;
+  typedef itk::Image<ConnectedComponentOutputType, 3> ConnectedComponentOutputImageType;
+  typedef itk::ConnectedComponentImageFilter<TImage, ConnectedComponentOutputImageType> ConnectedComponentFilterType;
+  typedef itk::MinimumMaximumImageCalculator<ConnectedComponentOutputImageType> MinMaxConnectedComponentFilterType;
 
   typedef itk::ImageFileReader<TImage> ScalarFileReaderType;
   typedef itk::ImageFileWriter<TImage> ScalarFileWriterType;
   typedef itk::ImageFileWriter<EigenVectorImageType> VectorFileWriterType;
 
+  // For writing out to TIFF images.
+  typedef itk::Image<unsigned short, 3> TIFFOutputImageType;
+  typedef itk::CastImageFilter<TImage,TIFFOutputImageType> UShort3DCastType;
+  typedef itk::ImageFileWriter<TIFFOutputImageType> TIFFWriterType;
+
 public:
   typedef std::string FilterType;
   static const FilterType NO_FILTER_STRING;
   static const FilterType FIBERNESS_FILTER_STRING;
+  static const FilterType FIBERNESS_THRESHOLD_FILTER_STRING;
   static const FilterType JUNCTIONNESS_FILTER_STRING;
   static const FilterType JUNCTIONNESS_LOCAL_MAX_FILTER_STRING;
 
@@ -63,6 +78,8 @@ public:
 
   void SetFiberDiameter(double diameter);
   double GetFiberDiameter();
+
+  void SetFibernessThreshold(double threshold);
 
   void SetJunctionProbeDiameter(double diameter);
   double GetJunctionProbeDiameter();
@@ -92,8 +109,13 @@ public:
 
   void SetFilterToNone();
   void SetFilterToFiberness();
+  void SetFilterToFibernessThreshold();
   void SetFilterToJunctionness();
   void SetFilterToJunctionnessLocalMax();
+
+  void ComputeConnectedComponentsVsThresholdData(double minThreshold, double maxThreshold,
+    double thresholdIncrement, std::string fileName);
+  void ComputeVolumeFractionEstimateVsZData(double threshold, std::string fileName);
 
   void SetProgressCallback(ProgressCallback callback);
 
@@ -106,6 +128,9 @@ protected:
 
   typename HessianFilterType::Pointer hessianFilter;
   typename FibernessFilterType::Pointer fibernessFilter;
+  typename ThresholdFilterType::Pointer fibernessThresholdFilter;
+  typename ConnectedComponentFilterType::Pointer fibernessConnectedComponentsFilter;
+  typename MinMaxConnectedComponentFilterType::Pointer minMaxConnectedComponentsFilter;
   typename JunctionnessFilterType::Pointer junctionnessFilter;
   typename JunctionnessLocalMaxFilterType::Pointer junctionnessLocalMaxFilter;
   ITKImageToVTKImage<TImage>* scalarImageITKToVTKFilter;

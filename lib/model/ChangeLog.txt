@@ -1,3 +1,12 @@
+2009-05-21  Cory Quammen <cquammen@cs.unc.edu>
+
+   * DataModel.h,.cxx: Added filter to binarize fiberness image
+   to distinguish fiber from non-fiber. Added method to set
+   fiberness threshold (was using isovalue from the visualization
+   before, but needed to separate out so we can look at the
+   isosurface of the binary image. Added two methods to compute
+   certain quantities as a function of z.
+
 2009-05-13  Cory Quammen <cquammen@cs.unc.edu>
 
    * DataModel.h,.cxx: Changed "vesselness" -> "fiberness".
