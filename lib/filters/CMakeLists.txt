@@ -1,5 +1,5 @@
 SET(filtersSrc
-  itk/itkEigenValues3DToVesselnessMeasureImageFilter.cxx
+  itk/itkEigenValues3DToSatoVesselnessMeasureImageFilter.cxx
   itk/itkEigenVectors3DToJunctionnessMeasureImageFilter.cxx
   itk/itkHessian3DEigenAnalysisImageFilter.cxx
 )

@@ -1,3 +1,9 @@
+2009-05-21  Cory Quammen <cquammen@cs.unc.edu>
+
+   * itk/itkEigenVectors3DToVesselnessMeasureImageFilter.h,.cxx:
+   Changed name of files to 
+   itk/itkEigenVectors3DToSatoVesselnessMeasureImageFilter.h,.cxx
+
 2009-04-08  Cory Quammen <cquammen@cs.unc.edu>
 
    * itk/itkEigenVectors3DToJunctionnessMeasureImageFilter.h,.cxx:

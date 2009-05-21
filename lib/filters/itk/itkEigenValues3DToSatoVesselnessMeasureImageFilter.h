@@ -1,10 +1,10 @@
 /*=========================================================================
 
   Program:   Insight Segmentation & Registration Toolkit
-  Module:    $RCSfile: itkEigenValues3DToVesselnessMeasureImageFilter.h,v $
+  Module:    $RCSfile: itkEigenValues3DToSatoVesselnessMeasureImageFilter.h,v $
   Language:  C++
-  Date:      $Date: 2009/03/19 15:44:09 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009/05/21 12:49:12 $
+  Version:   $Revision: 1.1 $
 
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
@@ -15,8 +15,8 @@
 
 =========================================================================*/
 
-#ifndef __itkEigenValues3DToVesselnessMeasureImageFilter_h
-#define __itkEigenValues3DToVesselnessMeasureImageFilter_h
+#ifndef __itkEigenValues3DToSatoVesselnessMeasureImageFilter_h
+#define __itkEigenValues3DToSatoVesselnessMeasureImageFilter_h
 
 #include "itkImageToImageFilter.h"
 
@@ -81,6 +81,6 @@ private:
 
 } // end namespace itk
 
-#include "itkEigenValues3DToVesselnessMeasureImageFilter.cxx"
+#include "itkEigenValues3DToSatoVesselnessMeasureImageFilter.cxx"
 
-#endif // __itkEigenValues3DToVesselnessMeasureImageFilter_h
+#endif // __itkEigenValues3DToSatoVesselnessMeasureImageFilter_h
