@@ -7,7 +7,7 @@
 #include <itkCastImageFilter.h>
 #include <itkCommand.h>
 #include <itkConnectedComponentImageFilter.h>
-#include <itkEigenValues3DToVesselnessMeasureImageFilter.h>
+#include <itkEigenValues3DToSatoVesselnessMeasureImageFilter.h>
 #include <itkEigenVectors3DToJunctionnessMeasureImageFilter.h>
 #include <itkEventObject.h>
 #include <itkFixedArray.h>

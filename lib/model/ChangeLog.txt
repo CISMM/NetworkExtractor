@@ -1,5 +1,10 @@
 2009-05-21  Cory Quammen <cquammen@cs.unc.edu>
 
+   * DataModel.h: Changed itkEigenValues3DToVesselnessMeasureImageFilter.h
+   to itkEigenValues3DToSatoVesselnessMeasureImageFilter.h.
+
+2009-05-21  Cory Quammen <cquammen@cs.unc.edu>
+
    * DataModel.h,.cxx: Added filter to binarize fiberness image
    to distinguish fiber from non-fiber. Added method to set
    fiberness threshold (was using isovalue from the visualization
