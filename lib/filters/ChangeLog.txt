@@ -1,5 +1,17 @@
 2009-05-21  Cory Quammen <cquammen@cs.unc.edu>
 
+   * ChangeLog.txt: Added itk/itkEigenValues3DToFrangiVesselnessMeasureImageFilter.cxx
+   source file.
+
+   * itk/itkEigenValues3DToFrangiVesselnessMeasureImageFilter.h,.cxx:
+   Initial implementation of Frangi vesselness measure filter.
+
+   * itk/itkEigenValues3DToSatoVesselnessMeasureImageFilter.h,.cxx:
+   Forgot to change class name to EigenValues3DToSatoVesselnessMeasureImageFilter
+   throughout.
+
+2009-05-21  Cory Quammen <cquammen@cs.unc.edu>
+
    * itk/itkEigenVectors3DToVesselnessMeasureImageFilter.h,.cxx:
    Changed name of files to 
    itk/itkEigenVectors3DToSatoVesselnessMeasureImageFilter.h,.cxx

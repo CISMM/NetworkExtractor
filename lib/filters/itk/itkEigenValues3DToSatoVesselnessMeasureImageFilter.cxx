@@ -3,8 +3,8 @@
   Program:   Insight Segmentation & Registration Toolkit
   Module:    $RCSfile: itkEigenValues3DToSatoVesselnessMeasureImageFilter.cxx,v $
   Language:  C++
-  Date:      $Date: 2009/05/21 12:49:12 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009/05/21 19:32:18 $
+  Version:   $Revision: 1.2 $
 
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
@@ -25,8 +25,8 @@ namespace itk {
  * Constructor.
  */
 template < class TEigenValueImage, class TOutputImage >
-EigenValues3DToVesselnessMeasureImageFilter< TEigenValueImage, TOutputImage >
-::EigenValues3DToVesselnessMeasureImageFilter()
+EigenValues3DToSatoVesselnessMeasureImageFilter< TEigenValueImage, TOutputImage >
+::EigenValues3DToSatoVesselnessMeasureImageFilter()
 {
   m_Alpha1 = 0.5;
   m_Alpha2 = 2.0;
@@ -35,10 +35,10 @@ EigenValues3DToVesselnessMeasureImageFilter< TEigenValueImage, TOutputImage >
 
 template < class TEigenValueImage, class TOutputImage >
 void
-EigenValues3DToVesselnessMeasureImageFilter< TEigenValueImage, TOutputImage >
+EigenValues3DToSatoVesselnessMeasureImageFilter< TEigenValueImage, TOutputImage >
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, int threadId)
 {
-  itkDebugMacro(<< "EigenValues3DToVesselnessMeasureImageFilter generating data");
+  itkDebugMacro(<< "EigenValues3DToSatoVesselnessMeasureImageFilter generating data");
 
   EigenValueImageConstPointer inputPtr(
     dynamic_cast<const EigenValueImageType*>(
