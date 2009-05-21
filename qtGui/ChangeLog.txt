@@ -1,3 +1,10 @@
+2009-05-21  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAppQt.h,.cxx,.ui: Added option to compute threshold
+   fiberness measure. Added GUI widgets to set fiberness threshold.
+   Added a new section with widgets for computing certain metrics
+   as a function of z.
+
 2009-05-13  Cory Quammen <cquammen@cs.unc.edu>
 
    * FibrinAppQt.h,.cxx: Changed names of slots that respond to GUI

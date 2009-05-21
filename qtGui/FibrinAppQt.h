@@ -46,6 +46,9 @@ public slots:
   virtual void on_actionOpenView_triggered();
   virtual void on_actionSaveView_triggered();
 
+  virtual void on_saveConnectedComponentsData_clicked();
+  virtual void on_saveVolumeFractionEstimateData_clicked();
+
   virtual void on_isoValueEdit_textEdited(QString text);
   virtual void on_isoValueSlider_sliderMoved(int value);
 

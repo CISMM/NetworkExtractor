@@ -55,6 +55,7 @@ FibrinAppQt::FibrinAppQt(QWidget* p)
 
   this->imageFilterComboBox->addItem(QString(DataModelType::NO_FILTER_STRING.c_str()));
   this->imageFilterComboBox->addItem(QString(DataModelType::FIBERNESS_FILTER_STRING.c_str()));
+  this->imageFilterComboBox->addItem(QString(DataModelType::FIBERNESS_THRESHOLD_FILTER_STRING.c_str()));
   this->imageFilterComboBox->addItem(QString(DataModelType::JUNCTIONNESS_FILTER_STRING.c_str()));
   this->imageFilterComboBox->addItem(QString(DataModelType::JUNCTIONNESS_LOCAL_MAX_FILTER_STRING.c_str()));
 
@@ -126,7 +127,7 @@ void FibrinAppQt::on_actionOpenImage_triggered() {
 
 
 void FibrinAppQt::on_actionSaveFilteredImage_triggered() {
-  QString fileName = QFileDialog::getSaveFileName(this, "Save Filtered Image", "", "VTK (*.vtk);;");
+  QString fileName = QFileDialog::getSaveFileName(this, "Save Filtered Image", "", "VTK (*.vtk);;TIF Images (*.tif);;");
   if (fileName == "")
     return;
 
@@ -256,6 +257,31 @@ void FibrinAppQt::on_isoValueSlider_sliderMoved(int value) {
 }
 
 
+void FibrinAppQt::on_saveConnectedComponentsData_clicked() {
+  QString fileName = QFileDialog::getSaveFileName(this, 
+    "Save Connected Component vs. Threshold Data", "", "TXT (*.txt);;");
+  if (fileName == "")
+    return;
+  
+  double minThreshold = minThresholdEdit->text().toDouble();
+  double maxThreshold = maxThresholdEdit->text().toDouble();
+  double thresholdIncrement = 0.5;
+  this->dataModel->ComputeConnectedComponentsVsThresholdData(minThreshold,
+    maxThreshold, thresholdIncrement, fileName.toStdString());
+}
+
+
+void FibrinAppQt::on_saveVolumeFractionEstimateData_clicked() {
+  QString fileName = QFileDialog::getSaveFileName(this, 
+    "Save Volume Fraction Estimate vs. Z Data", "", "TXT (*.txt);;");
+  if (fileName == "")
+    return;
+
+  double threshold = fibernessThresholdEdit->text().toDouble();
+  this->dataModel->ComputeVolumeFractionEstimateVsZData(threshold, fileName.toStdString());
+}
+
+
 void FibrinAppQt::on_showDataOutline_toggled(bool show) {
   this->visualization->SetShowOutline(show);
   this->qvtkWidget->GetRenderWindow()->Render();
@@ -266,6 +292,9 @@ void FibrinAppQt::on_applyButton_clicked() {
   // Read fiber diameter.
   double fiberDiameter = fiberDiameterEdit->text().toDouble();
   this->dataModel->SetFiberDiameter(fiberDiameter);
+
+  double fibernessThreshold = fibernessThresholdEdit->text().toDouble();
+  this->dataModel->SetFibernessThreshold(fibernessThreshold);
 
   double junctionProbeDiameter = junctionProbeDiameterEdit->text().toDouble();
   this->dataModel->SetJunctionProbeDiameter(junctionProbeDiameter);
@@ -293,6 +322,9 @@ void FibrinAppQt::refreshUI() {
     } else if (filterText.toStdString() == DataModelType::FIBERNESS_FILTER_STRING) {
       this->dataModel->SetFilterToFiberness();
       this->filterType = DataModelType::FIBERNESS_FILTER_STRING;
+    } else if (filterText.toStdString() == DataModelType::FIBERNESS_THRESHOLD_FILTER_STRING) {
+      this->dataModel->SetFilterToFibernessThreshold();
+      this->filterType = DataModelType::FIBERNESS_THRESHOLD_FILTER_STRING;
     } else if (filterText.toStdString() == DataModelType::JUNCTIONNESS_FILTER_STRING) {
       this->dataModel->SetFilterToJunctionness();
       this->filterType = DataModelType::JUNCTIONNESS_FILTER_STRING;
