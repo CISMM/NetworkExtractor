@@ -1,3 +1,9 @@
+2009-05-22  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAppQt.cxx,.ui: Added widgets to set Frangi vesselness
+   filter coefficients and the glue between the widgets and the ITK
+   filter.
+
 2009-05-21  Cory Quammen <cquammen@cs.unc.edu>
 
    * FibrinAppQt.h,.cxx,.ui: Added option to compute threshold

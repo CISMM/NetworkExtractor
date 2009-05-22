@@ -293,6 +293,15 @@ void FibrinAppQt::on_applyButton_clicked() {
   double fiberDiameter = fiberDiameterEdit->text().toDouble();
   this->dataModel->SetFiberDiameter(fiberDiameter);
 
+  double fibernessAlphaCoef = fibernessAlphaCoefficientEdit->text().toDouble();
+  this->dataModel->SetFibernessAlphaCoefficient(fibernessAlphaCoef);
+
+  double fibernessBetaCoef = fibernessBetaCoefficientEdit->text().toDouble();
+  this->dataModel->SetFibernessBetaCoefficient(fibernessBetaCoef);
+
+  double fibernessCCoef = fibernessCCoefficientEdit->text().toDouble();
+  this->dataModel->SetFibernessCCoefficient(fibernessCCoef);
+
   double fibernessThreshold = fibernessThresholdEdit->text().toDouble();
   this->dataModel->SetFibernessThreshold(fibernessThreshold);
 
@@ -339,6 +348,15 @@ void FibrinAppQt::refreshUI() {
 
   QString fiberDiameter = QString().sprintf(decimalFormat, this->dataModel->GetFiberDiameter());
   this->fiberDiameterEdit->setText(fiberDiameter);
+
+  QString fibernessAlphaCoef = QString().sprintf(decimalFormat, this->dataModel->GetFibernessAlphaCoefficient());
+  this->fibernessAlphaCoefficientEdit->setText(fibernessAlphaCoef);
+
+  QString fibernessBetaCoef = QString().sprintf(decimalFormat, this->dataModel->GetFibernessBetaCoefficient());
+  this->fibernessBetaCoefficientEdit->setText(fibernessBetaCoef);
+
+  QString fibernessCCoef = QString().sprintf(decimalFormat, this->dataModel->GetFibernessCCoefficient());
+  this->fibernessCCoefficientEdit->setText(fibernessCCoef);
   
   QString junctionProbeFilterDiameter = QString().sprintf(decimalFormat, this->dataModel->GetJunctionProbeDiameter());
   this->junctionProbeDiameterEdit->setText(junctionProbeFilterDiameter);
