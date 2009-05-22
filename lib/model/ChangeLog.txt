@@ -1,5 +1,14 @@
 2009-05-22  Cory Quammen <cquammen@cs.unc.edu>
 
+   * DataModel.h: Ended file with a newline.
+   
+   * DataModel.cxx: Added Types.h include file. Fixed initialization
+   of static const members (worked in Visual C++, not gcc). Added
+   'typename' keyword where it was needed by gcc (again, Visual C++ again 
+   gives this a pass).
+
+2009-05-22  Cory Quammen <cquammen@cs.unc.edu>
+
    * DataModel.h,.cxx: Added Frangi vesselness filter and methods to
    set the coefficients used by the method.
 
