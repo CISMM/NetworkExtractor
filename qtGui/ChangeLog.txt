@@ -1,5 +1,10 @@
 2009-05-22  Cory Quammen <cquammen@cs.unc.edu>
 
+   * FibrinAppQt.ui: Added scroll bars to controls panels. Separated
+   out buttons for calculating certain metrics to a separate dock.
+
+2009-05-22  Cory Quammen <cquammen@cs.unc.edu>
+
    * FibrinAppQt.cxx,.ui: Added widgets to set Frangi vesselness
    filter coefficients and the glue between the widgets and the ITK
    filter.
