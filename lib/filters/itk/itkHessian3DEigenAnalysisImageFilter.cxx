@@ -3,8 +3,8 @@
   Program:   Insight Segmentation & Registration Toolkit
   Module:    $RCSfile: itkHessian3DEigenAnalysisImageFilter.cxx,v $
   Language:  C++
-  Date:      $Date: 2009/04/08 14:29:52 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2009/05/22 22:55:53 $
+  Version:   $Revision: 1.5 $
 
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
@@ -20,6 +20,7 @@
 #include "itkHessian3DEigenAnalysisImageFilter.h"
 #include "itkImageRegionIterator.h"
 #include "itkImageRegionConstIterator.h"
+#include "itkImageRegionConstIteratorWithIndex.h"
 #include "itkProgressReporter.h"
 #include "itkSymmetricSecondRankTensor.h"
 
@@ -145,12 +146,12 @@ Hessian3DEigenAnalysisImageFilter<TInputImage, TEigenValueImage, TEigenVectorIma
   eigenVectorIt.GoToBegin();
 
   EigenValueImagePixelType eigenValues;
-  Matrix<EigenValueImagePixelType::ValueType, Self::ImageDimension, Self::ImageDimension> eigenVectorMatrix;
+  Matrix<typename EigenValueImagePixelType::ValueType, Self::ImageDimension, Self::ImageDimension> eigenVectorMatrix;
   EigenVectorImagePixelType eigenVector;
 
   while ( !inputIt.IsAtEnd() ) {
     
-    TInputImage::PixelType matrix = inputIt.Get();
+    typename TInputImage::PixelType matrix = inputIt.Get();
 
     // By default, matrix.ComputeEigenAnalysis sorts eigenvalues and 
     // eigenvectors by eigenvalue in ascending order.

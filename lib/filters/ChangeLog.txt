@@ -1,3 +1,12 @@
+2009-05-22  Cory Quammen <cquammen@cs.unc.edu>
+
+   * itkEigenValues3DToFrangiVesselnessMeasureImageFilter.cxx,
+   itkEigenValues3DToSatoVesselnessMeasureImageFilter.cxx,
+   itkEigenVectors3DToJunctionnessMeasureImageFilter.cxx,.h,
+   itkHessian3DEigenAnalysisImageFilter.cxx: Added typename where gcc
+   complained it was needed. Added include files that somehow
+   Visual Studio finds, but not gcc. Fixed some const conversion problems.
+
 2009-05-21  Cory Quammen <cquammen@cs.unc.edu>
 
    * ChangeLog.txt: Added itk/itkEigenValues3DToFrangiVesselnessMeasureImageFilter.cxx

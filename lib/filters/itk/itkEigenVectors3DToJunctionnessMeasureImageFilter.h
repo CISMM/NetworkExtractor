@@ -3,8 +3,8 @@
   Program:   Insight Segmentation & Registration Toolkit
   Module:    $RCSfile: itkEigenVectors3DToJunctionnessMeasureImageFilter.h,v $
   Language:  C++
-  Date:      $Date: 2009/04/08 14:29:52 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009/05/22 22:55:53 $
+  Version:   $Revision: 1.4 $
 
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
@@ -94,9 +94,9 @@ public:
   typedef typename EigenVectorImageType::SpacingType  EigenVectorSpacingType;
   typedef typename VesselnessImageType::SpacingType   VesselnessSpacingType;
 
-  typedef typename ImageRegionConstIteratorWithIndex<EigenVectorImageType> EigenVectorConstIteratorWithIndex;
-  typedef typename ImageRegionConstIteratorWithIndex<VesselnessImageType>  VesselnessConstIteratorWithIndex;
-  typedef typename ImageRegionIteratorWithIndex<OutputImageType>           OutputImageIteratorWithIndex;
+  typedef ImageRegionConstIteratorWithIndex<EigenVectorImageType> EigenVectorConstIteratorWithIndex;
+  typedef ImageRegionConstIteratorWithIndex<VesselnessImageType>  VesselnessConstIteratorWithIndex;
+  typedef ImageRegionIteratorWithIndex<OutputImageType>           OutputImageIteratorWithIndex;
 
   typedef Mesh<double> MeshType;
   typedef RegularSphereMeshSource<MeshType>                 SphereSourceType;
@@ -119,11 +119,11 @@ public:
   itkGetConstReferenceMacro(VesselnessThreshold, double);
 
   /** Set/get the eigenvector input image. */
-  typename void SetEigenVectorInput(typename EigenVectorImageType::Pointer input);
+  void SetEigenVectorInput(typename EigenVectorImageType::Pointer input);
   typename EigenVectorImageType::Pointer GetEigenVectorInput();
 
   /** Set/get the vesselness input image. */
-  typename void SetVesselnessInput(typename VesselnessImageType::Pointer input);
+  void SetVesselnessInput(typename VesselnessImageType::Pointer input);
   typename VesselnessImageType::Pointer GetVesselnessInput();
 
   /** EigenVectors3DToJunctionnessImageFilter needs a larger input requested

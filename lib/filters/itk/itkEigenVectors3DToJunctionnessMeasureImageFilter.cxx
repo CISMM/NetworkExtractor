@@ -3,8 +3,8 @@
   Program:   Insight Segmentation & Registration Toolkit
   Module:    $RCSfile: itkEigenVectors3DToJunctionnessMeasureImageFilter.cxx,v $
   Language:  C++
-  Date:      $Date: 2009/04/08 14:29:52 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009/05/22 22:55:53 $
+  Version:   $Revision: 1.4 $
 
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
@@ -19,11 +19,13 @@
 
 #include "itkEigenVectors3DToJunctionnessMeasureImageFilter.h"
 
-#include "itkImage.h"
-#include "itkOffset.h"
-#include "itkProgressReporter.h"
+#include <itkImage.h>
+#include <itkImageRegionIteratorWithIndex.h>
+#include <itkImageRegionConstIteratorWithIndex.h>
+#include <itkOffset.h>
+#include <itkProgressReporter.h>
 
-#include "itkVTKPolyDataWriter.h"
+#include <itkVTKPolyDataWriter.h>
 
 namespace itk {
 
@@ -89,9 +91,9 @@ EigenVectors3DToJunctionnessImageFilter<TEigenVectorImage, TVesselnessImage, TOu
   Superclass::GenerateInputRequestedRegion();
 
   // Get pointers to the input and output.
-  EigenVectorImageType::Pointer eigenVectorPtr =
+  typename EigenVectorImageType::Pointer eigenVectorPtr =
     this->GetEigenVectorInput();
-  VesselnessImageType::Pointer vesselnessPtr =
+  typename VesselnessImageType::Pointer vesselnessPtr =
     this->GetVesselnessInput();
   typename OutputImageType::Pointer outputPtr = this->GetOutput();
 
@@ -137,8 +139,8 @@ EigenVectors3DToJunctionnessImageFilter<TEigenVectorImage, TVesselnessImage, TOu
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
                        int threadId) {
 
-  EigenVectorImageConstPointer eigenVectorInput = this->GetEigenVectorInput();
-  VesselnessImageConstPointer  vesselnessInput = this->GetVesselnessInput();
+  EigenVectorImagePointer eigenVectorInput = this->GetEigenVectorInput();
+  VesselnessImagePointer  vesselnessInput = this->GetVesselnessInput();
   OutputImagePointer output = this->GetOutput();
 
   // Set the input for the vesselness interpolator.
@@ -178,7 +180,7 @@ EigenVectors3DToJunctionnessImageFilter<TEigenVectorImage, TVesselnessImage, TOu
     sum = NumericTraits<OutputRealType>::Zero;
 
     // Make she we are within legal bounds
-    EigenVectorConstIteratorWithIndex::IndexType index = eigenVectorIt.GetIndex();
+    typename EigenVectorConstIteratorWithIndex::IndexType index = eigenVectorIt.GetIndex();
 
     // Skip this voxel if the vesselness value is below a threshold value or if we are
     // outside the valid region.
@@ -191,7 +193,7 @@ EigenVectors3DToJunctionnessImageFilter<TEigenVectorImage, TVesselnessImage, TOu
   
     // Get the spatial location of the voxel. We'll use this to shift the 
     // sample points on the sampling sphere.
-    EigenVectorImageType::PointType voxelPoint;
+    typename EigenVectorImageType::PointType voxelPoint;
     eigenVectorInput->TransformIndexToPhysicalPoint(index, voxelPoint);
     
     // Iterate over directional samples
@@ -218,7 +220,7 @@ EigenVectors3DToJunctionnessImageFilter<TEigenVectorImage, TVesselnessImage, TOu
       // Take the absolute dot product of the eigen vector corresponding to the
       // principal direction of maximal curvature (for bright structure on dark
       // background) and the template direction.
-      EigenVectorInterpolatorType::OutputType interpolatedVector = m_EigenVectorInterpolator->Evaluate(point);
+      typename EigenVectorInterpolatorType::OutputType interpolatedVector = m_EigenVectorInterpolator->Evaluate(point);
       EigenVectorPixelType vectorValue;
       for (int j = 0; j < EigenVectorPixelType::Length; j++) {
         vectorValue[j] = interpolatedVector[j];
@@ -249,7 +251,7 @@ EigenVectors3DToJunctionnessImageFilter<TEigenVectorImage, TVesselnessImage, TOu
   // Convert the radius from physical distance to logical
   // coordinate distance.
   EigenVectorSizeType logicalRadius;
-  typename EigenVectorImageType::ConstPointer eigenVectorInput = 
+  typename EigenVectorImageType::Pointer eigenVectorInput = 
     this->GetEigenVectorInput();
   EigenVectorSpacingType imageSpacing = eigenVectorInput->GetSpacing();
   for (int i = 0; i < EigenVectorImageType::ImageDimension; i++) {
