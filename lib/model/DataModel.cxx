@@ -230,6 +230,57 @@ DataModel<TImage>
 template <class TImage>
 void
 DataModel<TImage>
+::SetFibernessAlphaCoefficient(double alpha) {
+  if (alpha != this->fibernessFilter->GetAlpha())
+    this->fibernessFilter->SetAlpha(alpha);
+}
+
+
+template <class TImage>
+double
+DataModel<TImage>
+::GetFibernessAlphaCoefficient() {
+  return this->fibernessFilter->GetAlpha();
+}
+
+
+template <class TImage>
+void
+DataModel<TImage>
+::SetFibernessBetaCoefficient(double beta) {
+  if (beta != this->fibernessFilter->GetBeta())
+    this->fibernessFilter->SetBeta(beta);
+}
+
+
+template <class TImage>
+double
+DataModel<TImage>
+::GetFibernessBetaCoefficient() {
+  return this->fibernessFilter->GetBeta();
+}
+
+
+template <class TImage>
+void
+DataModel<TImage>
+::SetFibernessCCoefficient(double c) {
+  if (c != this->fibernessFilter->GetC())
+    this->fibernessFilter->SetC(c);
+}
+
+
+template <class TImage>
+double
+DataModel<TImage>
+::GetFibernessCCoefficient() {
+  return this->fibernessFilter->GetC();
+}
+
+
+template <class TImage>
+void
+DataModel<TImage>
 ::SetFibernessThreshold(double threshold) {
   this->fibernessThresholdFilter->SetLowerThreshold(0.0);
   this->fibernessThresholdFilter->SetUpperThreshold(threshold);

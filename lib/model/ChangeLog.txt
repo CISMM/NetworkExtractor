@@ -1,3 +1,8 @@
+2009-05-22  Cory Quammen <cquammen@cs.unc.edu>
+
+   * DataModel.h,.cxx: Added Frangi vesselness filter and methods to
+   set the coefficients used by the method.
+
 2009-05-21  Cory Quammen <cquammen@cs.unc.edu>
 
    * DataModel.h: Changed itkEigenValues3DToVesselnessMeasureImageFilter.h

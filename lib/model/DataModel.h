@@ -7,6 +7,7 @@
 #include <itkCastImageFilter.h>
 #include <itkCommand.h>
 #include <itkConnectedComponentImageFilter.h>
+#include <itkEigenValues3DToFrangiVesselnessMeasureImageFilter.h>
 #include <itkEigenValues3DToSatoVesselnessMeasureImageFilter.h>
 #include <itkEigenVectors3DToJunctionnessMeasureImageFilter.h>
 #include <itkEventObject.h>
@@ -41,7 +42,7 @@ class DataModel {
   typedef typename itk::Image<EigenValueType, 3>  EigenValueImageType;
   typedef typename itk::Image<EigenVectorType, 3> EigenVectorImageType;
   typedef itk::Hessian3DEigenAnalysisImageFilter<HessianImageType, EigenValueImageType, EigenVectorImageType> HessianEigenAnalysisFilterType;
-  typedef itk::EigenValues3DToVesselnessMeasureImageFilter<EigenValueImageType, TImage> FibernessFilterType;
+  typedef itk::EigenValues3DToFrangiVesselnessMeasureImageFilter<EigenValueImageType, TImage> FibernessFilterType;
   typedef itk::EigenVectors3DToJunctionnessImageFilter<EigenVectorImageType, TImage> JunctionnessFilterType;
   typedef itk::ValuedRegionalMaximaImageFilter<TImage, TImage> JunctionnessLocalMaxFilterType;
   typedef itk::BinaryThresholdImageFilter<TImage, TImage> ThresholdFilterType;
@@ -78,6 +79,15 @@ public:
 
   void SetFiberDiameter(double diameter);
   double GetFiberDiameter();
+
+  void SetFibernessAlphaCoefficient(double alpha);
+  double GetFibernessAlphaCoefficient();
+
+  void SetFibernessBetaCoefficient(double beta);
+  double GetFibernessBetaCoefficient();
+
+  void SetFibernessCCoefficient(double c);
+  double GetFibernessCCoefficient();
 
   void SetFibernessThreshold(double threshold);
 
