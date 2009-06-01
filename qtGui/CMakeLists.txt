@@ -25,8 +25,12 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-SET(UIS FibrinAppQt.ui)
-SET (FibrinAppHeaders FibrinAppQt.h)
+SET(UIS
+  FibrinAppQt.ui
+)
+SET (FibrinAppHeaders
+  FibrinAppQt.h
+)
 QT4_WRAP_UI(UIHeaders ${UIS})
 QT4_WRAP_CPP(MOCSrcs ${FibrinAppHeaders} )
 ADD_DEFINITIONS(-DQT_GUI_LIBS -DQT_CORE_LIB -DQT3_SUPPORT)

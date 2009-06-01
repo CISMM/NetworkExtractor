@@ -1,3 +1,20 @@
+2009-06-01  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Minor formatting changes.
+   
+   * FibrinAppQt.h,.cxx: Added method for handling GUI changes to the
+   image filter drop-down menu (only parameters relevant to the currently
+   selected image filter are now shown). Did this by splitting up GUI
+   form elements into individual frames that can be shown or hidden at
+   will with one line of code. Now saving a filtered image file reads a
+   scale factor from the GUI.
+   
+   * FibrinAppQt.ui: Added separate image information dock widget.
+   Split up image filter settings widgets into different frames to
+   enable hiding/showing the appropriate widgets when the image filter
+   is changed. Added "Window" menu to show/hide dock widgets. Added
+   widgets to take image intensity scaling factor.
+
 2009-05-22  Cory Quammen <cquammen@cs.unc.edu>
 
    * FibrinAppQt.ui: Added scroll bars to controls panels. Separated
