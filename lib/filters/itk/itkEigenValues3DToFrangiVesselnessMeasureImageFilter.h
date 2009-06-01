@@ -3,8 +3,8 @@
   Program:   Insight Segmentation & Registration Toolkit
   Module:    $RCSfile: itkEigenValues3DToFrangiVesselnessMeasureImageFilter.h,v $
   Language:  C++
-  Date:      $Date: 2009/05/21 19:32:18 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009/06/01 01:32:20 $
+  Version:   $Revision: 1.2 $
 
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
@@ -47,10 +47,11 @@ public:
   itkSetMacro(Beta, double);
   itkGetMacro(Beta, double);
 
-  /** Set/Get macros for C, the sensitivity to the contrast term (defaults to 1.0).
+  /** Set/Get macros for gamma, the sensitivity to the contrast term
+  (referred to as C in the paper; defaults to 1.0).
   Please refer to http://dx.doi.org/10.1007/BFb0056195 */
-  itkSetMacro(C, double);
-  itkGetMacro(C, double);
+  itkSetMacro(Gamma, double);
+  itkGetMacro(Gamma, double);
 
   /** Typedef for the vector type representing the eigen values. */
   typedef          TEigenValueImage                  EigenValueImageType;
@@ -59,7 +60,6 @@ public:
   typedef typename EigenValueImageType::RegionType   EigenValueImageRegionType;
   typedef typename EigenValueImageType::PixelType    EigenValueImagePixelType;
 
-  typedef typename Superclass::InputImageType        InputImageType;
   typedef typename Superclass::OutputImageType       OutputImageType;
   typedef typename OutputImageType::Pointer          OutputImagePointer;
   typedef typename OutputImageType::ConstPointer     OutputImageConstPointer;
@@ -81,7 +81,7 @@ private:
 
   double m_Alpha;
   double m_Beta;
-  double m_C;
+  double m_Gamma;
 
 };
 

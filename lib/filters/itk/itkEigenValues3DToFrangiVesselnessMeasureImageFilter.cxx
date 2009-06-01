@@ -3,8 +3,8 @@
   Program:   Insight Segmentation & Registration Toolkit
   Module:    $RCSfile: itkEigenValues3DToFrangiVesselnessMeasureImageFilter.cxx,v $
   Language:  C++
-  Date:      $Date: 2009/05/22 22:55:53 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009/06/01 01:32:20 $
+  Version:   $Revision: 1.3 $
 
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
@@ -36,7 +36,7 @@ EigenValues3DToFrangiVesselnessMeasureImageFilter< TEigenValueImage, TOutputImag
 {
   m_Alpha = 0.5;
   m_Beta  = 0.5;
-  m_C     = 1.0;
+  m_Gamma     = 1.0;
 }
 
 
@@ -89,7 +89,7 @@ EigenValues3DToFrangiVesselnessMeasureImageFilter< TEigenValueImage, TOutputImag
     } else {
       double v = (1.0 - vcl_exp(-((r_a*r_a)/(2*m_Alpha*m_Alpha)))) *
         vcl_exp(-((r_b*r_b)/(2*m_Beta*m_Beta))) *
-        (1.0 - vcl_exp(-(s*s)/(2*m_C*m_C)));
+        (1.0 - vcl_exp(-(s*s)/(2*m_Gamma*m_Gamma)));
       outputIt.Set( static_cast< OutputPixelType >(v) );
     }
 

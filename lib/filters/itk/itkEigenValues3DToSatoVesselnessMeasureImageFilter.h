@@ -3,8 +3,8 @@
   Program:   Insight Segmentation & Registration Toolkit
   Module:    $RCSfile: itkEigenValues3DToSatoVesselnessMeasureImageFilter.h,v $
   Language:  C++
-  Date:      $Date: 2009/05/21 19:32:18 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009/06/01 01:32:20 $
+  Version:   $Revision: 1.3 $
 
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
@@ -54,7 +54,6 @@ public:
   typedef typename EigenValueImageType::RegionType   EigenValueImageRegionType;
   typedef typename EigenValueImageType::PixelType    EigenValueImagePixelType;
 
-  typedef typename Superclass::InputImageType        InputImageType;
   typedef typename Superclass::OutputImageType       OutputImageType;
   typedef typename OutputImageType::Pointer          OutputImagePointer;
   typedef typename OutputImageType::ConstPointer     OutputImageConstPointer;

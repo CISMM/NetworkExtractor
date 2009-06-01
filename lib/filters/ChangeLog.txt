@@ -1,3 +1,12 @@
+2009-05-31  Cory Quammen <cquammen@cs.unc.edu>
+
+   * itkEigenValues3DToFrangiVesselnessMeasureImageFilter.h,.cxx:
+   Changed member variable name from C to Gamma to match follow-up work
+   on Frangi vesselness filter.
+   
+   * itkEigenValues3DToSatoVesselnessMeasureImageFilter.h: Removed
+   unused typedef.
+
 2009-05-22  Cory Quammen <cquammen@cs.unc.edu>
 
    * itkEigenValues3DToFrangiVesselnessMeasureImageFilter.cxx,
