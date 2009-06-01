@@ -1,3 +1,10 @@
+2009-05-31  Cory Quammen <cquammen@cs.unc.edu>
+
+   * DataModel.h,.cxx: Added ITK classes that compute multiscale
+   Frangi vesselness measure (I didn't have to write it myself) and
+   methods for setting parameters for those filters. Added scaling
+   factor for saving files to unsigned short TIFF files.
+
 2009-05-22  Cory Quammen <cquammen@cs.unc.edu>
 
    * DataModel.h: Ended file with a newline.

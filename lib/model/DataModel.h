@@ -17,8 +17,11 @@
 #include <itkImageFileWriter.h>
 #include <itkHessian3DEigenAnalysisImageFilter.h>
 #include <itkHessianRecursiveGaussianImageFilter.h>
+#include <itkHessianToObjectnessMeasureImageFilter.h>
 #include <itkMatrix.h>
 #include <itkMinimumMaximumImageCalculator.h>
+#include <itkMultiScaleHessianBasedMeasureImageFilter.h>
+#include <itkShiftScaleImageFilter.h>
 #include <itkSymmetricSecondRankTensor.h>
 #include <itkValuedRegionalMaximaImageFilter.h>
 
@@ -41,8 +44,11 @@ class DataModel {
   typedef itk::Vector<ComponentType, 3>           EigenVectorType;
   typedef typename itk::Image<EigenValueType, 3>  EigenValueImageType;
   typedef typename itk::Image<EigenVectorType, 3> EigenVectorImageType;
+  typedef itk::MultiScaleHessianBasedMeasureImageFilter<TImage, HessianImageType> MultiScaleHessianMeasureImageType;
+  typedef itk::HessianToObjectnessMeasureImageFilter<HessianImageType, TImage> HessianToObjectnessFilterType;
   typedef itk::Hessian3DEigenAnalysisImageFilter<HessianImageType, EigenValueImageType, EigenVectorImageType> HessianEigenAnalysisFilterType;
   typedef itk::EigenValues3DToFrangiVesselnessMeasureImageFilter<EigenValueImageType, TImage> FibernessFilterType;
+  typedef itk::ShiftScaleImageFilter<TImage, TImage> ScaleFilterType;
   typedef itk::EigenVectors3DToJunctionnessImageFilter<EigenVectorImageType, TImage> JunctionnessFilterType;
   typedef itk::ValuedRegionalMaximaImageFilter<TImage, TImage> JunctionnessLocalMaxFilterType;
   typedef itk::BinaryThresholdImageFilter<TImage, TImage> ThresholdFilterType;
@@ -65,6 +71,7 @@ public:
   typedef std::string FilterType;
   static const FilterType NO_FILTER_STRING;
   static const FilterType FIBERNESS_FILTER_STRING;
+  static const FilterType MULTISCALE_FIBERNESS_FILTER_STRING;
   static const FilterType FIBERNESS_THRESHOLD_FILTER_STRING;
   static const FilterType JUNCTIONNESS_FILTER_STRING;
   static const FilterType JUNCTIONNESS_LOCAL_MAX_FILTER_STRING;
@@ -73,21 +80,30 @@ public:
   virtual ~DataModel();
 
   void LoadImageFile(std::string fileName);
-  void SaveImageFile(std::string fileName, std::string filterName);
+  void SaveFilteredImageFile(std::string fileName, std::string filterName, float scale);
 
   void SaveFiberOrientationImageFile(std::string fileName);
 
   void SetFiberDiameter(double diameter);
   double GetFiberDiameter();
 
-  void SetFibernessAlphaCoefficient(double alpha);
-  double GetFibernessAlphaCoefficient();
+  void SetMultiscaleFibernessAlphaCoefficient(double alpha);
+  double GetMultiscaleFibernessAlphaCoefficient();
 
-  void SetFibernessBetaCoefficient(double beta);
-  double GetFibernessBetaCoefficient();
+  void SetMultiscaleFibernessBetaCoefficient(double beta);
+  double GetMultiscaleFibernessBetaCoefficient();
 
-  void SetFibernessCCoefficient(double c);
-  double GetFibernessCCoefficient();
+  void SetMultiscaleFibernessGammaCoefficient(double gamma);
+  double GetMultiscaleFibernessGammaCoefficient();
+
+  void SetMultiscaleFibernessMinimumScale(double minimum);
+  double GetMultiscaleFibernessMinimumScale();
+
+  void SetMultiscaleFibernessMaximumScale(double maximum);
+  double GetMultiscaleFibernessMaximumScale();
+
+  void SetMultiscaleFibernessScaleIntervals(int intervals);
+  int GetMultiscaleFibernessScaleIntervals();
 
   void SetFibernessThreshold(double threshold);
 
@@ -119,9 +135,13 @@ public:
 
   void SetFilterToNone();
   void SetFilterToFiberness();
+  void SetFilterToMultiscaleFiberness();
   void SetFilterToFibernessThreshold();
   void SetFilterToJunctionness();
   void SetFilterToJunctionnessLocalMax();
+
+  void SetFilteredImageScaleFactor(double scale);
+  double GetFilteredImageScaleFactor();
 
   void ComputeConnectedComponentsVsThresholdData(double minThreshold, double maxThreshold,
     double thresholdIncrement, std::string fileName);
@@ -131,6 +151,7 @@ public:
 
 protected:
   double fiberDiameter;
+  double filteredImageScale;
   typename TImage::Pointer imageData;
 
   typename MinMaxType::Pointer minMaxFilter;
@@ -138,6 +159,8 @@ protected:
 
   typename HessianFilterType::Pointer hessianFilter;
   typename FibernessFilterType::Pointer fibernessFilter;
+  typename HessianToObjectnessFilterType::Pointer hessianToVesselnessFilter;
+  typename MultiScaleHessianMeasureImageType::Pointer multiscaleFibernessFilter;
   typename ThresholdFilterType::Pointer fibernessThresholdFilter;
   typename ConnectedComponentFilterType::Pointer fibernessConnectedComponentsFilter;
   typename MinMaxConnectedComponentFilterType::Pointer minMaxConnectedComponentsFilter;
