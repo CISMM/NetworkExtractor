@@ -712,7 +712,7 @@ DataModel<TImage>
     = accumulateFilter2->GetOutput()->GetLargestPossibleRegion();
   itk::Size<3> accumulatedRegionSize = accumulatedRegion.GetSize();
 
-  printf("Reduced dimensions: %d, %d, %d\n",
+  printf("Reduced dimensions: %ld, %ld, %ld\n",
     accumulatedRegionSize[0], accumulatedRegionSize[1], accumulatedRegionSize[2]);
 
   // Compute number of pixels above the fiberness threshold value.
