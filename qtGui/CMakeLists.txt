@@ -47,9 +47,9 @@ IF (${CMAKE_BUILD_TOOL} MATCHES "devenv")
   SET (QtGuiSrcs ${QtGuiSrcs} ${UIS})
 ENDIF (${CMAKE_BUILD_TOOL} MATCHES "devenv")
 
-ADD_EXECUTABLE( FibrinAnalysisQt MACOSX_BUNDLE ${QtGuiSrcs} ${UISrcs} ${MOCSrcs})
+ADD_EXECUTABLE( FibrinAnalysis MACOSX_BUNDLE ${QtGuiSrcs} ${UISrcs} ${MOCSrcs})
 
-TARGET_LINK_LIBRARIES( FibrinAnalysisQt
+TARGET_LINK_LIBRARIES( FibrinAnalysis
   QVTK
   ${QT_LIBRARIES}
   vtksys

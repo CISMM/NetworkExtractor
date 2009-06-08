@@ -1,3 +1,20 @@
+2009-06-08  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Changed name of the app to FibrinAnalysis from
+   FibrinAnalysisQt.
+   
+   * FibrinAppQt.h, .cxx: Added automatic saving of window size/position/visibility
+   settings between application launches. Put .TIF files in front of the
+   file-type list. Added a render call right after an image is loaded.
+   Added event handling for checkboxes that control visibility of isosurface
+   and image plane. Added event handling for image plane z-slice slider.
+   
+   * FibrinAppQt.ui: Added slider and text field for setting image z-slice
+   to show. Added checkboxes for toggling visibility of isosurface and
+   z-slice.
+   
+   * Visualization.h,.cxx: Added instance of image plane visualization.
+
 2009-06-01  Cory Quammen <cquammen@cs.unc.edu>
 
    * CMakeLists.txt: Minor formatting changes.

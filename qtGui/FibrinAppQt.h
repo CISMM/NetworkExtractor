@@ -28,6 +28,11 @@ public:
 
   void UpdateProgress(float progress) const;
 
+protected:
+  void closeEvent(QCloseEvent* event);
+  void writeSettings();
+  void readSettings();
+
 public slots:
 
   // Use Qt's auto-connect magic to tie GUI widgets to slots.
@@ -51,8 +56,13 @@ public slots:
   virtual void on_saveConnectedComponentsData_clicked();
   virtual void on_saveVolumeFractionEstimateData_clicked();
 
+  virtual void on_showIsosurfaceCheckbox_toggled(bool show);
   virtual void on_isoValueEdit_textEdited(QString text);
   virtual void on_isoValueSlider_sliderMoved(int value);
+  
+  virtual void on_showZPlaneCheckbox_toggled(bool show);
+  virtual void on_zPlaneEdit_textEdited(QString text);
+  virtual void on_zPlaneSlider_sliderMoved(int value);
 
   virtual void on_showDataOutline_toggled(bool show);
 

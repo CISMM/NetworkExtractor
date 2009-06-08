@@ -2,6 +2,7 @@
 #define _VISUALIZATION_H_
 
 #include "OutlineVisualizationPipeline.h"
+#include "ImagePlaneVisualizationPipeline.h"
 #include "IsosurfaceVisualizationPipeline.h"
 
 #include <vtkAlgorithmOutput.h>
@@ -20,6 +21,7 @@ public:
   void ShowOutlineOn();
   void ShowOutlineOff();
 
+  void SetIsosurfaceVisible(bool show);
   void SetIsoValue(double isoValue);
   double GetIsoValue();
 
@@ -29,12 +31,18 @@ public:
   void FastIsosurfaceRenderingOn();
   void FastIsosurfaceRenderingOff();
 
+  void SetImagePlaneVisible(bool show);
+  void SetZSlice(int slice);
+
+
+
 protected:
-  bool showOutline;
 
   OutlineVisualizationPipeline* outlineVisualization;
 
   IsosurfaceVisualizationPipeline* isoVisualization;
+
+  ImagePlaneVisualizationPipeline* imagePlaneVisualization;
 };
 
 #endif // _VISUALIZATION_H_

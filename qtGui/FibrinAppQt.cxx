@@ -2,6 +2,7 @@
 
 #include <qapplication.h>
 #include <qfiledialog.h>
+#include <qsettings.h>
 #include <qvariant.h>
 
 #include <vtkActor.h>
@@ -78,6 +79,13 @@ FibrinAppQt::FibrinAppQt(QWidget* p)
   }
 
   this->imageDataView->setModel(this->tableModel);
+
+  QCoreApplication::setOrganizationName("CISMM");
+  QCoreApplication::setOrganizationDomain("cissm.org");
+  QCoreApplication::setApplicationName("Fibrin Analysis");
+
+  // Restore GUI settings.
+  this->readSettings();
 }
 
 
@@ -93,7 +101,7 @@ FibrinAppQt::~FibrinAppQt() {
 void FibrinAppQt::on_actionOpenImage_triggered() {
 
   // Locate file.
-  QString fileName = QFileDialog::getOpenFileName(this, "Open Image Data", "", "VTK Images (*.vtk);;LSM Images (*.lsm);;TIF Images (*.tif);;");
+  QString fileName = QFileDialog::getOpenFileName(this, "Open Image Data", "", "TIF Images (*.tif);;VTK Images (*.vtk);;LSM Images (*.lsm);;");
 
   // Now read the file
   if (fileName == "") {
@@ -111,7 +119,7 @@ void FibrinAppQt::on_actionOpenImage_triggered() {
   double min = this->dataModel->GetFilteredDataMinimum();
   double max = this->dataModel->GetFilteredDataMaximum();
   double isoValue = 0.5*(min + max);
-  QString isoValueString = QString().sprintf(".4f", isoValue);
+  QString isoValueString = QString().sprintf("%.4f", isoValue);
   this->isoValueEdit->setText(isoValueString);
   this->isoValueSlider->setValue(static_cast<int>(isoValue));
 
@@ -124,11 +132,14 @@ void FibrinAppQt::on_actionOpenImage_triggered() {
 
   // Reset camera
   this->ren->ResetCamera();
+  
+  // Render
+  this->qvtkWidget->GetRenderWindow()->Render();
 }
 
 
 void FibrinAppQt::on_actionSaveFilteredImage_triggered() {
-  QString fileName = QFileDialog::getSaveFileName(this, "Save Filtered Image", "", "VTK (*.vtk);;TIF Images (*.tif);;");
+  QString fileName = QFileDialog::getSaveFileName(this, "Save Filtered Image", "", "TIF Images (*.tif);;VTK (*.vtk);;");
   if (fileName == "")
     return;
 
@@ -222,6 +233,7 @@ void FibrinAppQt::on_actionSaveGeometry_triggered() {
 
 
 void FibrinAppQt::on_actionExit_triggered() {
+  this->writeSettings();
   qApp->exit();
 }
 
@@ -238,7 +250,6 @@ void FibrinAppQt::on_actionResetView_triggered() {
 
 void FibrinAppQt::on_actionOpenView_triggered() {
   this->qvtkWidget->GetRenderWindow()->Render();
-
 }
 
 
@@ -272,6 +283,12 @@ void FibrinAppQt::on_imageFilterComboBox_currentIndexChanged(QString filterText)
 }
 
 
+void FibrinAppQt::on_showIsosurfaceCheckbox_toggled(bool show) {
+  this->visualization->SetIsosurfaceVisible(show);
+  this->qvtkWidget->GetRenderWindow()->Render();
+}
+
+
 void FibrinAppQt::on_isoValueEdit_textEdited(QString text) {
   int value = static_cast<int>(text.toDouble());
   this->isoValueSlider->setValue(value);
@@ -281,6 +298,33 @@ void FibrinAppQt::on_isoValueEdit_textEdited(QString text) {
 void FibrinAppQt::on_isoValueSlider_sliderMoved(int value) {
   QString text = QString().sprintf("%d", value);
   this->isoValueEdit->setText(text);
+}
+
+
+void FibrinAppQt::on_showZPlaneCheckbox_toggled(bool show) {
+  this->visualization->SetImagePlaneVisible(show);
+  this->qvtkWidget->GetRenderWindow()->Render();
+}
+
+
+void FibrinAppQt::on_zPlaneEdit_textEdited(QString text) {
+  int value = static_cast<int>(text.toDouble()) - 1;
+  this->zPlaneSlider->setValue(value);
+
+  // Read z-slice.
+  int slice = zPlaneEdit->text().toInt()-1;
+  this->visualization->SetZSlice(slice);
+}
+
+
+void FibrinAppQt::on_zPlaneSlider_sliderMoved(int value) {
+  QString text = QString().sprintf("%d", value);
+  this->zPlaneEdit->setText(text);
+
+  // Read z-slice.
+  int slice = zPlaneEdit->text().toInt()-1;
+  this->visualization->SetZSlice(slice);
+  this->qvtkWidget->GetRenderWindow()->Render();
 }
 
 
@@ -367,6 +411,11 @@ void FibrinAppQt::on_applyButton_clicked() {
   // Read isovalue.
   double isoValue = isoValueEdit->text().toDouble();
   this->visualization->SetIsoValue(isoValue);
+
+  // Read z-slice.
+  int slice = zPlaneEdit->text().toInt()-1;
+  this->visualization->SetZSlice(slice);
+
   refreshUI();
 }
 
@@ -444,6 +493,10 @@ void FibrinAppQt::refreshUI() {
   this->isoValueSlider->setMaxValue(static_cast<int>(
     this->dataModel->GetFilteredDataMaximum()));
 
+  // Update slice slider
+  this->zPlaneSlider->setMinValue(1);
+  this->zPlaneSlider->setMaxValue(dims[2]);
+
   ///////////////// Update visualization stuff /////////////////
   this->ren->RemoveAllViewProps();
 
@@ -462,3 +515,55 @@ void FibrinAppQt::UpdateProgress(float progress) const {
   this->progressBar->setValue(progressValue);
 }
 
+
+void FibrinAppQt::closeEvent(QCloseEvent* event) {
+  this->writeSettings();
+}
+
+
+void FibrinAppQt::writeSettings() {
+  QSettings settings;
+
+  settings.beginGroup("MainWindow");
+  settings.setValue("size", this->size());
+  settings.setValue("pos", this->pos());
+  settings.endGroup();
+
+  QList<QDockWidget*> widgets = this->findChildren<QDockWidget*>();
+  QListIterator<QDockWidget*> iterator(widgets);
+  while (iterator.hasNext()) {
+    QDockWidget* dockWidget = iterator.next();
+    settings.beginGroup(dockWidget->objectName());
+    settings.setValue("size", dockWidget->size());
+    settings.setValue("pos", dockWidget->pos());
+    settings.setValue("visible", dockWidget->isVisible());
+    settings.setValue("floating", dockWidget->isFloating());
+    settings.setValue("dockArea", this->dockWidgetArea(dockWidget));
+    settings.endGroup();
+  }
+
+}
+
+
+void FibrinAppQt::readSettings() {
+  QSettings settings;
+
+  settings.beginGroup("MainWindow");
+  this->resize(settings.value("size", QSize(1000, 743)).toSize());
+  this->move(settings.value("pos", QPoint(0, 0)).toPoint());
+  settings.endGroup();
+
+  QList<QDockWidget*> widgets = this->findChildren<QDockWidget*>();
+  QListIterator<QDockWidget*> iterator(widgets);
+  while (iterator.hasNext()) {
+    QDockWidget* dockWidget = iterator.next();
+    settings.beginGroup(dockWidget->objectName());
+    dockWidget->resize(settings.value("size", QSize(340, 200)).toSize());
+    dockWidget->move(settings.value("pos", QPoint(0, 0)).toPoint());
+    dockWidget->setVisible(settings.value("visible", true).toBool());
+    dockWidget->setFloating(settings.value("floating", false).toBool());
+    this->addDockWidget(static_cast<Qt::DockWidgetArea>(settings.value("dockArea", Qt::LeftDockWidgetArea).toUInt()), dockWidget);
+    settings.endGroup();
+  }
+
+}

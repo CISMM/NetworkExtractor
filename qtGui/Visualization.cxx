@@ -2,10 +2,10 @@
 
 Visualization
 ::Visualization() {
-  this->showOutline = true;
-
   this->outlineVisualization = new OutlineVisualizationPipeline();
   this->isoVisualization = new IsosurfaceVisualizationPipeline();
+  this->isoVisualization->SetColor(0.0, 1.0, 0.0);
+  this->imagePlaneVisualization = new ImagePlaneVisualizationPipeline();
 }
 
 
@@ -13,37 +13,43 @@ Visualization
 ::~Visualization() {
   delete this->outlineVisualization;
   delete this->isoVisualization;
+  delete this->imagePlaneVisualization;
 }
 
 
 void
 Visualization
 ::SetInputConnection(vtkAlgorithmOutput* input) {
+  if (input != this->outlineVisualization->GetInputConnection())
+    this->outlineVisualization->SetInputConnection(input);
+
   if (input == this->isoVisualization->GetInputConnection())
-    return;
-  this->isoVisualization->SetInputConnection(input);
-  this->outlineVisualization->SetInputConnection(input);
+    this->isoVisualization->SetInputConnection(input);
+
+  if (input == this->imagePlaneVisualization->GetInputConnection())
+    this->imagePlaneVisualization->SetInputConnection(input);
+
 }
 
 
 void
 Visualization
 ::AddToRenderer(vtkRenderer* renderer) {
-  vtkAlgorithmOutput *visInput = NULL;
- 
-  // if (visualizationMode == ...)
-  visInput = this->isoVisualization->GetInputConnection();
+  vtkAlgorithmOutput *visInput = NULL; 
+  visInput = this->outlineVisualization->GetInputConnection();
+  this->outlineVisualization->AddToRenderer(renderer);
+
+  this->isoVisualization->SetInputConnection(visInput);
   this->isoVisualization->AddToRenderer(renderer);
 
-  this->outlineVisualization->SetInputConnection(visInput);
-  this->outlineVisualization->AddToRenderer(renderer);
+  this->imagePlaneVisualization->SetInputConnection(visInput);
+  this->imagePlaneVisualization->AddToRenderer(renderer);
 }
 
 
 void
 Visualization
 ::SetShowOutline(bool show) {
-  this->showOutline = show;
   this->outlineVisualization->SetVisible(show);
 }
 
@@ -59,6 +65,13 @@ void
 Visualization
 ::ShowOutlineOff() {
   this->SetShowOutline(false);
+}
+
+
+void
+Visualization
+::SetIsosurfaceVisible(bool show) {
+  this->isoVisualization->SetVisible(show);
 }
 
 
@@ -104,4 +117,18 @@ void
 Visualization
 ::FastIsosurfaceRenderingOff() {
   this->isoVisualization->FastRenderingOff();
+}
+
+
+void
+Visualization
+::SetZSlice(int slice) {
+  this->imagePlaneVisualization->SetSliceNumber(slice);
+}
+
+
+void
+Visualization
+::SetImagePlaneVisible(bool show) {
+  this->imagePlaneVisualization->SetVisible(show);
 }
