@@ -20,6 +20,10 @@ public:
   void SetIsoValue(double isoValue);
   double GetIsoValue();
 
+  void SetColor(double r, double g, double b);
+
+  void SetVisible(bool visible);
+
   vtkAlgorithmOutput* GetIsosurfaceOutputPort();
 
   void FastRenderingOn();

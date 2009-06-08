@@ -1,3 +1,14 @@
+2009-06-08  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Added source files for ImagePlaneVisualization
+   class.
+   
+   * ImagePlaneVisualizationPipeline.h,.cxx: New pipeline for
+   visualizing the image data as z-slices.
+   
+   * IsosurfaceVisualizationPipeline.h,.cxx: Added methods for
+   setting visibility and color of isosurface.
+
 2009-03-15  Cory Quammen <cquammen@cs.unc.edu>
 
    * IsosurfaceVisualizationPipeline.h,.cxx: Added method to

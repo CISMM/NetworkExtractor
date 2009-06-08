@@ -1,4 +1,5 @@
 SET(visualizationSrc
+  ImagePlaneVisualizationPipeline.cxx
   IsosurfaceVisualizationPipeline.cxx
   OutlineVisualizationPipeline.cxx
   VisualizationPipeline.cxx

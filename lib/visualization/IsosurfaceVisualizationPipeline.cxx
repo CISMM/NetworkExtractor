@@ -4,6 +4,7 @@
 #include <vtkAlgorithmOutput.h>
 #include <vtkContourFilter.h>
 #include <vtkPolyDataMapper.h>
+#include <vtkProperty.h>
 #include <vtkRenderer.h>
 
 
@@ -18,7 +19,6 @@ IsosurfaceVisualizationPipeline
 
   // It is essential to set the inputAlgorithm
   this->SetInputAlgorithm(isoContourer);
-  this->inputAlgorithm = isoContourer;
 
   this->isoMapper = vtkPolyDataMapper::New();
   this->isoMapper->SetInputConnection(this->inputAlgorithm->GetOutputPort());
@@ -39,6 +39,20 @@ void
 IsosurfaceVisualizationPipeline
 ::AddToRenderer(vtkRenderer* renderer) {
   renderer->AddActor(this->isoActor);
+}
+
+
+void
+IsosurfaceVisualizationPipeline
+::SetColor(double r, double g, double b) {
+  this->isoActor->GetProperty()->SetColor(r, g, b);
+}
+
+
+void
+IsosurfaceVisualizationPipeline
+::SetVisible(bool visible) {
+  this->isoActor->SetVisibility(visible ? 1 : 0);
 }
 
 
