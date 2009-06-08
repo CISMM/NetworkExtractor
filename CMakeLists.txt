@@ -1,4 +1,5 @@
 PROJECT (FibrinAnalysis)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 
 SET (EXECUTABLE_OUTPUT_PATH "${FibrinAnalysis_BINARY_DIR}/bin")
 SET (LIBRARY_OUTPUT_PATH "${FibrinAnalysis_BINARY_DIR}/lib")
@@ -88,3 +89,8 @@ ADD_SUBDIRECTORY(lib)
 #IF (BUILD_IT_TESTS)
 #    SUBDIRS(TestSuite Tests)
 #ENDIF (BUILD_IT_TESTS)
+
+#######################################
+# CPack installer stuff
+#######################################
+#INCLUDE(CPack)
