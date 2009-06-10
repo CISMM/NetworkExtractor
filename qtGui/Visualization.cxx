@@ -19,30 +19,24 @@ Visualization
 
 void
 Visualization
-::SetInputConnection(vtkAlgorithmOutput* input) {
-  if (input != this->outlineVisualization->GetInputConnection())
-    this->outlineVisualization->SetInputConnection(input);
+::SetImageInputConnection(vtkAlgorithmOutput* input) {
+  this->outlineVisualization->SetInputConnection(input);
+  this->imagePlaneVisualization->SetInputConnection(input);  
+}
 
-  if (input == this->isoVisualization->GetInputConnection())
-    this->isoVisualization->SetInputConnection(input);
 
-  if (input == this->imagePlaneVisualization->GetInputConnection())
-    this->imagePlaneVisualization->SetInputConnection(input);
-
+void
+Visualization
+::SetFilteredImageInputConnection(vtkAlgorithmOutput* input) {
+  this->isoVisualization->SetInputConnection(input);
 }
 
 
 void
 Visualization
 ::AddToRenderer(vtkRenderer* renderer) {
-  vtkAlgorithmOutput *visInput = NULL; 
-  visInput = this->outlineVisualization->GetInputConnection();
   this->outlineVisualization->AddToRenderer(renderer);
-
-  this->isoVisualization->SetInputConnection(visInput);
   this->isoVisualization->AddToRenderer(renderer);
-
-  this->imagePlaneVisualization->SetInputConnection(visInput);
   this->imagePlaneVisualization->AddToRenderer(renderer);
 }
 

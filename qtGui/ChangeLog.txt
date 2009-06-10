@@ -1,3 +1,25 @@
+2009-06-10  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAppQt.cxx: Turned off some of the experimental junction finding
+   image filters for now. Added skeletonization filter. Added support for
+   new methods in the Visualization class that enable viewing the original
+   image data in the slice plane and the filtered data as an isosurface.
+   Added message box that asks for confirmation that user wanted to quit.
+   Added toggling of widgets for setting the fiberness threshold. Did
+   some variable renaming for greater consistency. Added reading/writing
+   of new fiberness threshold widget.
+   
+   * FibrinAppQt.ui: Added widgets for setting fiberness threshold. Moved
+   vertical spacers to make resizing of the various docks nicer. Added
+   keyboard shortcuts for menu items.
+   
+   * Visualization.h: Changed so that now there are two methods for setting
+   image data, one for the original input data, and one for the filtered
+   data. Right now, the original data is shown in a slice viewer and the
+   filtered data is shown as an isosurface. In the future, we could take
+   an arbitrary number of inputs and a property describing which visualization
+   mode to use.
+
 2009-06-08  Cory Quammen <cquammen@cs.unc.edu>
 
    * CMakeLists.txt: Changed name of the app to FibrinAnalysis from

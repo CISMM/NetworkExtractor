@@ -14,7 +14,8 @@ public:
   Visualization();
   virtual ~Visualization();
 
-  void SetInputConnection(vtkAlgorithmOutput* input);
+  void SetImageInputConnection(vtkAlgorithmOutput* input);
+  void SetFilteredImageInputConnection(vtkAlgorithmOutput* input);
   void AddToRenderer(vtkRenderer* renderer);
 
   void SetShowOutline(bool show);

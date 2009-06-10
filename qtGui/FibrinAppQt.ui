@@ -42,7 +42,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QVTKWidget" name="qvtkWidget" native="true">
+       <widget class="QVTKWidget" name="qvtkWidget">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
@@ -76,7 +76,7 @@
      <x>0</x>
      <y>0</y>
      <width>1001</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -148,7 +148,7 @@
     <string>Image Analysis</string>
    </property>
    <attribute name="dockWidgetArea">
-    <number>1</number>
+    <number>2</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents">
     <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -161,9 +161,9 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>-277</y>
-          <width>357</width>
-          <height>486</height>
+          <y>0</y>
+          <width>320</width>
+          <height>661</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -280,6 +280,9 @@
             <item>
              <widget class="QWidget" name="multiscaleFibernessSettingsWidget" native="true">
               <layout class="QFormLayout" name="formLayout_4">
+               <property name="fieldGrowthPolicy">
+                <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+               </property>
                <property name="horizontalSpacing">
                 <number>6</number>
                </property>
@@ -326,34 +329,69 @@
                 <widget class="QLineEdit" name="fibernessGammaCoefficientEdit"/>
                </item>
                <item row="3" column="0">
-                <widget class="QLabel" name="fiberScaleMinimumLabel">
+                <widget class="QLabel" name="fibernessScaleMinimumLabel">
                  <property name="text">
                   <string>Fiber scale minimum (um):</string>
                  </property>
                 </widget>
                </item>
                <item row="4" column="0">
-                <widget class="QLabel" name="fiberScaleMaximumLabel">
+                <widget class="QLabel" name="fibenessrScaleMaximumLabel">
                  <property name="text">
                   <string>Fiber scale maximum (um):</string>
                  </property>
                 </widget>
                </item>
                <item row="5" column="0">
-                <widget class="QLabel" name="fiberScaleIntervalsLabel">
+                <widget class="QLabel" name="fibernessNumberOfScalesLabel">
                  <property name="text">
-                  <string>Fiber scale intervals:</string>
+                  <string>Fiber scales:</string>
                  </property>
                 </widget>
                </item>
                <item row="3" column="1">
-                <widget class="QLineEdit" name="fiberScaleMinimumEdit"/>
+                <widget class="QLineEdit" name="fibernessScaleMinimumEdit"/>
                </item>
                <item row="4" column="1">
-                <widget class="QLineEdit" name="fiberScaleMaximumEdit"/>
+                <widget class="QLineEdit" name="fibernessScaleMaximumEdit"/>
                </item>
                <item row="5" column="1">
-                <widget class="QLineEdit" name="fiberScaleIntervalsEdit"/>
+                <widget class="QLineEdit" name="fibernessNumberOfScalesEdit"/>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QWidget" name="multiscaleFibernessThresholdSettingsWidget" native="true">
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+              <layout class="QFormLayout" name="formLayout_2">
+               <property name="fieldGrowthPolicy">
+                <enum>QFormLayout::ExpandingFieldsGrow</enum>
+               </property>
+               <property name="margin">
+                <number>0</number>
+               </property>
+               <item row="0" column="0">
+                <widget class="QLabel" name="fibernessThresoldLabel">
+                 <property name="text">
+                  <string>Fiberness Threshold:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLineEdit" name="fibernessThresholdEdit">
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="layoutDirection">
+                  <enum>Qt::LeftToRight</enum>
+                 </property>
+                </widget>
                </item>
               </layout>
              </widget>
@@ -361,6 +399,9 @@
             <item>
              <widget class="QWidget" name="junctionnessSettingsWidget" native="true">
               <layout class="QFormLayout" name="formLayout_5">
+               <property name="fieldGrowthPolicy">
+                <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+               </property>
                <property name="margin">
                 <number>0</number>
                </property>
@@ -419,21 +460,21 @@
               </property>
              </widget>
             </item>
-            <item>
-             <spacer name="verticalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>0</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
            </layout>
           </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>0</height>
+            </size>
+           </property>
+          </spacer>
          </item>
         </layout>
        </widget>
@@ -474,7 +515,7 @@
     <string>Display</string>
    </property>
    <attribute name="dockWidgetArea">
-    <number>2</number>
+    <number>1</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_2">
     <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -488,8 +529,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>317</width>
-          <height>286</height>
+          <width>363</width>
+          <height>238</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -688,44 +729,44 @@
            </layout>
           </widget>
          </item>
+         <item>
+          <widget class="QPushButton" name="applyButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="text">
+            <string>Apply</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>0</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
         </layout>
        </widget>
       </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="applyButton">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="layoutDirection">
-        <enum>Qt::LeftToRight</enum>
-       </property>
-       <property name="text">
-        <string>Apply</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>0</height>
-        </size>
-       </property>
-      </spacer>
      </item>
     </layout>
    </widget>
@@ -733,6 +774,12 @@
   <widget class="QDockWidget" name="tasksDockWidget">
    <property name="enabled">
     <bool>true</bool>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
    </property>
    <property name="minimumSize">
     <size>
@@ -761,13 +808,19 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>377</width>
-          <height>207</height>
+          <width>380</width>
+          <height>167</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_11">
          <item>
           <widget class="QGroupBox" name="groupBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="title">
             <string>Measurements</string>
            </property>
@@ -820,29 +873,6 @@
              </widget>
             </item>
             <item>
-             <widget class="QWidget" name="widget_2" native="true">
-              <layout class="QHBoxLayout" name="horizontalLayout_4">
-               <property name="margin">
-                <number>4</number>
-               </property>
-               <item>
-                <widget class="QLabel" name="fibernessThresholdLabel">
-                 <property name="text">
-                  <string>Fiberness Threshold:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="fibernessThresholdEdit">
-                 <property name="text">
-                  <string>5.0</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
              <widget class="QPushButton" name="saveVolumeFractionEstimateData">
               <property name="text">
                <string>Save Volume Fraction Estimate vs. Z Data</string>
@@ -853,14 +883,17 @@
           </widget>
          </item>
          <item>
-          <spacer name="verticalSpacer_4">
+          <spacer name="verticalSpacer_3">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Expanding</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
              <width>20</width>
-             <height>40</height>
+             <height>0</height>
             </size>
            </property>
           </spacer>
@@ -868,22 +901,6 @@
         </layout>
        </widget>
       </widget>
-     </item>
-     <item>
-      <spacer name="verticalSpacer_3">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Expanding</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>0</height>
-        </size>
-       </property>
-      </spacer>
      </item>
     </layout>
    </widget>
@@ -968,6 +985,9 @@
    <property name="text">
     <string>&amp;Open Image...</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
   </action>
   <action name="actionExit">
    <property name="text">
@@ -1007,6 +1027,9 @@
   <action name="actionSaveFilteredImage">
    <property name="text">
     <string>Save Filtered Image...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
   <action name="actionSaveFiberOrientationImage">

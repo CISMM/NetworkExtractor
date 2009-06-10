@@ -2,6 +2,7 @@
 
 #include <qapplication.h>
 #include <qfiledialog.h>
+#include <qmessagebox.h>
 #include <qsettings.h>
 #include <qvariant.h>
 
@@ -55,11 +56,12 @@ FibrinAppQt::FibrinAppQt(QWidget* p)
   this->visualization = new Visualization();
 
   this->imageFilterComboBox->addItem(QString(DataModelType::NO_FILTER_STRING.c_str()));
-  this->imageFilterComboBox->addItem(QString(DataModelType::FIBERNESS_FILTER_STRING.c_str()));
+  //this->imageFilterComboBox->addItem(QString(DataModelType::FRANGI_FIBERNESS_FILTER_STRING.c_str()));
   this->imageFilterComboBox->addItem(QString(DataModelType::MULTISCALE_FIBERNESS_FILTER_STRING.c_str()));
-  this->imageFilterComboBox->addItem(QString(DataModelType::FIBERNESS_THRESHOLD_FILTER_STRING.c_str()));
-  this->imageFilterComboBox->addItem(QString(DataModelType::JUNCTIONNESS_FILTER_STRING.c_str()));
-  this->imageFilterComboBox->addItem(QString(DataModelType::JUNCTIONNESS_LOCAL_MAX_FILTER_STRING.c_str()));
+  this->imageFilterComboBox->addItem(QString(DataModelType::MULTISCALE_FIBERNESS_THRESHOLD_FILTER_STRING.c_str()));
+  this->imageFilterComboBox->addItem(QString(DataModelType::MULTISCALE_SKELETONIZATION_FILTER_STRING.c_str()));
+  //this->imageFilterComboBox->addItem(QString(DataModelType::JUNCTIONNESS_FILTER_STRING.c_str()));
+  //this->imageFilterComboBox->addItem(QString(DataModelType::JUNCTIONNESS_LOCAL_MAX_FILTER_STRING.c_str()));
 
   // Create and populate table model.
   this->tableModel = new QStandardItemModel(8, 2, this);
@@ -81,7 +83,7 @@ FibrinAppQt::FibrinAppQt(QWidget* p)
   this->imageDataView->setModel(this->tableModel);
 
   QCoreApplication::setOrganizationName("CISMM");
-  QCoreApplication::setOrganizationDomain("cissm.org");
+  QCoreApplication::setOrganizationDomain("cismm.org");
   QCoreApplication::setApplicationName("Fibrin Analysis");
 
   // Restore GUI settings.
@@ -124,7 +126,8 @@ void FibrinAppQt::on_actionOpenImage_triggered() {
   this->isoValueSlider->setValue(static_cast<int>(isoValue));
 
   // Set up visualization pipeline.
-  this->visualization->SetInputConnection(this->dataModel->GetOutputPort());
+  this->visualization->SetImageInputConnection(this->dataModel->GetImageOutputPort());
+  this->visualization->SetFilteredImageInputConnection(this->dataModel->GetFilteredImageOutputPort());
   this->visualization->SetIsoValue(isoValue);
 
   // Refresh the UI
@@ -233,8 +236,19 @@ void FibrinAppQt::on_actionSaveGeometry_triggered() {
 
 
 void FibrinAppQt::on_actionExit_triggered() {
-  this->writeSettings();
-  qApp->exit();
+  // Ask if user really wants to quit.
+  QMessageBox messageBox;
+  messageBox.setText("Do you really want to exit?");
+  messageBox.setInformativeText("If you exit now, all settings will be lost.");
+  messageBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+  messageBox.setDefaultButton(QMessageBox::Cancel);
+  int selected = messageBox.exec();
+
+  if (selected == QMessageBox::Ok) {
+    this->writeSettings();
+    qApp->exit();
+  }
+
 }
 
 
@@ -261,17 +275,22 @@ void FibrinAppQt::on_actionSaveView_triggered() {
 void FibrinAppQt::on_imageFilterComboBox_currentIndexChanged(QString filterText) {
   this->fibernessSettingsWidget->setVisible(false);
   this->multiscaleFibernessSettingsWidget->setVisible(false);
+  this->multiscaleFibernessThresholdSettingsWidget->setVisible(false);
   this->junctionnessSettingsWidget->setVisible(false);
   this->junctionnessLocalMaxSettingsWidget->setVisible(false);
 
   if (filterText.toStdString() == DataModelType::NO_FILTER_STRING) {
 
-  } else if (filterText.toStdString() == DataModelType::FIBERNESS_FILTER_STRING) {
+  } else if (filterText.toStdString() == DataModelType::FRANGI_FIBERNESS_FILTER_STRING) {
     this->fibernessSettingsWidget->setVisible(true);
   } else if (filterText.toStdString() == DataModelType::MULTISCALE_FIBERNESS_FILTER_STRING) {
     this->multiscaleFibernessSettingsWidget->setVisible(true);
-  } else if (filterText.toStdString() == DataModelType::FIBERNESS_THRESHOLD_FILTER_STRING) {
-    this->fibernessSettingsWidget->setVisible(true);
+  } else if (filterText.toStdString() == DataModelType::MULTISCALE_FIBERNESS_THRESHOLD_FILTER_STRING) {
+    this->multiscaleFibernessSettingsWidget->setVisible(true);
+    this->multiscaleFibernessThresholdSettingsWidget->setVisible(true);
+  } else if (filterText.toStdString() == DataModelType::MULTISCALE_SKELETONIZATION_FILTER_STRING) {
+    this->multiscaleFibernessSettingsWidget->setVisible(true);
+    this->multiscaleFibernessThresholdSettingsWidget->setVisible(true);
   } else if (filterText.toStdString() == DataModelType::JUNCTIONNESS_FILTER_STRING) {
     this->fibernessSettingsWidget->setVisible(true);
     this->junctionnessSettingsWidget->setVisible(true);
@@ -362,31 +381,40 @@ void FibrinAppQt::on_showDataOutline_toggled(bool show) {
 void FibrinAppQt::on_applyButton_clicked() {
 
   // Read fiber diameter.
-  double fiberDiameter = fiberDiameterEdit->text().toDouble();
+  double fiberDiameter = this->fiberDiameterEdit->text().toDouble();
   this->dataModel->SetFiberDiameter(fiberDiameter);
 
-  double fibernessAlphaCoef = fibernessAlphaCoefficientEdit->text().toDouble();
+  double fibernessAlphaCoef = this->fibernessAlphaCoefficientEdit->text().toDouble();
   this->dataModel->SetMultiscaleFibernessAlphaCoefficient(fibernessAlphaCoef);
 
-  double fibernessBetaCoef = fibernessBetaCoefficientEdit->text().toDouble();
+  double fibernessBetaCoef = this->fibernessBetaCoefficientEdit->text().toDouble();
   this->dataModel->SetMultiscaleFibernessBetaCoefficient(fibernessBetaCoef);
 
-  double fibernessGammaCoef = fibernessGammaCoefficientEdit->text().toDouble();
+  double fibernessGammaCoef = this->fibernessGammaCoefficientEdit->text().toDouble();
   this->dataModel->SetMultiscaleFibernessGammaCoefficient(fibernessGammaCoef);
 
-  double fibernessThreshold = fibernessThresholdEdit->text().toDouble();
-  this->dataModel->SetFibernessThreshold(fibernessThreshold);
+  double fibernessScaleMinimum = this->fibernessScaleMinimumEdit->text().toDouble();
+  this->dataModel->SetMultiscaleFibernessMinimumScale(fibernessScaleMinimum);
 
-  double junctionProbeDiameter = junctionProbeDiameterEdit->text().toDouble();
+  double fibernessScaleMaximum = this->fibernessScaleMaximumEdit->text().toDouble();
+  this->dataModel->SetMultiscaleFibernessMaximumScale(fibernessScaleMaximum);
+
+  double fibernessNumberOfScales = this->fibernessNumberOfScalesEdit->text().toInt();
+  this->dataModel->SetMultiscaleFibernessNumberOfScales(fibernessNumberOfScales);
+
+  double fibernessThreshold = this->fibernessThresholdEdit->text().toDouble();
+  this->dataModel->SetMultiscaleFibernessThreshold(fibernessThreshold);
+
+  double junctionProbeDiameter = this->junctionProbeDiameterEdit->text().toDouble();
   this->dataModel->SetJunctionProbeDiameter(junctionProbeDiameter);
 
-  double junctionFibernessThreshold = junctionFibernessThresholdEdit->text().toDouble();
+  double junctionFibernessThreshold = this->junctionFibernessThresholdEdit->text().toDouble();
   this->dataModel->SetJunctionFibernessThreshold(junctionFibernessThreshold);
 
-  double junctionnessLocalMaxHeight = junctionnessLocalMaxHeightEdit->text().toDouble();
+  double junctionnessLocalMaxHeight = this->junctionnessLocalMaxHeightEdit->text().toDouble();
   this->dataModel->SetJunctionnessLocalMaxHeight(junctionnessLocalMaxHeight);
 
-  double filteredImageScaleFactor = filteredImageScaleEdit->text().toDouble();
+  double filteredImageScaleFactor = this->filteredImageScaleEdit->text().toDouble();
   this->dataModel->SetFilteredImageScaleFactor(filteredImageScaleFactor);
 
   ///////////////// Update image filters ////////////////
@@ -394,12 +422,14 @@ void FibrinAppQt::on_applyButton_clicked() {
   if (filterText.toStdString() != this->filterType) {
     if (filterText.toStdString() == DataModelType::NO_FILTER_STRING) {
       this->dataModel->SetFilterToNone();
-    } else if (filterText.toStdString() == DataModelType::FIBERNESS_FILTER_STRING) {
-      this->dataModel->SetFilterToFiberness();
+    } else if (filterText.toStdString() == DataModelType::FRANGI_FIBERNESS_FILTER_STRING) {
+      this->dataModel->SetFilterToFrangiFiberness();
     } else if (filterText.toStdString() == DataModelType::MULTISCALE_FIBERNESS_FILTER_STRING) {
       this->dataModel->SetFilterToMultiscaleFiberness();
-    } else if (filterText.toStdString() == DataModelType::FIBERNESS_THRESHOLD_FILTER_STRING) {
-      this->dataModel->SetFilterToFibernessThreshold();
+    } else if (filterText.toStdString() == DataModelType::MULTISCALE_FIBERNESS_THRESHOLD_FILTER_STRING) {
+      this->dataModel->SetFilterToMultiscaleFibernessThreshold();
+    } else if (filterText.toStdString() == DataModelType::MULTISCALE_SKELETONIZATION_FILTER_STRING) {
+      this->dataModel->SetFilterToMultiscaleSkeletonization();
     } else if (filterText.toStdString() == DataModelType::JUNCTIONNESS_FILTER_STRING) {
       this->dataModel->SetFilterToJunctionness();
     } else if (filterText.toStdString() == DataModelType::JUNCTIONNESS_LOCAL_MAX_FILTER_STRING) {
@@ -409,11 +439,11 @@ void FibrinAppQt::on_applyButton_clicked() {
   }
 
   // Read isovalue.
-  double isoValue = isoValueEdit->text().toDouble();
+  double isoValue = this->isoValueEdit->text().toDouble();
   this->visualization->SetIsoValue(isoValue);
 
   // Read z-slice.
-  int slice = zPlaneEdit->text().toInt()-1;
+  int slice = this->zPlaneEdit->text().toInt()-1;
   this->visualization->SetZSlice(slice);
 
   refreshUI();
@@ -438,14 +468,17 @@ void FibrinAppQt::refreshUI() {
   QString fibernessGammaCoef = QString().sprintf(decimalFormat, this->dataModel->GetMultiscaleFibernessGammaCoefficient());
   this->fibernessGammaCoefficientEdit->setText(fibernessGammaCoef);
 
-  QString fiberScaleMinimum = QString().sprintf(decimalFormat, this->dataModel->GetMultiscaleFibernessMinimumScale());
-  this->fiberScaleMinimumEdit->setText(fiberScaleMinimum);
+  QString fibernessScaleMinimum = QString().sprintf(decimalFormat, this->dataModel->GetMultiscaleFibernessMinimumScale());
+  this->fibernessScaleMinimumEdit->setText(fibernessScaleMinimum);
 
-  QString fiberScaleMaximum = QString().sprintf(decimalFormat, this->dataModel->GetMultiscaleFibernessMaximumScale());
-  this->fiberScaleMaximumEdit->setText(fiberScaleMaximum);
+  QString fibernessScaleMaximum = QString().sprintf(decimalFormat, this->dataModel->GetMultiscaleFibernessMaximumScale());
+  this->fibernessScaleMaximumEdit->setText(fibernessScaleMaximum);
 
-  QString fiberScaleIntervals = QString().sprintf(intFormat, this->dataModel->GetMultiscaleFibernessScaleIntervals());
-  this->fiberScaleIntervalsEdit->setText(fiberScaleIntervals);
+  QString fibernessScales = QString().sprintf(intFormat, this->dataModel->GetMultiscaleFibernessNumberOfScales());
+  this->fibernessNumberOfScalesEdit->setText(fibernessScales);
+
+  QString fibernessThreshold = QString().sprintf(decimalFormat, this->dataModel->GetMultiscaleFibernessThreshold());
+  this->fibernessThresholdEdit->setText(fibernessThreshold);
   
   QString junctionProbeFilterDiameter = QString().sprintf(decimalFormat, this->dataModel->GetJunctionProbeDiameter());
   this->junctionProbeDiameterEdit->setText(junctionProbeFilterDiameter);
@@ -501,7 +534,8 @@ void FibrinAppQt::refreshUI() {
   this->ren->RemoveAllViewProps();
 
   if (this->dataModel->GetImageData()) {
-    this->visualization->SetInputConnection(this->dataModel->GetOutputPort());
+    this->visualization->SetImageInputConnection(this->dataModel->GetImageOutputPort());
+    this->visualization->SetFilteredImageInputConnection(this->dataModel->GetFilteredImageOutputPort());
     this->visualization->AddToRenderer(this->ren);
     this->visualization->SetFastIsosurfaceRendering(this->fastRenderingCheckBox->isChecked());
   }
