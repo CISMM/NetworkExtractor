@@ -38,6 +38,7 @@ IsosurfaceVisualizationPipeline
 void
 IsosurfaceVisualizationPipeline
 ::AddToRenderer(vtkRenderer* renderer) {
+  this->isoContourer->Modified();
   renderer->AddActor(this->isoActor);
 }
 

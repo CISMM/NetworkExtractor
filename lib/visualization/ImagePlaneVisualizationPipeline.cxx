@@ -1,5 +1,6 @@
 #include "ImagePlaneVisualizationPipeline.h"
 
+#include <vtkAlgorithmOutput.h>
 #include <vtkImageActor.h>
 #include <vtkImageData.h>
 #include <vtkImageShiftScale.h>
@@ -10,15 +11,16 @@ ImagePlaneVisualizationPipeline
 ::ImagePlaneVisualizationPipeline() {
 
   // Set up pipeline.
-  this->typeCaster = vtkSmartPointer<vtkImageShiftScale>::New();
-  this->typeCaster->SetOutputScalarTypeToUnsignedChar();
+  this->shiftScaler = vtkSmartPointer<vtkImageShiftScale>::New();
+  this->shiftScaler->SetOutputScalarTypeToUnsignedChar();
+  this->shiftScaler->ClampOverflowOn();
 
   // It is essential to set the input algorithm.
-  this->SetInputAlgorithm(this->typeCaster);
+  this->SetInputAlgorithm(this->shiftScaler);
 
   this->imageActor = vtkSmartPointer<vtkImageActor>::New();
   this->imageActor->InterpolateOn();
-  this->imageActor->SetInput(this->typeCaster->GetOutput());
+  this->imageActor->SetInput(this->shiftScaler->GetOutput());
 }
 
 
@@ -32,6 +34,20 @@ ImagePlaneVisualizationPipeline
 ::SetInputConnection(vtkAlgorithmOutput* input) {
   this->input = input;
   this->inputAlgorithm->SetInputConnection(input);
+
+    // Update shift/scale filter automatically if auto-rescaling is on.
+  if (this->autoRescalingOn) {
+    // Gotta be a better way to do this.
+    input->GetProducer()->Update();
+    vtkImageData* originalImage 
+      = vtkImageData::SafeDownCast(input->GetProducer()->GetOutputDataObject(0));
+    double* scalarRange = originalImage->GetScalarRange();
+    this->shiftScaler->SetShift(-scalarRange[0]);
+    this->shiftScaler->SetScale(255.0 / (scalarRange[1] - scalarRange[0]));
+  } else {
+    this->shiftScaler->SetShift(0.0);
+    this->shiftScaler->SetScale(1.0);
+  }
 }
 
 

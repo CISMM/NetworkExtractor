@@ -24,11 +24,16 @@ public:
   void SetSliceNumber(int sliceNumber);
   int GetSliceNumber();
 
+  void AutoRescalingOn();
+  void AutoRescalingOff();
+
 protected:
 
-  vtkSmartPointer<vtkImageShiftScale> typeCaster;
+  vtkSmartPointer<vtkImageShiftScale> shiftScaler;
 
   vtkSmartPointer<vtkImageActor> imageActor;
+
+  bool autoRescalingOn;
 
 };
 

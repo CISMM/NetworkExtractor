@@ -22,6 +22,9 @@ VisualizationPipeline
 ::SetInputConnection(vtkAlgorithmOutput* input) {
   this->input = input;
   this->inputAlgorithm->SetInputConnection(input);
+  
+  // Need this here for visualizations to update properly.
+  this->inputAlgorithm->Update();
 }
 
 

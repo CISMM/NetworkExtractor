@@ -1,3 +1,16 @@
+2009-06-10  Cory Quammen <cquammen@cs.unc.edu>
+
+   * ImagePlaneVisualizationPipeline.h,.cxx: Added methods for
+   enabling/disabling auto-rescaling of image intensities, and implemented
+   auto-rescaling.
+   
+   * IsosurfaceVisualizationPipeline.h,.cxx: Marked the vtkContourFilter
+   as modified so that the isosurface is updated when it is added to
+   the renderer.
+   
+   * VisualizationPipeline.cxx: Added call to Update() on the input 
+   algorithm to ensure the visualization is updated.
+
 2009-06-08  Cory Quammen <cquammen@cs.unc.edu>
 
    * CMakeLists.txt: Added source files for ImagePlaneVisualization
