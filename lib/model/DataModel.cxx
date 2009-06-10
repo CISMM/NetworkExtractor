@@ -15,7 +15,7 @@ DataModel<TImage>::NO_FILTER_STRING("No filter");
 
 template <class TImage>
 const typename DataModel<TImage>::FilterType
-DataModel<TImage>::FIBERNESS_FILTER_STRING("Fiberness");
+DataModel<TImage>::FRANGI_FIBERNESS_FILTER_STRING("Frangi Fiberness Filter");
 
 template <class TImage>
 const typename DataModel<TImage>::FilterType
@@ -23,7 +23,11 @@ DataModel<TImage>::MULTISCALE_FIBERNESS_FILTER_STRING("Multiscale Fiberness");
 
 template <class TImage>
 const typename DataModel<TImage>::FilterType
-DataModel<TImage>::FIBERNESS_THRESHOLD_FILTER_STRING("Fiberness Threshold");
+DataModel<TImage>::MULTISCALE_FIBERNESS_THRESHOLD_FILTER_STRING("Multiscale Fiberness Threshold");
+
+template <class TImage>
+const typename DataModel<TImage>::FilterType
+DataModel<TImage>::MULTISCALE_SKELETONIZATION_FILTER_STRING("Skeletonization");
 
 template <class TImage>
 const typename DataModel<TImage>::FilterType
@@ -56,7 +60,7 @@ DataModel<TImage>
   this->hessianToVesselnessFilter->SetBrightObject(true);
 
   this->multiscaleFibernessFilter = MultiScaleHessianMeasureImageType::New();
-  this->multiscaleFibernessFilter->GenerateHessianOutputOff();
+  this->multiscaleFibernessFilter->GenerateHessianOutputOn();
   this->multiscaleFibernessFilter->GenerateScalesOutputOff();
   this->multiscaleFibernessFilter->SetSigmaMinimum(0.5);
   this->multiscaleFibernessFilter->SetSigmaMaximum(1.5);
@@ -66,13 +70,18 @@ DataModel<TImage>
 
   this->minMaxFilter = MinMaxType::New();
 
-  this->fibernessThresholdFilter = ThresholdFilterType::New();
-  this->fibernessThresholdFilter->SetInput(this->fibernessFilter->GetOutput());
-  this->fibernessThresholdFilter->SetInsideValue(0.0);
-  this->fibernessThresholdFilter->SetOutsideValue(1.0);
+  this->multiscaleFibernessThresholdFilter = ThresholdFilterType::New();
+  this->multiscaleFibernessThresholdFilter->SetInput(this->multiscaleFibernessFilter->GetOutput());
+  this->multiscaleFibernessThresholdFilter->SetInsideValue(0.0);
+  this->multiscaleFibernessThresholdFilter->SetOutsideValue(1.0);
+  this->multiscaleFibernessThresholdFilter->SetLowerThreshold(0.0);
+  this->multiscaleFibernessThresholdFilter->SetUpperThreshold(0.0);
+
+  this->skeletonizationFilter = SkeletonizationFilterType::New();
+  this->skeletonizationFilter->SetInput(this->multiscaleFibernessThresholdFilter->GetOutput());
 
   this->fibernessConnectedComponentsFilter = ConnectedComponentFilterType::New();
-  this->fibernessConnectedComponentsFilter->SetInput(this->fibernessThresholdFilter->GetOutput());
+  this->fibernessConnectedComponentsFilter->SetInput(this->multiscaleFibernessThresholdFilter->GetOutput());
   this->fibernessConnectedComponentsFilter->FullyConnectedOn();
 
   this->minMaxConnectedComponentsFilter = MinMaxConnectedComponentFilterType::New();
@@ -85,7 +94,8 @@ DataModel<TImage>
   this->junctionnessLocalMaxFilter->SetInput(this->junctionnessFilter->GetOutput());
   this->junctionnessLocalMaxFilter->FullyConnectedOn();
 
-  this->scalarImageITKToVTKFilter = new ITKImageToVTKImage<TImage>();
+  this->inputImageITKToVTKFilter = new ITKImageToVTKImage<TImage>();
+  this->filteredImageITKToVTKFilter = new ITKImageToVTKImage<TImage>();
   this->vectorImageITKToVTKFilter = new ITKImageToVTKImage<EigenVectorImageType>();
   this->progressCallback = NULL;
 
@@ -105,6 +115,9 @@ DataModel<TImage>
   typename itk::MemberCommand< DataModel< TImage > >::Pointer fibernessThresholdFilterProgressCommand
     = itk::MemberCommand< DataModel< TImage > >::New();
 
+  typename itk::MemberCommand< DataModel< TImage > >::Pointer skeletonizationFilterProgressCommand
+    = itk::MemberCommand< DataModel< TImage > >::New();
+
   typename itk::MemberCommand< DataModel< TImage > >::Pointer fibernessConnectedComponentsFilterProgressCommand
     = itk::MemberCommand< DataModel< TImage > >::New();
 
@@ -120,6 +133,7 @@ DataModel<TImage>
   fibernessFilterProgressCommand->SetCallbackFunction(this, &DataModel<TImage>::UpdateProgress);
   multiscaleFibernessFilterProgressCommand->SetCallbackFunction(this, &DataModel<TImage>::UpdateProgress);
   fibernessThresholdFilterProgressCommand->SetCallbackFunction(this, &DataModel<TImage>::UpdateProgress);
+  skeletonizationFilterProgressCommand->SetCallbackFunction(this, &DataModel<TImage>::UpdateProgress);
   fibernessConnectedComponentsFilterProgressCommand->SetCallbackFunction(this, &DataModel<TImage>::UpdateProgress);
   junctionnessFilterProgressCommand->SetCallbackFunction(this, &DataModel<TImage>::UpdateProgress);
   junctionnessLocalMaxFilterProgressCommand->SetCallbackFunction(this, &DataModel<TImage>::UpdateProgress);
@@ -133,8 +147,10 @@ DataModel<TImage>
     "filterName", std::string("Fiberness Filter"));
   itk::EncapsulateMetaData<std::string >(multiscaleFibernessFilter->GetMetaDataDictionary(),
     "filterName", std::string("Multiscale Fiberness Filter"));
-  itk::EncapsulateMetaData<std::string >(fibernessThresholdFilter->GetMetaDataDictionary(),
+  itk::EncapsulateMetaData<std::string >(multiscaleFibernessThresholdFilter->GetMetaDataDictionary(),
     "filterName", std::string("Fiberness Threshold Filter"));
+  itk::EncapsulateMetaData<std::string >(skeletonizationFilter->GetMetaDataDictionary(),
+    "filterName", std::string("Skeletonization Filter"));
   itk::EncapsulateMetaData<std::string >(fibernessConnectedComponentsFilter->GetMetaDataDictionary(),
     "filterName", std::string("Fiberness Connected Components Filter"));
   itk::EncapsulateMetaData<std::string >(junctionnessFilter->GetMetaDataDictionary(),
@@ -146,7 +162,8 @@ DataModel<TImage>
   this->eigenAnalysisFilter->AddObserver(itk::ProgressEvent(), eigenAnalysisFilterProgressCommand);
   this->fibernessFilter->AddObserver(itk::ProgressEvent(), fibernessFilterProgressCommand);
   this->multiscaleFibernessFilter->AddObserver(itk::ProgressEvent(), multiscaleFibernessFilterProgressCommand);
-  this->fibernessThresholdFilter->AddObserver(itk::ProgressEvent(), fibernessThresholdFilterProgressCommand);
+  this->multiscaleFibernessThresholdFilter->AddObserver(itk::ProgressEvent(), fibernessThresholdFilterProgressCommand);
+  this->skeletonizationFilter->AddObserver(itk::ProgressEvent(), skeletonizationFilterProgressCommand);
   this->fibernessConnectedComponentsFilter->AddObserver(itk::ProgressEvent(), fibernessConnectedComponentsFilterProgressCommand);
   this->junctionnessFilter->AddObserver(itk::ProgressEvent(), junctionnessFilterProgressCommand);
   this->junctionnessLocalMaxFilter->AddObserver(itk::ProgressEvent(), junctionnessLocalMaxFilterProgressCommand);
@@ -158,7 +175,8 @@ DataModel<TImage>
 template <class TImage>
 DataModel<TImage>
 ::~DataModel() {
-  delete this->scalarImageITKToVTKFilter;
+  delete this->inputImageITKToVTKFilter;
+  delete this->filteredImageITKToVTKFilter;
   delete this->vectorImageITKToVTKFilter;
 }
 
@@ -185,32 +203,32 @@ DataModel<TImage>
   // Check for TIFF output and perform casting as needed.
   size_t tiffLocation = fileName.rfind(".tif");
   if (tiffLocation == fileName.size()-4) {
-    typename UShort3DCastType::Pointer caster = UShort3DCastType::New();
-    typename TIFFWriterType::Pointer writer = TIFFWriterType::New();
     typename ScaleFilterType::Pointer scaler = ScaleFilterType::New();
+    scaler->SetShift(0.0f);
+    scaler->SetScale(scale);
 
     if (filterName == NO_FILTER_STRING) {
-      caster->SetInput(this->imageData);
-    } else if (filterName == FIBERNESS_FILTER_STRING) {
-      scaler->SetShift(0.0f);
-      scaler->SetScale(scale);
+      scaler->SetInput(this->imageData);
+    } else if (filterName == FRANGI_FIBERNESS_FILTER_STRING) {
       scaler->SetInput(this->fibernessFilter->GetOutput());
-      caster->SetInput(scaler->GetOutput());
     } else if (filterName == MULTISCALE_FIBERNESS_FILTER_STRING) {
-      scaler->SetShift(0.0f);
-      scaler->SetScale(scale);
       scaler->SetInput(this->multiscaleFibernessFilter->GetOutput());
-      caster->SetInput(scaler->GetOutput());
-    } else if (filterName == FIBERNESS_THRESHOLD_FILTER_STRING) {
-      caster->SetInput(this->fibernessThresholdFilter->GetOutput());
+    } else if (filterName == MULTISCALE_FIBERNESS_THRESHOLD_FILTER_STRING) {
+      scaler->SetInput(this->multiscaleFibernessThresholdFilter->GetOutput());
+    } else if (filterName == MULTISCALE_SKELETONIZATION_FILTER_STRING) {
+      scaler->SetInput(this->skeletonizationFilter->GetOutput());
     } else if (filterName == JUNCTIONNESS_FILTER_STRING) {
-      caster->SetInput(this->junctionnessFilter->GetOutput());
+      scaler->SetInput(this->junctionnessFilter->GetOutput());
     } else if (filterName == JUNCTIONNESS_LOCAL_MAX_FILTER_STRING) {
-      caster->SetInput(this->junctionnessLocalMaxFilter->GetOutput());
+      scaler->SetInput(this->junctionnessLocalMaxFilter->GetOutput());
     } else {
       return;
     }
 
+    typename UShort3DCastType::Pointer caster = UShort3DCastType::New();
+    caster->SetInput(scaler->GetOutput());
+
+    typename TIFFWriterType::Pointer writer = TIFFWriterType::New();
     writer->SetInput(caster->GetOutput());
     writer->SetFileName(fileName.c_str());
     writer->Update();
@@ -220,12 +238,14 @@ DataModel<TImage>
     typename ScalarFileWriterType::Pointer writer = ScalarFileWriterType::New();
     if (filterName == NO_FILTER_STRING)
       writer->SetInput(this->imageData);
-    else if (filterName == FIBERNESS_FILTER_STRING)
+    else if (filterName == MULTISCALE_FIBERNESS_FILTER_STRING)
       writer->SetInput(this->fibernessFilter->GetOutput());
     else if (filterName == MULTISCALE_FIBERNESS_FILTER_STRING)
       writer->SetInput(this->multiscaleFibernessFilter->GetOutput());
-    else if (filterName == FIBERNESS_THRESHOLD_FILTER_STRING)
-      writer->SetInput(this->fibernessThresholdFilter->GetOutput());
+    else if (filterName == MULTISCALE_FIBERNESS_THRESHOLD_FILTER_STRING)
+      writer->SetInput(this->multiscaleFibernessThresholdFilter->GetOutput());
+    else if (filterName == MULTISCALE_SKELETONIZATION_FILTER_STRING)
+      writer->SetInput(this->skeletonizationFilter->GetOutput());
     else if (filterName == JUNCTIONNESS_FILTER_STRING)
       writer->SetInput(this->junctionnessFilter->GetOutput());
     else if (filterName == JUNCTIONNESS_LOCAL_MAX_FILTER_STRING)
@@ -366,15 +386,15 @@ DataModel<TImage>
 template <class TImage>
 void
 DataModel<TImage>
-::SetMultiscaleFibernessScaleIntervals(int intervals) {
-  this->multiscaleFibernessFilter->SetNumberOfSigmaSteps(intervals);
+::SetMultiscaleFibernessNumberOfScales(int numberOfScales) {
+  this->multiscaleFibernessFilter->SetNumberOfSigmaSteps(numberOfScales);
 }
 
 
 template <class TImage>
 int
 DataModel<TImage>
-::GetMultiscaleFibernessScaleIntervals() {
+::GetMultiscaleFibernessNumberOfScales() {
   return this->multiscaleFibernessFilter->GetNumberOfSigmaSteps();
 }
 
@@ -382,9 +402,17 @@ DataModel<TImage>
 template <class TImage>
 void
 DataModel<TImage>
-::SetFibernessThreshold(double threshold) {
-  this->fibernessThresholdFilter->SetLowerThreshold(0.0);
-  this->fibernessThresholdFilter->SetUpperThreshold(threshold);
+::SetMultiscaleFibernessThreshold(double threshold) {
+  this->multiscaleFibernessThresholdFilter->SetLowerThreshold(0.0);
+  this->multiscaleFibernessThresholdFilter->SetUpperThreshold(threshold);
+}
+
+
+template <class TImage>
+double
+DataModel<TImage>
+::GetMultiscaleFibernessThreshold() {
+  return this->multiscaleFibernessThresholdFilter->GetUpperThreshold();
 }
 
 
@@ -463,8 +491,11 @@ DataModel<TImage>
   this->hessianFilter->SetInput(this->imageData);
   this->multiscaleFibernessFilter->SetInput(this->imageData);
 
-  // Set display volume to image data by default.
-  this->scalarImageITKToVTKFilter->SetInput(this->imageData);
+  // Set image data.
+  this->inputImageITKToVTKFilter->SetInput(this->imageData);
+
+  // Set filtered image data to input image initially.
+  this->filteredImageITKToVTKFilter->SetInput(this->imageData);
 }
 
 
@@ -479,8 +510,16 @@ DataModel<TImage>
 template <class TImage>
 vtkAlgorithmOutput*
 DataModel<TImage>
-::GetOutputPort() {
-  return this->scalarImageITKToVTKFilter->GetOutputPort();
+::GetImageOutputPort() {
+  return this->inputImageITKToVTKFilter->GetOutputPort();
+}
+
+
+template <class TImage>
+vtkAlgorithmOutput*
+DataModel<TImage>
+::GetFilteredImageOutputPort() {
+  return this->filteredImageITKToVTKFilter->GetOutputPort();
 }
 
 
@@ -556,7 +595,7 @@ DataModel<TImage>
     this->minMaxFilter->SetImage(this->imageData);
     this->minMaxFilter->Compute();
     
-    this->scalarImageITKToVTKFilter->SetInput(this->imageData);
+    this->filteredImageITKToVTKFilter->SetInput(this->imageData);
   }
 }
 
@@ -564,7 +603,7 @@ DataModel<TImage>
 template <class TImage>
 void
 DataModel<TImage>
-::SetFilterToFiberness() {
+::SetFilterToFrangiFiberness() {
 
   if (!this->imageData)
     return;
@@ -572,7 +611,7 @@ DataModel<TImage>
   this->fibernessFilter->Update();
   this->minMaxFilter->SetImage(this->fibernessFilter->GetOutput());
   this->minMaxFilter->Compute();
-  this->scalarImageITKToVTKFilter->SetInput(this->fibernessFilter->GetOutput());
+  this->filteredImageITKToVTKFilter->SetInput(this->fibernessFilter->GetOutput());
 }
 
 
@@ -587,22 +626,35 @@ DataModel<TImage>
   this->multiscaleFibernessFilter->Update();
   this->minMaxFilter->SetImage(this->multiscaleFibernessFilter->GetOutput());
   this->minMaxFilter->Compute();
-  this->scalarImageITKToVTKFilter->SetInput(this->multiscaleFibernessFilter->GetOutput());
+  this->filteredImageITKToVTKFilter->SetInput(this->multiscaleFibernessFilter->GetOutput());
 }
 
 
 template <class TImage>
 void
 DataModel<TImage>
-::SetFilterToFibernessThreshold() {
+::SetFilterToMultiscaleFibernessThreshold() {
 
   if (!this->imageData)
     return;
 
-  this->fibernessThresholdFilter->Update();
-  this->minMaxFilter->SetImage(this->fibernessThresholdFilter->GetOutput());
+  this->multiscaleFibernessThresholdFilter->Update();
+  this->minMaxFilter->SetImage(this->multiscaleFibernessThresholdFilter->GetOutput());
   this->minMaxFilter->Compute();
-  this->scalarImageITKToVTKFilter->SetInput(this->fibernessThresholdFilter->GetOutput());
+  this->filteredImageITKToVTKFilter->SetInput(this->multiscaleFibernessThresholdFilter->GetOutput());
+}
+
+
+template <class TImage>
+void
+DataModel<TImage>
+::SetFilterToMultiscaleSkeletonization() {
+
+  if (!this->imageData)
+    return;
+
+  this->skeletonizationFilter->Update();
+  this->filteredImageITKToVTKFilter->SetInput(this->skeletonizationFilter->GetOutput());
 }
 
 
@@ -617,7 +669,7 @@ DataModel<TImage>
   this->junctionnessFilter->Update();
   this->minMaxFilter->SetImage(this->junctionnessFilter->GetOutput());
   this->minMaxFilter->Compute();
-  this->scalarImageITKToVTKFilter->SetInput(this->junctionnessFilter->GetOutput());
+  this->filteredImageITKToVTKFilter->SetInput(this->junctionnessFilter->GetOutput());
   this->vectorImageITKToVTKFilter->SetInput(
     this->junctionnessFilter->GetEigenVectorInput());
 }
@@ -634,7 +686,7 @@ DataModel<TImage>
   this->junctionnessLocalMaxFilter->Update();
   this->minMaxFilter->SetImage(this->junctionnessFilter->GetOutput());
   this->minMaxFilter->Compute();
-  this->scalarImageITKToVTKFilter->SetInput(this->junctionnessLocalMaxFilter->GetOutput());
+  this->filteredImageITKToVTKFilter->SetInput(this->junctionnessLocalMaxFilter->GetOutput());
 }
 
 
@@ -644,6 +696,7 @@ DataModel<TImage>
 ::SetFilteredImageScaleFactor(double scale) {
   this->filteredImageScale = scale;
 }
+
 
 template <class TImage>
 double
@@ -664,9 +717,9 @@ DataModel<TImage>
   for (double thresholdValue = minThreshold; thresholdValue <= maxThreshold; thresholdValue += thresholdIncrement) {
     
     // Compute number of connected components.
-    this->fibernessThresholdFilter->SetLowerThreshold(0);
-    this->fibernessThresholdFilter->SetUpperThreshold(thresholdValue);
-    this->fibernessThresholdFilter->Modified();
+    this->multiscaleFibernessThresholdFilter->SetLowerThreshold(0);
+    this->multiscaleFibernessThresholdFilter->SetUpperThreshold(thresholdValue);
+    this->multiscaleFibernessThresholdFilter->Modified();
 
     try {
       this->fibernessConnectedComponentsFilter->Update();
@@ -693,13 +746,13 @@ DataModel<TImage>
   FILE *fp = fopen(fileName.c_str(), "w");
   fprintf(fp, "z\tvolumeFraction\n");
 
-  this->fibernessThresholdFilter->SetLowerThreshold(0);
-  this->fibernessThresholdFilter->SetUpperThreshold(threshold);
-  this->fibernessThresholdFilter->Modified();
+  this->multiscaleFibernessThresholdFilter->SetLowerThreshold(0);
+  this->multiscaleFibernessThresholdFilter->SetUpperThreshold(threshold);
+  this->multiscaleFibernessThresholdFilter->Modified();
 
   typename itk::AccumulateImageFilter< TImage, TImage >::Pointer accumulateFilter1 =
     itk::AccumulateImageFilter< TImage, TImage >::New();
-  accumulateFilter1->SetInput(this->fibernessThresholdFilter->GetOutput());
+  accumulateFilter1->SetInput(this->multiscaleFibernessThresholdFilter->GetOutput());
   accumulateFilter1->SetAccumulateDimension(0);
 
   typename itk::AccumulateImageFilter<TImage, TImage>::Pointer accumulateFilter2 =

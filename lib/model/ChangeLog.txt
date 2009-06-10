@@ -1,3 +1,11 @@
+2009-06-10  Cory Quammen <cquammen@cs.unc.edu>
+
+   * DataModel.h,.cxx: Added thinning filter. Renamed some methods for
+   clarity. Added methods for retrieving the original input image
+   and the filtered image and added another ITK-to-VTK filter for
+   the original image data. Added mode for computing/showing
+   skeletonization.
+
 2009-06-08  Cory Quammen <cquammen@cs.unc.edu>
 
    * DataModel.cxx: Changed string formatting specifier in

@@ -4,6 +4,7 @@
 #include <string>
 
 #include <itkBinaryThresholdImageFilter.h>
+#include <itkBinaryThinningImageFilter.h>
 #include <itkCastImageFilter.h>
 #include <itkCommand.h>
 #include <itkConnectedComponentImageFilter.h>
@@ -12,6 +13,7 @@
 #include <itkEigenVectors3DToJunctionnessMeasureImageFilter.h>
 #include <itkEventObject.h>
 #include <itkFixedArray.h>
+#include <itkHessian3DEigenAnalysisImageFilter.h>
 #include <itkImage.h>
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
@@ -52,6 +54,8 @@ class DataModel {
   typedef itk::EigenVectors3DToJunctionnessImageFilter<EigenVectorImageType, TImage> JunctionnessFilterType;
   typedef itk::ValuedRegionalMaximaImageFilter<TImage, TImage> JunctionnessLocalMaxFilterType;
   typedef itk::BinaryThresholdImageFilter<TImage, TImage> ThresholdFilterType;
+  typedef itk::BinaryThinningImageFilter<TImage, TImage> SkeletonizationFilterType;
+  typedef typename SkeletonizationFilterType::Pointer SkeletonizationFilterTypePointer;
 
   typedef int ConnectedComponentOutputType;
   typedef itk::Image<ConnectedComponentOutputType, 3> ConnectedComponentOutputImageType;
@@ -70,9 +74,10 @@ class DataModel {
 public:
   typedef std::string FilterType;
   static const FilterType NO_FILTER_STRING;
-  static const FilterType FIBERNESS_FILTER_STRING;
+  static const FilterType FRANGI_FIBERNESS_FILTER_STRING;
   static const FilterType MULTISCALE_FIBERNESS_FILTER_STRING;
-  static const FilterType FIBERNESS_THRESHOLD_FILTER_STRING;
+  static const FilterType MULTISCALE_FIBERNESS_THRESHOLD_FILTER_STRING;
+  static const FilterType MULTISCALE_SKELETONIZATION_FILTER_STRING;
   static const FilterType JUNCTIONNESS_FILTER_STRING;
   static const FilterType JUNCTIONNESS_LOCAL_MAX_FILTER_STRING;
 
@@ -102,10 +107,11 @@ public:
   void SetMultiscaleFibernessMaximumScale(double maximum);
   double GetMultiscaleFibernessMaximumScale();
 
-  void SetMultiscaleFibernessScaleIntervals(int intervals);
-  int GetMultiscaleFibernessScaleIntervals();
+  void SetMultiscaleFibernessNumberOfScales(int numberOfScales);
+  int GetMultiscaleFibernessNumberOfScales();
 
-  void SetFibernessThreshold(double threshold);
+  void SetMultiscaleFibernessThreshold(double threshold);
+  double GetMultiscaleFibernessThreshold();
 
   void SetJunctionProbeDiameter(double diameter);
   double GetJunctionProbeDiameter();
@@ -119,8 +125,11 @@ public:
   void SetImageData(typename TImage::Pointer image);
   typename TImage::Pointer GetImageData();
 
-  // Returns the VTK output port for the scalar image data.
-  vtkAlgorithmOutput* GetOutputPort();
+  // Returns the VTK output port for the original scalar image data.
+  vtkAlgorithmOutput* GetImageOutputPort();
+
+  // Returns the VTK output port for the filtered scalar image data.
+  vtkAlgorithmOutput* GetFilteredImageOutputPort();
 
   // Returns the VTK output port for the vector image data from the
   // eigen vectors oriented along the cylinder axes of the fibers.
@@ -134,9 +143,10 @@ public:
   void GetSpacing(double spacing[3]);
 
   void SetFilterToNone();
-  void SetFilterToFiberness();
+  void SetFilterToFrangiFiberness();
   void SetFilterToMultiscaleFiberness();
-  void SetFilterToFibernessThreshold();
+  void SetFilterToMultiscaleFibernessThreshold();
+  void SetFilterToMultiscaleSkeletonization();
   void SetFilterToJunctionness();
   void SetFilterToJunctionnessLocalMax();
 
@@ -161,12 +171,15 @@ protected:
   typename FibernessFilterType::Pointer fibernessFilter;
   typename HessianToObjectnessFilterType::Pointer hessianToVesselnessFilter;
   typename MultiScaleHessianMeasureImageType::Pointer multiscaleFibernessFilter;
-  typename ThresholdFilterType::Pointer fibernessThresholdFilter;
+  typename ThresholdFilterType::Pointer multiscaleFibernessThresholdFilter;
+  SkeletonizationFilterTypePointer skeletonizationFilter;
   typename ConnectedComponentFilterType::Pointer fibernessConnectedComponentsFilter;
   typename MinMaxConnectedComponentFilterType::Pointer minMaxConnectedComponentsFilter;
   typename JunctionnessFilterType::Pointer junctionnessFilter;
   typename JunctionnessLocalMaxFilterType::Pointer junctionnessLocalMaxFilter;
-  ITKImageToVTKImage<TImage>* scalarImageITKToVTKFilter;
+
+  ITKImageToVTKImage<TImage>* inputImageITKToVTKFilter;
+  ITKImageToVTKImage<TImage>* filteredImageITKToVTKFilter;
   ITKImageToVTKImage<EigenVectorImageType>* vectorImageITKToVTKFilter;
 
   void UpdateProgress(itk::Object* object, const itk::EventObject& event);
