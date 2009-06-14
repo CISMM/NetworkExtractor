@@ -69,4 +69,30 @@ TARGET_LINK_LIBRARIES( FibrinAnalysis
   faVisualization
 )
 
+# Set package properties
+SET( CPACK_PACKAGE_NAME "Fibrin-Analysis" )
+SET( CPACK_PACKAGE_VENDOR "University of North Carolina CISMM" )
+SET( CPACK_PACKAGE_EXECUTABLES "FibrinAnalysis;Fibrin Analysis 1.0.0" )
+SET( CPACK_PACKAGE_DESCRIPTION_SUMMARY "Fibrin Analysis" )
+SET( CPACK_PACKAGE_VERSION "1.0.0" )
+SET( CPACK_PACKAGE_VERSION_MAJOR "1" )
+SET( CPACK_PACKAGE_VERSION_MINOR "0" )
+SET( CPACK_PACKAGE_VERSION_PATCH "0" )
+SET( CPACK_PACKAGE_INSTALL_DIRECTORY "Fibrin Analysis 1.0.0" )
+SET( CPACK_PACKAGE_INSTALL_REGISTRY_KEY "Fibrin Analysis 1.0.0" )
+SET( CPACK_RESOURCE_FILE_LICENSE "${FibrinAnalysis_SOURCE_DIR}/installer/licenses/FibrinAnalysis-license.txt" )
+SET( CPACK_RESOURCE_FILE_README  "${FibrinAnalysis_SOURCE_DIR}/installer/licenses/README.txt" )
 
+IF ( WIN32 )
+  INCLUDE( "${FibrinAnalysis_SOURCE_DIR}/installer/CMake/Win32Package.txt" )
+ENDIF ( WIN32 )
+
+INSTALL( TARGETS FibrinAnalysis
+  RUNTIME DESTINATION bin
+)
+
+# This must always be last!
+INCLUDE( CPack )
+
+# This includes Microsoft runtime libraries when run in Windows dev environment.
+INCLUDE( InstallRequiredSystemLibraries )

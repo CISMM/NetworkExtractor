@@ -1,6 +1,7 @@
 #include "FibrinAppQt.h"
 
 #include <qapplication.h>
+#include <qerrormessage.h>
 #include <qfiledialog.h>
 #include <qmessagebox.h>
 #include <qsettings.h>
@@ -18,6 +19,11 @@
 #include <vtkWindowToImageFilter.h>
 
 #include <itkSize.h>
+
+#include <XMLHelper.h>
+#include <libxml/encoding.h>
+#include <libxml/xmlreader.h>
+#include <libxml/xmlwriter.h>
 
 
 void ProgressCallback(float progress, const char* processName) {
@@ -42,11 +48,11 @@ FibrinAppQt::FibrinAppQt(QWidget* p)
  : QMainWindow(p) {
   setupUi(this);
 
-  filterType = DataModelType::NO_FILTER_STRING;
+  this->filterType = DataModelType::NO_FILTER_STRING;
 
   // QT/VTK interact
   this->ren = vtkRenderer::New();
-  qvtkWidget->GetRenderWindow()->AddRenderer(ren);
+  this->qvtkWidget->GetRenderWindow()->AddRenderer(ren);
 
   // Instantiate data model.
   this->dataModel = new DataModel<Float3DImageType>();
@@ -64,30 +70,50 @@ FibrinAppQt::FibrinAppQt(QWidget* p)
   //this->imageFilterComboBox->addItem(QString(DataModelType::JUNCTIONNESS_LOCAL_MAX_FILTER_STRING.c_str()));
 
   // Create and populate table model.
+  int LEFT_COLUMN = 0;
+  int RIGHT_COLUMN = 1;
   this->tableModel = new QStandardItemModel(8, 2, this);
-  this->tableModel->setHeaderData(0, Qt::Horizontal, tr("Property"));
-  this->tableModel->setHeaderData(1, Qt::Horizontal, tr("Value"));
+  this->tableModel->setHeaderData(LEFT_COLUMN,  Qt::Horizontal, tr("Property"));
+  this->tableModel->setHeaderData(RIGHT_COLUMN, Qt::Horizontal, tr("Value"));
 
-  this->tableModel->setItem(0, 0, new QStandardItem(tr("Data minimum")));
-  this->tableModel->setItem(1, 0, new QStandardItem(tr("Data maximum")));
-  this->tableModel->setItem(2, 0, new QStandardItem(tr("X dimension")));
-  this->tableModel->setItem(3, 0, new QStandardItem(tr("Y dimension")));
-  this->tableModel->setItem(4, 0, new QStandardItem(tr("Z dimension")));
-  this->tableModel->setItem(5, 0, new QStandardItem(tr("X spacing")));
-  this->tableModel->setItem(6, 0, new QStandardItem(tr("Y spacing")));
-  this->tableModel->setItem(7, 0, new QStandardItem(tr("Z spacing")));
+  QStandardItem* labelItems[8];
+  labelItems[0] = new QStandardItem(tr("Data minimum"));
+  labelItems[1] = new QStandardItem(tr("Data maximum"));
+  labelItems[2] = new QStandardItem(tr("X dimension"));
+  labelItems[3] = new QStandardItem(tr("Y dimension"));
+  labelItems[4] = new QStandardItem(tr("Z dimension"));
+  labelItems[5] = new QStandardItem(tr("X spacing"));
+  labelItems[6] = new QStandardItem(tr("Y spacing"));
+  labelItems[7] = new QStandardItem(tr("Z spacing"));
+
   for (int i = 0; i < 8; i++) {
-    this->tableModel->setItem(i, 1, new QStandardItem(tr("")));
-  }
+    labelItems[i]->setEditable(false);
+    this->tableModel->setItem(i, LEFT_COLUMN, labelItems[i]);
 
+    QStandardItem* item = new QStandardItem(tr(""));
+
+    // Allow editing of voxel spacing.
+    if (i < 5)
+      item->setEditable(false);
+    this->tableModel->setItem(i, RIGHT_COLUMN, item);
+  }
   this->imageDataView->setModel(this->tableModel);
+
+  connect(tableModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), 
+    this, SLOT(handle_tableModel_dataChanged(const QModelIndex&, const QModelIndex&)));
 
   QCoreApplication::setOrganizationName("CISMM");
   QCoreApplication::setOrganizationDomain("cismm.org");
   QCoreApplication::setApplicationName("Fibrin Analysis");
 
   // Restore GUI settings.
-  this->readSettings();
+  this->readProgramSettings();
+
+  // Initialize the XML library.
+  LIBXML_TEST_VERSION
+
+  // Set up error dialog box.
+  this->errorDialog.setModal(true);
 }
 
 
@@ -96,6 +122,9 @@ FibrinAppQt::~FibrinAppQt() {
   delete this->dataModel;
   delete this->visualization;
   delete this->tableModel;
+
+  // Cleanup the XML library.
+  xmlCleanupParser();
 }
 
 
@@ -123,7 +152,7 @@ void FibrinAppQt::on_actionOpenImage_triggered() {
   double isoValue = 0.5*(min + max);
   QString isoValueString = QString().sprintf("%.4f", isoValue);
   this->isoValueEdit->setText(isoValueString);
-  this->isoValueSlider->setValue(static_cast<int>(isoValue));
+  this->isoValueSlider->setValue(this->isoValueSliderPosition(isoValue));
 
   // Set up visualization pipeline.
   this->visualization->SetImageInputConnection(this->dataModel->GetImageOutputPort());
@@ -245,7 +274,7 @@ void FibrinAppQt::on_actionExit_triggered() {
   int selected = messageBox.exec();
 
   if (selected == QMessageBox::Ok) {
-    this->writeSettings();
+    this->writeProgramSettings();
     qApp->exit();
   }
 
@@ -263,11 +292,113 @@ void FibrinAppQt::on_actionResetView_triggered() {
 
 
 void FibrinAppQt::on_actionOpenView_triggered() {
+  QString fileName = QFileDialog::getOpenFileName(this, 
+    "Open Camera View File", "", "XML (*.xml);;");
+  if (fileName == "")
+    return;
+
+  int rc;
+  xmlDoc* doc = xmlReadFile(fileName.toStdString().c_str(), NULL, 0);
+
+  if (doc == NULL) {
+    errorDialog.showMessage(tr("Could not parse view file."));
+    return;
+  }
+
+  double x, y, z;
+  xmlNode* rootElement = xmlDocGetRootElement(doc);
+
+  xmlNode* positionNode = FindChildNodeWithName(rootElement, "Position"); //root_element->children;
+  if (positionNode) {
+    sscanf((char *) xmlGetProp(positionNode, BAD_CAST "x"), "%lf", &x);
+    sscanf((char *) xmlGetProp(positionNode, BAD_CAST "y"), "%lf", &y);
+    sscanf((char *) xmlGetProp(positionNode, BAD_CAST "z"), "%lf", &z);
+    this->ren->GetActiveCamera()->SetPosition(x, y, z);
+  }
+
+  xmlNode* focalPointNode = FindChildNodeWithName(rootElement, "FocalPoint"); //positionNode->next;
+  if (focalPointNode) {
+    sscanf((char *) xmlGetProp(focalPointNode, BAD_CAST "x"), "%lf", &x);
+    sscanf((char *) xmlGetProp(focalPointNode, BAD_CAST "y"), "%lf", &y);
+    sscanf((char *) xmlGetProp(focalPointNode, BAD_CAST "z"), "%lf", &z);
+    this->ren->GetActiveCamera()->SetFocalPoint(x, y, z);
+  }
+
+  xmlNode* upVectorNode = FindChildNodeWithName(rootElement, "UpVector"); //focalPointNode->next;
+  if (upVectorNode) {
+    sscanf((char *) xmlGetProp(upVectorNode, BAD_CAST "x"), "%lf", &x);
+    sscanf((char *) xmlGetProp(upVectorNode, BAD_CAST "y"), "%lf", &y);
+    sscanf((char *) xmlGetProp(upVectorNode, BAD_CAST "z"), "%lf", &z);
+    this->ren->GetActiveCamera()->SetViewUp(x, y, z);
+  }
+
+  xmlFreeDoc(doc);
+
+  this->ren->ResetCameraClippingRange();
   this->qvtkWidget->GetRenderWindow()->Render();
 }
 
 
 void FibrinAppQt::on_actionSaveView_triggered() {
+
+  QString fileName = QFileDialog::getSaveFileName(this, 
+    "Save Camera View File", "", "XML (*.xml);;");
+  if (fileName == "")
+    return;
+
+  xmlTextWriterPtr writer;
+  int rc;
+  char charBuffer[20];
+
+  // Create a new xmlWriter for file path with no compression.
+  writer = xmlNewTextWriterFilename(fileName.toStdString().c_str(), 0);
+  if (writer == NULL) {
+    errorDialog.showMessage(tr("Could not write view file."));
+  }
+
+  // Start the document with XML default for version and encoding (ISO 8859-1).
+  rc = xmlTextWriterStartDocument(writer, NULL, "ISO-8859-1", NULL);
+
+  // Start an element named "Camera". This will be the root element of the document.
+  rc = xmlTextWriterStartElement(writer, BAD_CAST "Camera");
+
+  // Start a camera position element.
+  rc = xmlTextWriterStartElement(writer, BAD_CAST "Position");
+  double* position = this->ren->GetActiveCamera()->GetPosition();
+  sprintf(charBuffer, "%.3f", position[0]);
+  rc = xmlTextWriterWriteAttribute(writer, BAD_CAST "x", BAD_CAST charBuffer);
+  sprintf(charBuffer, "%.3f", position[1]);
+  rc = xmlTextWriterWriteAttribute(writer, BAD_CAST "y", BAD_CAST charBuffer);
+  sprintf(charBuffer, "%.3f", position[2]);
+  rc = xmlTextWriterWriteAttribute(writer, BAD_CAST "z", BAD_CAST charBuffer);
+  rc = xmlTextWriterEndElement(writer); // Position element
+
+  // Start a focal point element.
+  rc = xmlTextWriterStartElement(writer, BAD_CAST "FocalPoint");
+  double* focalPoint = this->ren->GetActiveCamera()->GetFocalPoint();
+  sprintf(charBuffer, "%.3f", focalPoint[0]);
+  rc = xmlTextWriterWriteAttribute(writer, BAD_CAST "x", BAD_CAST charBuffer);
+  sprintf(charBuffer, "%.3f", focalPoint[1]);
+  rc = xmlTextWriterWriteAttribute(writer, BAD_CAST "y", BAD_CAST charBuffer);
+  sprintf(charBuffer, "%.3f", focalPoint[2]);
+  rc = xmlTextWriterWriteAttribute(writer, BAD_CAST "z", BAD_CAST charBuffer);
+  rc = xmlTextWriterEndElement(writer); // Focal point element
+
+  // Start an up vector element.
+  rc = xmlTextWriterStartElement(writer, BAD_CAST "UpVector");
+  double* upVector = this->ren->GetActiveCamera()->GetViewUp();
+  sprintf(charBuffer, "%.3f", upVector[0]);
+  rc = xmlTextWriterWriteAttribute(writer, BAD_CAST "x", BAD_CAST charBuffer);
+  sprintf(charBuffer, "%.3f", upVector[1]);
+  rc = xmlTextWriterWriteAttribute(writer, BAD_CAST "y", BAD_CAST charBuffer);
+  sprintf(charBuffer, "%.3f", upVector[2]);
+  rc = xmlTextWriterWriteAttribute(writer, BAD_CAST "z", BAD_CAST charBuffer);
+  rc = xmlTextWriterEndElement(writer); // Up vector element.
+
+  rc = xmlTextWriterEndElement(writer); // View element
+  rc = xmlTextWriterEndDocument(writer);
+
+  xmlFreeTextWriter(writer);
 
 }
 
@@ -310,12 +441,12 @@ void FibrinAppQt::on_showIsosurfaceCheckbox_toggled(bool show) {
 
 void FibrinAppQt::on_isoValueEdit_textEdited(QString text) {
   int value = static_cast<int>(text.toDouble());
-  this->isoValueSlider->setValue(value);
+  this->isoValueSlider->setValue(this->isoValueSliderPosition(value));
 }
 
 
 void FibrinAppQt::on_isoValueSlider_sliderMoved(int value) {
-  QString text = QString().sprintf("%d", value);
+  QString text = QString().sprintf("%.3f", this->isoValueSliderValue(value));
   this->isoValueEdit->setText(text);
 }
 
@@ -450,6 +581,27 @@ void FibrinAppQt::on_applyButton_clicked() {
 }
 
 
+void FibrinAppQt::handle_tableModel_dataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight) {
+  if (topLeft != bottomRight) {
+    return;
+  }
+  
+  QStandardItem* item = this->tableModel->item(topLeft.row(), topLeft.column());
+  double value = item->text().toDouble();
+
+  int itemIndex = topLeft.row();
+  if (itemIndex == 5) {
+    this->dataModel->SetVoxelXSpacing(value);
+  } else if (itemIndex == 6) {
+    this->dataModel->SetVoxelYSpacing(value);
+  } else if (itemIndex == 7) {
+    this->dataModel->SetVoxelZSpacing(value);
+  }
+
+  this->qvtkWidget->GetRenderWindow()->Render();
+}
+
+
 void FibrinAppQt::refreshUI() {
 
   ///////////////// Update GUI /////////////////
@@ -520,11 +672,7 @@ void FibrinAppQt::refreshUI() {
   double isoValue = this->visualization->GetIsoValue();
   QString isoValueString = QString().sprintf(decimalFormat, isoValue);
   this->isoValueEdit->setText(isoValueString);
-  this->isoValueSlider->setValue(static_cast<int>(isoValue));
-  this->isoValueSlider->setMinValue(static_cast<int>(
-    this->dataModel->GetFilteredDataMinimum()));
-  this->isoValueSlider->setMaxValue(static_cast<int>(
-    this->dataModel->GetFilteredDataMaximum()));
+  this->isoValueSlider->setValue(this->isoValueSliderPosition(isoValue));
 
   // Update slice slider
   this->zPlaneSlider->setMinValue(1);
@@ -551,11 +699,11 @@ void FibrinAppQt::UpdateProgress(float progress) const {
 
 
 void FibrinAppQt::closeEvent(QCloseEvent* event) {
-  this->writeSettings();
+  this->writeProgramSettings();
 }
 
 
-void FibrinAppQt::writeSettings() {
+void FibrinAppQt::writeProgramSettings() {
   QSettings settings;
 
   settings.beginGroup("MainWindow");
@@ -579,7 +727,7 @@ void FibrinAppQt::writeSettings() {
 }
 
 
-void FibrinAppQt::readSettings() {
+void FibrinAppQt::readProgramSettings() {
   QSettings settings;
 
   settings.beginGroup("MainWindow");
@@ -600,4 +748,21 @@ void FibrinAppQt::readSettings() {
     settings.endGroup();
   }
 
+}
+
+
+int FibrinAppQt::isoValueSliderPosition(double value) {
+  double dataMin = this->dataModel->GetFilteredDataMinimum();
+  double dataMax = this->dataModel->GetFilteredDataMaximum();
+  double sliderMax = static_cast<double>(this->isoValueSlider->maximum());
+  return static_cast<int>(sliderMax*((value-dataMin)/(dataMax-dataMin)));
+}
+
+
+double FibrinAppQt::isoValueSliderValue(int position) {
+  double dataMin = this->dataModel->GetFilteredDataMinimum();
+  double dataMax = this->dataModel->GetFilteredDataMaximum();
+  double sliderMax = static_cast<double>(this->isoValueSlider->maximum());
+  return (static_cast<double>(position) / sliderMax) 
+    * (dataMax - dataMin) + dataMin;
 }

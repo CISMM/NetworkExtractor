@@ -1,6 +1,7 @@
 #ifndef _FIBRIN_APP_QT_H_
 #define _FIBRIN_APP_QT_H_
 
+#include <qerrormessage.h>
 #include <qmainwindow.h>
 #include <qstandarditemmodel.h>
 #include "ui_FibrinAppQT.h"
@@ -30,8 +31,12 @@ public:
 
 protected:
   void closeEvent(QCloseEvent* event);
-  void writeSettings();
-  void readSettings();
+
+  void writeProgramSettings();
+  void readProgramSettings();
+
+  int isoValueSliderPosition(double value);
+  double isoValueSliderValue(int position);
 
 public slots:
 
@@ -44,7 +49,6 @@ public slots:
   virtual void on_actionSavePicture_triggered();
   virtual void on_actionSaveRotationAnimation_triggered();
   virtual void on_actionSaveGeometry_triggered();
-
   virtual void on_actionExit_triggered();
 
   virtual void on_actionResetView_triggered();
@@ -68,7 +72,11 @@ public slots:
 
   virtual void on_applyButton_clicked();
 
+  virtual void handle_tableModel_dataChanged(const QModelIndex& topLeft,
+    const QModelIndex& bottomRight);
+
 protected:
+  QStandardItemModel* tableModel;
   DataModelType* dataModel;
   Visualization* visualization;
 
@@ -77,12 +85,13 @@ protected:
 protected slots:
 
 private:
-  QStandardItemModel* tableModel;
   vtkRenderer* ren;
 
   DataModelType::FilterType filterType;
+
+  QErrorMessage errorDialog;
    
 };
 
-#endif // _FIBRIN_APP_QT_H_
 
+#endif // _FIBRIN_APP_QT_H_

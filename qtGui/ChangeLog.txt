@@ -1,3 +1,15 @@
+2009-06-14  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Added commands for getting packaging with CPack
+   mechanism to work.
+   
+   * FibrinAppQt.h,.cxx,.ui: Added some methods to convert between integral
+   slider positions and floating point isosurface values and vice versa
+   to get float slider behavior (will someday replace with David Feng's
+   float slider). Added message dialog to confirm that user wants to
+   close the program. Added ticks to sliders. Turned on editting of image
+   data properties table and added method to handle those changes.
+
 2009-06-10  Cory Quammen <cquammen@cs.unc.edu>
 
    * FibrinAppQt.cxx: Turned off some of the experimental junction finding

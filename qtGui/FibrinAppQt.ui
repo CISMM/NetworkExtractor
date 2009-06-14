@@ -97,11 +97,10 @@
     <property name="title">
      <string>View</string>
     </property>
-    <addaction name="actionResetView"/>
-    <addaction name="separator"/>
     <addaction name="actionOpenView"/>
     <addaction name="actionSaveView"/>
     <addaction name="separator"/>
+    <addaction name="actionResetView"/>
    </widget>
    <widget class="QMenu" name="menuWindows">
     <property name="title">
@@ -148,7 +147,7 @@
     <string>Image Analysis</string>
    </property>
    <attribute name="dockWidgetArea">
-    <number>2</number>
+    <number>1</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents">
     <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -162,8 +161,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>320</width>
-          <height>661</height>
+          <width>363</width>
+          <height>439</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -528,9 +527,9 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>0</y>
+          <y>-81</y>
           <width>363</width>
-          <height>238</height>
+          <height>248</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -618,8 +617,11 @@
             </item>
             <item>
              <widget class="QSlider" name="isoValueSlider">
+              <property name="minimum">
+               <number>0</number>
+              </property>
               <property name="maximum">
-               <number>10000</number>
+               <number>399</number>
               </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
@@ -628,10 +630,10 @@
                <bool>false</bool>
               </property>
               <property name="tickPosition">
-               <enum>QSlider::NoTicks</enum>
+               <enum>QSlider::TicksAbove</enum>
               </property>
               <property name="tickInterval">
-               <number>1000</number>
+               <number>50</number>
               </property>
              </widget>
             </item>
@@ -686,8 +688,17 @@
             </item>
             <item>
              <widget class="QSlider" name="zPlaneSlider">
+              <property name="maximum">
+               <number>99</number>
+              </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="tickPosition">
+               <enum>QSlider::TicksAbove</enum>
+              </property>
+              <property name="tickInterval">
+               <number>10</number>
               </property>
              </widget>
             </item>
@@ -808,8 +819,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>380</width>
-          <height>167</height>
+          <width>363</width>
+          <height>134</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_11">
@@ -953,7 +964,16 @@
            <enum>Qt::ScrollBarAlwaysOff</enum>
           </property>
           <property name="editTriggers">
-           <set>QAbstractItemView::NoEditTriggers</set>
+           <set>QAbstractItemView::AllEditTriggers</set>
+          </property>
+          <property name="dragEnabled">
+           <bool>true</bool>
+          </property>
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::NoSelection</enum>
           </property>
           <property name="wordWrap">
            <bool>false</bool>
