@@ -20,9 +20,6 @@ ELSE(ITK_FOUND)
      "Cannot build without ITK.  Please set ITK_DIR.")
 ENDIF(ITK_FOUND)
 
-INCLUDE_DIRECTORIES(${ITK_INCLUDE_DIRS})
-LINK_DIRECTORIES(${ITK_LIBRARY_DIRS})
-
 #######################################
 # Include VTK
 #######################################
@@ -35,9 +32,9 @@ ELSE(VTK_FOUND)
      "Cannot build without VTK.  Please set VTK_DIR.")
 ENDIF (VTK_FOUND)
 
-INCLUDE_DIRECTORIES(${VTK_INCLUDE_DIRS})
-LINK_DIRECTORIES(${VTK_LIBRARY_DIRS})
-
+INCLUDE_DIRECTORIES(
+  ${VTK_DIR}/Utilities/vtklibxml2
+)
 
 ###################################
 # nanoCommon stuff, including 
@@ -89,8 +86,3 @@ ADD_SUBDIRECTORY(lib)
 #IF (BUILD_IT_TESTS)
 #    SUBDIRS(TestSuite Tests)
 #ENDIF (BUILD_IT_TESTS)
-
-#######################################
-# CPack installer stuff
-#######################################
-#INCLUDE(CPack)

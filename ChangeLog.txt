@@ -1,3 +1,8 @@
+2009-06-14  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Removed some unnecessary INCLUDE_DIRECTORIES commands
+   and added one so that libxml2 headers are found.
+
 2009-06-08  Cory Quammen <cquammen@cs.unc.edu>
 
    * CMakeLists.txt: Added CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
