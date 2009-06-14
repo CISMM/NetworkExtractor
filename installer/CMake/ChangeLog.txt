@@ -1,0 +1,7 @@
+2009-06-14  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMake/: New directory for CMake files used to configure the
+   CPack installation mechanism.
+
+   * Win32Package.txt: New file that adds Windows-specific variables
+   for the NSIS installer.
