@@ -1,5 +1,10 @@
 2009-06-14  Cory Quammen <cquammen@cs.unc.edu>
 
+   * README.txt: Added README file for installer. It doesn't seem to
+   be used by the NSIS installer, unfortunately.
+
+2009-06-14  Cory Quammen <cquammen@cs.unc.edu>
+
    * licenses\: New directory for holding licenses for this software
    and the software libraries it uses.
 
