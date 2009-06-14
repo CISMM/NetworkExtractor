@@ -1,3 +1,10 @@
+2009-06-14  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Added libxml2 directory in VTK Utilities
+   to list of include directories.
+   
+   * XMLHelper.h,.cxx: Utility files for working with XML files.
+
 2009-03-15  Cory Quammen <cquammen@cs.unc.edu>
 
    * LoadVTKImageFile.h,.cxx: This class isn't needed. The ITK
