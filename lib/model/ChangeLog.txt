@@ -1,3 +1,7 @@
+2009-06-14  Cory Quammen <cquammen@cs.unc.edu>
+
+   * DataModel.h,.cxx: Added methods for changing image voxel spacing.
+
 2009-06-10  Cory Quammen <cquammen@cs.unc.edu>
 
    * DataModel.h,.cxx: Added thinning filter. Renamed some methods for

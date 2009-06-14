@@ -150,6 +150,11 @@ public:
   void SetFilterToJunctionness();
   void SetFilterToJunctionnessLocalMax();
 
+  void SetVoxelSpacing(int dimension, double spacing);
+  void SetVoxelXSpacing(double spacing);
+  void SetVoxelYSpacing(double spacing);
+  void SetVoxelZSpacing(double spacing);
+
   void SetFilteredImageScaleFactor(double scale);
   double GetFilteredImageScaleFactor();
 

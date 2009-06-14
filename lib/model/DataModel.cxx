@@ -693,6 +693,47 @@ DataModel<TImage>
 template <class TImage>
 void
 DataModel<TImage>
+::SetVoxelSpacing(int dimension, double spacing) {
+  if (!this->imageData)
+    return;
+
+  typename TImage::SpacingType currentSpacing = this->imageData->GetSpacing();
+  currentSpacing[dimension] = spacing;
+  this->imageData->SetSpacing(currentSpacing);
+
+  this->inputImageITKToVTKFilter->GetOutputPort()->GetProducer()->Modified();
+  this->filteredImageITKToVTKFilter->GetOutputPort()->GetProducer()->Modified();
+  this->vectorImageITKToVTKFilter->GetOutputPort()->GetProducer()->Modified();
+}
+
+
+template <class TImage>
+void
+DataModel<TImage>
+::SetVoxelXSpacing(double spacing) {
+  this->SetVoxelSpacing(0, spacing); 
+}
+
+
+template <class TImage>
+void
+DataModel<TImage>
+::SetVoxelYSpacing(double spacing) {
+  this->SetVoxelSpacing(1, spacing); 
+}
+
+
+template <class TImage>
+void
+DataModel<TImage>
+::SetVoxelZSpacing(double spacing) {
+  this->SetVoxelSpacing(2, spacing); 
+}
+
+
+template <class TImage>
+void
+DataModel<TImage>
 ::SetFilteredImageScaleFactor(double scale) {
   this->filteredImageScale = scale;
 }
