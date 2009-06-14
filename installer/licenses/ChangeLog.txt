@@ -1,0 +1,8 @@
+2009-06-14  Cory Quammen <cquammen@cs.unc.edu>
+
+   * licenses\: New directory for holding licenses for this software
+   and the software libraries it uses.
+
+   * FibrinAnalysis-license.txt: Place-holder file for license file
+   shown in the installer.
+   
