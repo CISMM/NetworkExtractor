@@ -8,39 +8,41 @@ INSTALL( FILES
   DESTINATION bin
 )
 
-# VTK files
-SET(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${VTK_DIR};VTK;ALL;/")
+# This should work, but seems to prevent other files from being written 
+# into the bin directory in the installation tree.
+#SET(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${VTK_BINARY_DIR};VTK;ALL;/")
 
-#INSTALL( FILES
-#  "${VTK_LIBRARY_DIRS}/release/vtkCommon.dll"
-#  "${VTK_LIBRARY_DIRS}/release/vtkDICOMParser.dll"
-#  "${VTK_LIBRARY_DIRS}/release/vtkexoIIc.dll"
-#  "${VTK_LIBRARY_DIRS}/release/vtkexpat.dll"
-#  "${VTK_LIBRARY_DIRS}/release/vtkFiltering.dll"
-#  "${VTK_LIBRARY_DIRS}/release/vtkfreetype.dll"
-#  "${VTK_LIBRARY_DIRS}/release/vtkftgl.dll"
-#  "${VTK_LIBRARY_DIRS}/release/vtkGenericFiltering.dll"
-#  "${VTK_LIBRARY_DIRS}/release/vtkGraphics.dll"
-#  "${VTK_LIBRARY_DIRS}/release/vtkHybrid.dll"
-#  "${VTK_LIBRARY_DIRS}/release/vtkImaging.dll"
-#  "${VTK_LIBRARY_DIRS}/release/vtkInfovis.dll"
-#  "${VTK_LIBRARY_DIRS}/release/vtkIO.dll"
-#  "${VTK_LIBRARY_DIRS}/release/vtkjpeg.dll"
-#  "${VTK_LIBRARY_DIRS}/release/vtklibxml2.dll"
-#  "${VTK_LIBRARY_DIRS}/release/vtkmetaio.dll"
-#  "${VTK_LIBRARY_DIRS}/release/vtkNetCDF.dll"
-#  "${VTK_LIBRARY_DIRS}/release/vtkParallel.dll"
-#  "${VTK_LIBRARY_DIRS}/release/vtkpng.dll"
-#  "${VTK_LIBRARY_DIRS}/release/vtkRendering.dll"
-#  "${VTK_LIBRARY_DIRS}/release/vtksys.dll"
-#  "${VTK_LIBRARY_DIRS}/release/vtktiff.dll"
-#  "${VTK_LIBRARY_DIRS}/release/vtkverdict.dll"
-#  "${VTK_LIBRARY_DIRS}/release/vtkViews.dll"
-#  "${VTK_LIBRARY_DIRS}/release/vtkVolumeRendering.dll"
-#  "${VTK_LIBRARY_DIRS}/release/vtkWidgets.dll"
-#  "${VTK_LIBRARY_DIRS}/release/vtkzlib.dll"
-#  DESTINATION bin
-#)
+# VTK files
+INSTALL( FILES
+  "${VTK_LIBRARY_DIRS}/release/vtkCommon.dll"
+  "${VTK_LIBRARY_DIRS}/release/vtkDICOMParser.dll"
+  "${VTK_LIBRARY_DIRS}/release/vtkexoIIc.dll"
+  "${VTK_LIBRARY_DIRS}/release/vtkexpat.dll"
+  "${VTK_LIBRARY_DIRS}/release/vtkFiltering.dll"
+  "${VTK_LIBRARY_DIRS}/release/vtkfreetype.dll"
+  "${VTK_LIBRARY_DIRS}/release/vtkftgl.dll"
+  "${VTK_LIBRARY_DIRS}/release/vtkGenericFiltering.dll"
+  "${VTK_LIBRARY_DIRS}/release/vtkGraphics.dll"
+  "${VTK_LIBRARY_DIRS}/release/vtkHybrid.dll"
+  "${VTK_LIBRARY_DIRS}/release/vtkImaging.dll"
+  "${VTK_LIBRARY_DIRS}/release/vtkInfovis.dll"
+  "${VTK_LIBRARY_DIRS}/release/vtkIO.dll"
+  "${VTK_LIBRARY_DIRS}/release/vtkjpeg.dll"
+  "${VTK_LIBRARY_DIRS}/release/vtklibxml2.dll"
+  "${VTK_LIBRARY_DIRS}/release/vtkmetaio.dll"
+  "${VTK_LIBRARY_DIRS}/release/vtkNetCDF.dll"
+  "${VTK_LIBRARY_DIRS}/release/vtkParallel.dll"
+  "${VTK_LIBRARY_DIRS}/release/vtkpng.dll"
+  "${VTK_LIBRARY_DIRS}/release/vtkRendering.dll"
+  "${VTK_LIBRARY_DIRS}/release/vtksys.dll"
+  "${VTK_LIBRARY_DIRS}/release/vtktiff.dll"
+  "${VTK_LIBRARY_DIRS}/release/vtkverdict.dll"
+  "${VTK_LIBRARY_DIRS}/release/vtkViews.dll"
+  "${VTK_LIBRARY_DIRS}/release/vtkVolumeRendering.dll"
+  "${VTK_LIBRARY_DIRS}/release/vtkWidgets.dll"
+  "${VTK_LIBRARY_DIRS}/release/vtkzlib.dll"
+  DESTINATION bin
+)
 
 # Cg files (need to escape backslashes twice - once for CMake and once for NSIS program).
 SET( CG_DLL_DIR "C:\\\\Program Files\\\\NVIDIA Corporation\\\\Cg\\\\bin")
