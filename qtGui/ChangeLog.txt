@@ -1,3 +1,9 @@
+2009-06-15  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Removed MACOSX_BUNDLE option from ADD_EXECUTABLE
+   because it interferes with the Bundle generator of CPack. Now includes
+   a top-level CMakeLists.txt file from the installer directory.
+   
 2009-06-14  Cory Quammen <cquammen@cs.unc.edu>
 
    * CMakeLists.txt: Added commands for getting packaging with CPack

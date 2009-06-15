@@ -47,7 +47,7 @@ IF (${CMAKE_BUILD_TOOL} MATCHES "devenv")
   SET (QtGuiSrcs ${QtGuiSrcs} ${UIS})
 ENDIF (${CMAKE_BUILD_TOOL} MATCHES "devenv")
 
-ADD_EXECUTABLE( FibrinAnalysis MACOSX_BUNDLE ${QtGuiSrcs} ${UISrcs} ${MOCSrcs})
+ADD_EXECUTABLE( FibrinAnalysis ${QtGuiSrcs} ${UISrcs} ${MOCSrcs})
 
 TARGET_LINK_LIBRARIES( FibrinAnalysis
   QVTK
@@ -83,9 +83,7 @@ SET( CPACK_PACKAGE_INSTALL_REGISTRY_KEY "Fibrin Analysis 1.0.0" )
 SET( CPACK_RESOURCE_FILE_LICENSE "${FibrinAnalysis_SOURCE_DIR}/installer/licenses/FibrinAnalysis-license.txt" )
 SET( CPACK_RESOURCE_FILE_README  "${FibrinAnalysis_SOURCE_DIR}/installer/licenses/README.txt" )
 
-IF ( WIN32 )
-  INCLUDE( "${FibrinAnalysis_SOURCE_DIR}/installer/CMake/Win32Package.txt" )
-ENDIF ( WIN32 )
+INCLUDE( ../installer/CMakeLists.txt )
 
 INSTALL( TARGETS FibrinAnalysis
   RUNTIME DESTINATION bin
