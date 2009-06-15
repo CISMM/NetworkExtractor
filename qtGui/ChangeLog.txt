@@ -1,5 +1,10 @@
 2009-06-15  Cory Quammen <cquammen@cs.unc.edu>
 
+   * CMakeLists.txt: Added Windows resource file that sets the program
+   icon.
+
+2009-06-15  Cory Quammen <cquammen@cs.unc.edu>
+
    * CMakeLists.txt: Removed MACOSX_BUNDLE option from ADD_EXECUTABLE
    because it interferes with the Bundle generator of CPack. Now includes
    a top-level CMakeLists.txt file from the installer directory.

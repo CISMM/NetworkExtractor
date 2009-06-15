@@ -47,7 +47,11 @@ IF (${CMAKE_BUILD_TOOL} MATCHES "devenv")
   SET (QtGuiSrcs ${QtGuiSrcs} ${UIS})
 ENDIF (${CMAKE_BUILD_TOOL} MATCHES "devenv")
 
-ADD_EXECUTABLE( FibrinAnalysis ${QtGuiSrcs} ${UISrcs} ${MOCSrcs})
+IF ( WIN32 )
+  SET( WinResources "${FibrinAnalysis_SOURCE_DIR}/installer/Win32/icon.rc" )
+ENDIF ( WIN32 )
+
+ADD_EXECUTABLE( FibrinAnalysis ${QtGuiSrcs} ${UISrcs} ${MOCSrcs} ${WinResources} )
 
 TARGET_LINK_LIBRARIES( FibrinAnalysis
   QVTK
