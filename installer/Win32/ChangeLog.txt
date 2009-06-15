@@ -1,0 +1,5 @@
+2009-06-15  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMake/: New directory for CMake files.
+   
+   * CMake/Win32Package.txt: Win32-specific CMake commands.
