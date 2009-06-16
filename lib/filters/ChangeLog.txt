@@ -1,3 +1,16 @@
+2009-06-16  Cory Quammen <cquammen@cs.unc.edu>
+
+   * itk/itkMultiScaleHessianBasedMeasureImageFilter2.h,.cxx:
+   Copied this class from Review directory of current ITK release
+   (3.12) and added the generation of an image containing the
+   eigenvectors corresponding to the eigenvalue with the minimum
+   absolute value.  These vectors are aligned with fiber-like objects
+   in the image. This approach is more memory efficient than generating 
+   the Hessian image, which the class already supported, followed by
+   eigenanalysis.
+
+   * CMakeLists.txt: Added the above file.
+
 2009-05-31  Cory Quammen <cquammen@cs.unc.edu>
 
    * itkEigenValues3DToFrangiVesselnessMeasureImageFilter.h,.cxx:
