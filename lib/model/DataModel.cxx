@@ -4,9 +4,12 @@
 #include "DataModel.h"
 #include "Types.h"
 
+#include <itkAccumulateImageFilter.h>
+#include <itkImageRegionIteratorWithIndex.h>
+#include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkMetaDataObject.h>
 #include <itkMultiThreader.h>
-#include <itkAccumulateImageFilter.h>
+#include <itkPoint.h>
 
 // Constants
 template <class TImage>
@@ -60,8 +63,9 @@ DataModel<TImage>
   this->hessianToVesselnessFilter->SetBrightObject(true);
 
   this->multiscaleFibernessFilter = MultiScaleHessianMeasureImageType::New();
-  this->multiscaleFibernessFilter->GenerateHessianOutputOn();
+  this->multiscaleFibernessFilter->GenerateHessianOutputOff();
   this->multiscaleFibernessFilter->GenerateScalesOutputOff();
+  this->multiscaleFibernessFilter->GenerateEigenvectorOutputOn();
   this->multiscaleFibernessFilter->SetSigmaMinimum(0.5);
   this->multiscaleFibernessFilter->SetSigmaMaximum(1.5);
   this->multiscaleFibernessFilter->SetSigmaStepMethodToEquispaced();
@@ -238,7 +242,7 @@ DataModel<TImage>
     typename ScalarFileWriterType::Pointer writer = ScalarFileWriterType::New();
     if (filterName == NO_FILTER_STRING)
       writer->SetInput(this->imageData);
-    else if (filterName == MULTISCALE_FIBERNESS_FILTER_STRING)
+    else if (filterName == FRANGI_FIBERNESS_FILTER_STRING)
       writer->SetInput(this->fibernessFilter->GetOutput());
     else if (filterName == MULTISCALE_FIBERNESS_FILTER_STRING)
       writer->SetInput(this->multiscaleFibernessFilter->GetOutput());
@@ -264,10 +268,45 @@ void
 DataModel<TImage>
 ::SaveFiberOrientationImageFile(std::string fileName) {
   typename VectorFileWriterType::Pointer writer = VectorFileWriterType::New();
-  writer->SetInput(junctionnessFilter->GetEigenVectorInput());
+  writer->SetInput(this->multiscaleFibernessFilter->GetEigenvectorOutput());
   writer->SetFileName(fileName.c_str());
   writer->Update();
   writer->Write();
+}
+
+
+template <class TImage>
+void
+DataModel<TImage>
+::SaveFiberOrientationDataFile(std::string fileName) {
+  typename InputImageType::Pointer skeletonImage = this->skeletonizationFilter->GetOutput();
+  itk::ImageRegionIteratorWithIndex<InputImageType> sit(skeletonImage,skeletonImage->GetLargestPossibleRegion());
+
+  const typename EigenVectorImageType* eigenvectorImage = this->multiscaleFibernessFilter->GetEigenvectorOutput();
+  itk::ImageRegionConstIteratorWithIndex<EigenVectorImageType> eit(eigenvectorImage,eigenvectorImage->GetLargestPossibleRegion());
+
+  sit.GoToBegin();
+  eit.GoToBegin();
+
+  // Open file.
+  FILE *fp = fopen(fileName.c_str(), "w");
+  fprintf(fp, "xPosition,yPosition,zPosition,xDirection,yDirection,zDirection\n");
+
+  while(!sit.IsAtEnd()) {
+    if (sit.Value() > 0.0) {
+      itk::Index<3> index = eit.GetIndex();
+      itk::Point<float, 3> point;
+      imageData->TransformIndexToPhysicalPoint(index, point);
+      EigenVectorType eigenvector = eit.Value();
+      fprintf(fp, "%f,%f,%f,%f,%f,%f\n", point[0], point[1], point[2], eigenvector[0], eigenvector[1], eigenvector[2]);
+
+    }
+
+    ++sit;
+    ++eit;
+  }
+
+  fclose(fp);
 }
 
 

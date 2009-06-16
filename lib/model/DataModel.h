@@ -9,20 +9,18 @@
 #include <itkCommand.h>
 #include <itkConnectedComponentImageFilter.h>
 #include <itkEigenValues3DToFrangiVesselnessMeasureImageFilter.h>
-#include <itkEigenValues3DToSatoVesselnessMeasureImageFilter.h>
 #include <itkEigenVectors3DToJunctionnessMeasureImageFilter.h>
 #include <itkEventObject.h>
 #include <itkFixedArray.h>
 #include <itkHessian3DEigenAnalysisImageFilter.h>
+#include <itkHessianRecursiveGaussianImageFilter.h>
+#include <itkHessianToObjectnessMeasureImageFilter.h>
 #include <itkImage.h>
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
-#include <itkHessian3DEigenAnalysisImageFilter.h>
-#include <itkHessianRecursiveGaussianImageFilter.h>
-#include <itkHessianToObjectnessMeasureImageFilter.h>
 #include <itkMatrix.h>
 #include <itkMinimumMaximumImageCalculator.h>
-#include <itkMultiScaleHessianBasedMeasureImageFilter.h>
+#include <itkMultiScaleHessianBasedMeasureImageFilter2.h>
 #include <itkShiftScaleImageFilter.h>
 #include <itkSymmetricSecondRankTensor.h>
 #include <itkValuedRegionalMaximaImageFilter.h>
@@ -35,6 +33,8 @@ class vtkAlgorithmOutput;
 template <class TImage>
 class DataModel {
 
+  typedef TImage InputImageType;
+
   typedef void (*ProgressCallback)(float, const char *);
   typedef float ComponentType;
   typedef itk::MinimumMaximumImageCalculator<TImage> MinMaxType;
@@ -46,7 +46,7 @@ class DataModel {
   typedef itk::Vector<ComponentType, 3>           EigenVectorType;
   typedef typename itk::Image<EigenValueType, 3>  EigenValueImageType;
   typedef typename itk::Image<EigenVectorType, 3> EigenVectorImageType;
-  typedef itk::MultiScaleHessianBasedMeasureImageFilter<TImage, HessianImageType> MultiScaleHessianMeasureImageType;
+  typedef itk::MultiScaleHessianBasedMeasureImageFilter2<TImage, HessianImageType, EigenVectorImageType> MultiScaleHessianMeasureImageType;
   typedef itk::HessianToObjectnessMeasureImageFilter<HessianImageType, TImage> HessianToObjectnessFilterType;
   typedef itk::Hessian3DEigenAnalysisImageFilter<HessianImageType, EigenValueImageType, EigenVectorImageType> HessianEigenAnalysisFilterType;
   typedef itk::EigenValues3DToFrangiVesselnessMeasureImageFilter<EigenValueImageType, TImage> FibernessFilterType;
@@ -88,6 +88,8 @@ public:
   void SaveFilteredImageFile(std::string fileName, std::string filterName, float scale);
 
   void SaveFiberOrientationImageFile(std::string fileName);
+
+  void SaveFiberOrientationDataFile(std::string fileName);
 
   void SetFiberDiameter(double diameter);
   double GetFiberDiameter();

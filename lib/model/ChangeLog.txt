@@ -1,3 +1,10 @@
+2009-06-15  Cory Quammen <cquammen@cs.unc.edu>
+
+   * DataModel.h,.cxx: Changed multiscale fiberness filter to
+   itkMultiScaleHessianBasedMeasureImageFilter2. Added method to save
+   skeletonized fibrin network voxels and the fiber orientations computed
+   for those voxels.
+
 2009-06-14  Cory Quammen <cquammen@cs.unc.edu>
 
    * DataModel.h,.cxx: Added methods for changing image voxel spacing.
