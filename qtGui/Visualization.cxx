@@ -118,6 +118,42 @@ void
 Visualization
 ::SetZSlice(int slice) {
   this->imagePlaneVisualization->SetSliceNumber(slice);
+  this->isoVisualization->SetZPlane(slice);
+}
+
+
+int
+Visualization
+::GetZSlice() {
+  return this->isoVisualization->GetZPlane();
+}
+
+
+void
+Visualization
+::SetCropIsosurface(bool crop) {
+  this->isoVisualization->SetClipData(crop);
+}
+
+
+bool
+Visualization
+::GetCropIsosurface() {
+  return this->isoVisualization->GetClipData();
+}
+
+
+void
+Visualization
+::SetKeepPlanesAboveBelowImagePlane(int keep) {
+  this->isoVisualization->SetDeltaZ(keep);
+}
+
+
+int
+Visualization
+::GetKeepPlanesAboveBelowImagePlane() {
+  return this->isoVisualization->GetDeltaZ();
 }
 
 
@@ -125,4 +161,11 @@ void
 Visualization
 ::SetImagePlaneVisible(bool show) {
   this->imagePlaneVisualization->SetVisible(show);
+}
+
+
+bool
+Visualization
+::GetImagePlaneVisible() {
+  return this->imagePlaneVisualization->GetVisible();
 }

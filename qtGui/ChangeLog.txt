@@ -1,3 +1,16 @@
+2009-06-17  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAppQt.h,.cxx: Added method to save fiber orientations to a
+   file. Added some more error checking on values in text boxes in the
+   GUI. Added handler for new image cropping checkbox.
+   
+   * FibrinAppQt.ui: Added lots of tool tips. Added widgets to turn
+   image cropping on/off and to set how many planes above and below
+   the image plane should be fed into the isosurface filter.
+   
+   * Visualization.h,.cxx: Added some glue methods between GUI and
+   the visualization pipelines.
+
 2009-06-15  Cory Quammen <cquammen@cs.unc.edu>
 
    * CMakeLists.txt: Added Windows resource file that sets the program

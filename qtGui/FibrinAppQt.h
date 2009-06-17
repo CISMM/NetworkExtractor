@@ -46,6 +46,9 @@ public slots:
   virtual void on_actionOpenImage_triggered();
   virtual void on_actionSaveFilteredImage_triggered();
   virtual void on_actionSaveFiberOrientationImage_triggered();
+
+  virtual void on_actionSaveFiberOrientationData_triggered();
+
   virtual void on_actionSavePicture_triggered();
   virtual void on_actionSaveRotationAnimation_triggered();
   virtual void on_actionSaveGeometry_triggered();
@@ -68,7 +71,9 @@ public slots:
   virtual void on_zPlaneEdit_textEdited(QString text);
   virtual void on_zPlaneSlider_sliderMoved(int value);
 
-  virtual void on_showDataOutline_toggled(bool show);
+  virtual void on_showDataOutlineCheckBox_toggled(bool show);
+
+  virtual void on_cropIsosurfaceCheckBox_toggled(bool crop);
 
   virtual void on_applyButton_clicked();
 

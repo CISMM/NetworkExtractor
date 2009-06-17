@@ -1,5 +1,9 @@
 #include "FibrinAppQt.h"
 
+#if defined(_WIN32) // Turn off deprecation warnings in Visual Studio
+#pragma warning( disable : 4996 )
+#endif
+
 #include <qapplication.h>
 #include <qerrormessage.h>
 #include <qfiledialog.h>
@@ -182,11 +186,32 @@ void FibrinAppQt::on_actionSaveFilteredImage_triggered() {
 
 
 void FibrinAppQt::on_actionSaveFiberOrientationImage_triggered() {
-QString fileName = QFileDialog::getSaveFileName(this, "Save Fiber Orientation Image", "", "VTK (*.vtk);;");
+  QString fileName = QFileDialog::getSaveFileName(this, "Save Fiber Orientation Image", "", "VTK (*.vtk);;");
   if (fileName == "")
     return;
 
   this->dataModel->SaveFiberOrientationImageFile(fileName.toStdString());
+}
+
+
+void FibrinAppQt::on_actionSaveFiberOrientationData_triggered() {
+
+  // Allow saving only when skeletonization filter is selected.
+  if (this->filterType == DataModelType::MULTISCALE_SKELETONIZATION_FILTER_STRING) {
+    QString fileName = QFileDialog::getSaveFileName(this, "Save Fiber Orientation Data", "", "CSV (*.csv);;");
+    if (fileName == "")
+      return;
+    this->dataModel->SaveFiberOrientationDataFile(fileName.toStdString());
+
+  } else {
+
+    // Notify the user that skeletonization filter must be selected.
+    QMessageBox messageBox;
+    messageBox.setText("Error");
+    messageBox.setInformativeText("You must have the Skeletonization filter selected in the Image Analysis dock to save the fiber orientation data.");
+    messageBox.setStandardButtons(QMessageBox::Ok);
+    messageBox.exec();
+  }
 }
 
 
@@ -462,8 +487,13 @@ void FibrinAppQt::on_zPlaneEdit_textEdited(QString text) {
   this->zPlaneSlider->setValue(value);
 
   // Read z-slice.
+  int dims[3];
+  this->dataModel->GetDimensions(dims);
   int slice = zPlaneEdit->text().toInt()-1;
-  this->visualization->SetZSlice(slice);
+  if (slice >= 0 && slice < dims[2]) {
+    this->visualization->SetZSlice(slice);
+    this->qvtkWidget->GetRenderWindow()->Render();
+  }
 }
 
 
@@ -472,9 +502,13 @@ void FibrinAppQt::on_zPlaneSlider_sliderMoved(int value) {
   this->zPlaneEdit->setText(text);
 
   // Read z-slice.
+  int dims[3];
+  this->dataModel->GetDimensions(dims);
   int slice = zPlaneEdit->text().toInt()-1;
-  this->visualization->SetZSlice(slice);
-  this->qvtkWidget->GetRenderWindow()->Render();
+  if (slice >= 0 && slice < dims[2]) {
+    this->visualization->SetZSlice(slice);
+    this->qvtkWidget->GetRenderWindow()->Render();
+  }
 }
 
 
@@ -503,9 +537,23 @@ void FibrinAppQt::on_saveVolumeFractionEstimateData_clicked() {
 }
 
 
-void FibrinAppQt::on_showDataOutline_toggled(bool show) {
+void FibrinAppQt::on_showDataOutlineCheckBox_toggled(bool show) {
   this->visualization->SetShowOutline(show);
   this->qvtkWidget->GetRenderWindow()->Render();
+}
+
+
+void FibrinAppQt::on_cropIsosurfaceCheckBox_toggled(bool crop) {
+  this->visualization->SetCropIsosurface(crop);
+  
+  // Read z-slice.
+  int dims[3];
+  this->dataModel->GetDimensions(dims);
+  int slice = zPlaneEdit->text().toInt()-1;
+  if (slice >= 0 && slice < dims[2]) {
+    this->visualization->SetZSlice(slice);
+    this->qvtkWidget->GetRenderWindow()->Render();
+  }
 }
 
 
@@ -572,6 +620,10 @@ void FibrinAppQt::on_applyButton_clicked() {
   // Read isovalue.
   double isoValue = this->isoValueEdit->text().toDouble();
   this->visualization->SetIsoValue(isoValue);
+
+  // Read delta z.
+  int keepPlanes = this->keepPlanesEdit->text().toInt();
+  this->visualization->SetKeepPlanesAboveBelowImagePlane(keepPlanes);
 
   // Read z-slice.
   int slice = this->zPlaneEdit->text().toInt()-1;
@@ -677,6 +729,15 @@ void FibrinAppQt::refreshUI() {
   // Update slice slider
   this->zPlaneSlider->setMinValue(1);
   this->zPlaneSlider->setMaxValue(dims[2]);
+  int zSlice = this->visualization->GetZSlice()+1;
+  this->zPlaneSlider->setValue(zSlice);
+  QString zPlaneString = QString().sprintf(intFormat, zSlice);
+  this->zPlaneEdit->setText(zPlaneString);
+
+  // Update cropping widgets
+  this->cropIsosurfaceCheckBox->setChecked(this->visualization->GetCropIsosurface());
+  QString keepPlanesString = QString().sprintf(intFormat, this->visualization->GetKeepPlanesAboveBelowImagePlane());
+  this->keepPlanesEdit->setText(keepPlanesString);
 
   ///////////////// Update visualization stuff /////////////////
   this->ren->RemoveAllViewProps();

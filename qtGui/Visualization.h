@@ -33,9 +33,16 @@ public:
   void FastIsosurfaceRenderingOff();
 
   void SetImagePlaneVisible(bool show);
+  bool GetImagePlaneVisible();
+
   void SetZSlice(int slice);
+  int  GetZSlice();
 
+  void SetCropIsosurface(bool crop);
+  bool GetCropIsosurface();
 
+  void SetKeepPlanesAboveBelowImagePlane(int keep);
+  int  GetKeepPlanesAboveBelowImagePlane();
 
 protected:
 
