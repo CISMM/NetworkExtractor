@@ -1,3 +1,13 @@
+2009-06-17  Cory Quammen <cquammen@cs.unc.edu>
+
+   * ImagePlaneVisualizationPipeline.h,.cxx: Added method GetVisible().
+   
+   * IsosurfaceVisualizationPipeline.h,.cxx: Added image clipping in the
+   pipeline prior to isosurfacing. This makes inspection of the fiberness
+   filter results easier by removing parts of the isosurface far from the 
+   image plane so that we can see how the isosurface intersects the image
+   plane.
+
 2009-06-10  Cory Quammen <cquammen@cs.unc.edu>
 
    * ImagePlaneVisualizationPipeline.h,.cxx: Added methods for

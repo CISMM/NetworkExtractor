@@ -65,6 +65,13 @@ ImagePlaneVisualizationPipeline
 }
 
 
+bool
+ImagePlaneVisualizationPipeline
+::GetVisible() {
+  return this->imageActor->GetVisibility() == 1;
+}
+
+
 void
 ImagePlaneVisualizationPipeline
 ::SetSliceNumber(int sliceNumber) {

@@ -6,6 +6,7 @@
 class vtkActor;
 class vtkAlgorithmOutput;
 class vtkContourFilter;
+class vtkImageClip;
 class vtkPolyDataMapper;
 class vtkRenderer;
 
@@ -24,6 +25,17 @@ public:
 
   void SetVisible(bool visible);
 
+  void ClipDataOn();
+  void ClipDataOff();
+  void SetClipData(bool clip);
+  bool GetClipData();
+
+  void SetZPlane(int zPlane);
+  int GetZPlane();
+
+  void SetDeltaZ(int deltaZ);
+  int GetDeltaZ();
+
   vtkAlgorithmOutput* GetIsosurfaceOutputPort();
 
   void FastRenderingOn();
@@ -31,6 +43,12 @@ public:
 
 protected:
   double isoValue;
+
+  int zPlane;
+
+  int deltaZ;
+
+  vtkImageClip* imageClip;
 
   vtkContourFilter* isoContourer;
 

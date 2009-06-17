@@ -20,6 +20,7 @@ public:
   void AddToRenderer(vtkRenderer* renderer);
 
   void SetVisible(bool visible);
+  bool GetVisible();
 
   void SetSliceNumber(int sliceNumber);
   int GetSliceNumber();
