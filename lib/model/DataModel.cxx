@@ -1,6 +1,10 @@
 #ifndef _DATA_MODEL_CXX_
 #define _DATA_MODEL_CXX_
 
+#if defined(_WIN32) // Turn off deprecation warnings in Visual Studio
+#pragma warning( disable : 4996 )
+#endif
+
 #include "DataModel.h"
 #include "Types.h"
 

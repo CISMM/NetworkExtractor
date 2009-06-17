@@ -1,3 +1,8 @@
+2009-06-17  Cory Quammen <cquammen@cs.unc.edu>
+
+   * DataModel.cxx: Added pragma to turn off annoying Visual Studio
+   warnings about deprecated functions.
+
 2009-06-15  Cory Quammen <cquammen@cs.unc.edu>
 
    * DataModel.h,.cxx: Changed multiscale fiberness filter to
