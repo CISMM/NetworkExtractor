@@ -1,3 +1,9 @@
+2009-06-17  Cory Quammen <cquammen@cs.unc.edu>
+
+   * itk/itkMultiScaleHessianBasedMeasureImageFilter2.cxx: Added missing
+   "typename" keyword, which is required in C++ (but Visual Studio let's it
+   pass).
+
 2009-06-16  Cory Quammen <cquammen@cs.unc.edu>
 
    * itk/itkMultiScaleHessianBasedMeasureImageFilter2.h,.cxx:

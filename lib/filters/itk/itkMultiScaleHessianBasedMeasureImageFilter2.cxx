@@ -3,8 +3,8 @@
   Program:   Insight Segmentation & Registration Toolkit
   Module:    $RCSfile: itkMultiScaleHessianBasedMeasureImageFilter2.cxx,v $
   Language:  C++
-  Date:      $Date: 2009/06/16 18:55:11 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009/06/17 19:58:30 $
+  Version:   $Revision: 1.2 $
 
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
@@ -242,7 +242,7 @@ MultiScaleHessianBasedMeasureImageFilter2
         if (fabs(eigenvalues[2]) < fabs(eigenvalues[smallestAbsEigenvalueIndex]))
           smallestAbsEigenvalueIndex = 2;
 
-        EigenvectorImageType::PixelType eigenvector;
+        typename EigenvectorImageType::PixelType eigenvector;
         typename EigenvectorImageType::PixelType::ValueType scale;
         scale = eigenvectors[smallestAbsEigenvalueIndex][Self::ImageDimension-1] > 0 ? 1.0 : -1.0;
         for (int i = 0; i < Self::ImageDimension; i++) {
