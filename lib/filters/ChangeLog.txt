@@ -1,3 +1,16 @@
+2009-06-23  Cory Quammen <cquammen@cs.unc.edu>
+
+   * itkEigenValues3DToFrangiVesselnessMeasureImageFilter.h,
+   itkEigenValues3DToSatoVesselnessMeasureImageFilter.h,
+   itkHessian3DEigenAnalysisImageFilter.h: Added newline at end of file 
+   and move comments from after #endif to above to make gcc happy.
+
+   * itkMultiScaleHessianBasedMeasureImageFilter2.cxx: Made sure to set
+   the correct number of required output images. Fixed problem where
+   itk::ImageSource::GetOutput() was dynamically casting the eigenvector
+   image to the output image type of the filter (a scalar image), which
+   resulted in a NULL pointer.
+
 2009-06-17  Cory Quammen <cquammen@cs.unc.edu>
 
    * itk/itkMultiScaleHessianBasedMeasureImageFilter2.cxx: Added missing

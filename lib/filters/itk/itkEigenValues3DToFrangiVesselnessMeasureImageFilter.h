@@ -3,8 +3,8 @@
   Program:   Insight Segmentation & Registration Toolkit
   Module:    $RCSfile: itkEigenValues3DToFrangiVesselnessMeasureImageFilter.h,v $
   Language:  C++
-  Date:      $Date: 2009/06/01 01:32:20 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009/06/23 20:13:28 $
+  Version:   $Revision: 1.3 $
 
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.

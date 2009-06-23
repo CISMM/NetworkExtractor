@@ -3,8 +3,8 @@
   Program:   Insight Segmentation & Registration Toolkit
   Module:    $RCSfile: itkMultiScaleHessianBasedMeasureImageFilter2.cxx,v $
   Language:  C++
-  Date:      $Date: 2009/06/17 19:58:30 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009/06/23 20:13:28 $
+  Version:   $Revision: 1.3 $
 
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
@@ -55,7 +55,7 @@ MultiScaleHessianBasedMeasureImageFilter2
   typename OutputImageType::Pointer scalesImage = OutputImageType::New();
   typename HessianImageType::Pointer hessianImage = HessianImageType::New();
   typename EigenvectorImageType::Pointer eigenvectorImage = EigenvectorImageType::New();
-  this->ProcessObject::SetNumberOfRequiredOutputs(3);
+  this->ProcessObject::SetNumberOfRequiredOutputs(4);
   this->ProcessObject::SetNthOutput(1,scalesImage.GetPointer());
   this->ProcessObject::SetNthOutput(2,hessianImage.GetPointer());
   this->ProcessObject::SetNthOutput(3,eigenvectorImage.GetPointer());
@@ -120,8 +120,9 @@ MultiScaleHessianBasedMeasureImageFilter2
 
   if (m_GenerateEigenvectorOutput)
     {
-    this->GetOutput(3)->SetBufferedRegion(this->GetOutput(3)->GetRequestedRegion());
-    this->GetOutput(3)->Allocate();
+    EigenvectorImageType* eigenvectorOutput = dynamic_cast<EigenvectorImageType*>(this->ProcessObject::GetOutput(3));
+    eigenvectorOutput->SetBufferedRegion(eigenvectorOutput->GetRequestedRegion());
+    eigenvectorOutput->Allocate();
     }
 
   // Allocate the buffer
