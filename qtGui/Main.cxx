@@ -1,7 +1,7 @@
 // Qt includes
 #include <qapplication.h>
 
-#include "FibrinAppQT.h"
+#include "FibrinAppQt.h"
 
 int main( int argc, char** argv )
 {

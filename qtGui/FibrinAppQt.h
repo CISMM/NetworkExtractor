@@ -4,7 +4,7 @@
 #include <qerrormessage.h>
 #include <qmainwindow.h>
 #include <qstandarditemmodel.h>
-#include "ui_FibrinAppQT.h"
+#include "ui_FibrinAppQt.h"
 
 #include "DataModel.h"
 #include "Visualization.h"
