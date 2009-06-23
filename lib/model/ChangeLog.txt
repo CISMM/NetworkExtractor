@@ -1,3 +1,8 @@
+2009-06-23  Cory Quammen <cquammen@cs.unc.edu>
+
+   * DataModel.cxx: Added 'typename' keyword in front of EigenVectorImageType,
+   which I guess is required when you want a pointer to a typedefed class.
+
 2009-06-17  Cory Quammen <cquammen@cs.unc.edu>
 
    * DataModel.cxx: Added pragma to turn off annoying Visual Studio

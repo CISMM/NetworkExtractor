@@ -286,7 +286,7 @@ DataModel<TImage>
   typename InputImageType::Pointer skeletonImage = this->skeletonizationFilter->GetOutput();
   itk::ImageRegionIteratorWithIndex<InputImageType> sit(skeletonImage,skeletonImage->GetLargestPossibleRegion());
 
-  const typename EigenVectorImageType* eigenvectorImage = this->multiscaleFibernessFilter->GetEigenvectorOutput();
+  const EigenVectorImageType* eigenvectorImage = this->multiscaleFibernessFilter->GetEigenvectorOutput();
   itk::ImageRegionConstIteratorWithIndex<EigenVectorImageType> eit(eigenvectorImage,eigenvectorImage->GetLargestPossibleRegion());
 
   sit.GoToBegin();
