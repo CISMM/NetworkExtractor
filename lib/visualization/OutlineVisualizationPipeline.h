@@ -28,3 +28,4 @@ protected:
 
 
 #endif // _OUTLINE_VISUALIZATION_PIPELINE_H_
+
