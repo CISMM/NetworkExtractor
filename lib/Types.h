@@ -17,4 +17,5 @@ typedef itk::Image<FloatPixelType, Dimension3> Float3DImageType;
 typedef itk::ImageFileReader<Float3DImageType> Float3DImageReaderType;
 typedef itk::VTKImageExport<Float3DImageType> Float3DExporterType;
 
-#endif // _TYPES_H_
+// _TYPES_H_
+#endif

@@ -1,3 +1,8 @@
+2009-06-23  Cory Quammen <cquammen@cs.unc.edu>
+
+   * Types.h: Added newline at end of file and move comments
+   from after #endif to above to make gcc happy.
+
 2009-03-30  Cory Quammen <cquammen@cs.unc.edu>
 
    * Types.h: Made 3D float image type actually be floats.
