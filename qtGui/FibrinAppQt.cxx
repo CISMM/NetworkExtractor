@@ -80,7 +80,7 @@ FibrinAppQt::FibrinAppQt(QWidget* p)
   this->tableModel->setHeaderData(LEFT_COLUMN,  Qt::Horizontal, tr("Property"));
   this->tableModel->setHeaderData(RIGHT_COLUMN, Qt::Horizontal, tr("Value"));
 
-  QStandardItem* labelItems[8];
+  QStandardItem* labelItems[9];
   labelItems[0] = new QStandardItem(tr("Intensity minimum"));
   labelItems[1] = new QStandardItem(tr("Intensity maximum"));
   labelItems[2] = new QStandardItem(tr("X dimension (pixels)"));
@@ -89,8 +89,9 @@ FibrinAppQt::FibrinAppQt(QWidget* p)
   labelItems[5] = new QStandardItem(tr("X pixel size (µm)"));
   labelItems[6] = new QStandardItem(tr("Y pixel size (µm)"));
   labelItems[7] = new QStandardItem(tr("Z slice spacing (µm)"));
+  labelItems[8] = new QStandardItem(tr("File name"));
 
-  for (int i = 0; i < 8; i++) {
+  for (int i = 0; i < 9; i++) {
     labelItems[i]->setEditable(false);
     this->tableModel->setItem(i, LEFT_COLUMN, labelItems[i]);
 
@@ -656,6 +657,9 @@ void FibrinAppQt::handle_tableModel_dataChanged(const QModelIndex& topLeft, cons
     this->dataModel->SetVoxelYSpacing(value);
   } else if (itemIndex == 7) {
     this->dataModel->SetVoxelZSpacing(value);
+  } else if (itemIndex == 8) {
+    QFileInfo fileInfo(this->dataModel->GetImageFileName().c_str());
+    this->tableModel->item(8, 1)->setText(fileInfo.fileName());
   }
 
   this->qvtkWidget->GetRenderWindow()->Render();
@@ -665,6 +669,12 @@ void FibrinAppQt::handle_tableModel_dataChanged(const QModelIndex& topLeft, cons
 void FibrinAppQt::refreshUI() {
 
   ///////////////// Update GUI /////////////////
+  
+  // Update window title
+  QFileInfo fileInfo(this->dataModel->GetImageFileName().c_str());
+  this->setWindowTitle(QString(tr("Fibrin Analysis - '"))
+		       .append(fileInfo.fileName()).append(tr("'")));
+
   const char *decimalFormat = "%.3f";
   const char *intFormat = "%d";
 
@@ -728,6 +738,9 @@ void FibrinAppQt::refreshUI() {
 
   QString zSpacing = QString().sprintf(decimalFormat, spacing[2]);
   this->tableModel->item(7, 1)->setText(zSpacing);
+
+  QString fileName = QString(this->dataModel->GetImageFileName().c_str());
+  this->tableModel->item(8, 1)->setText(fileName);
 
   double isoValue = this->visualization->GetIsoValue();
   QString isoValueString = QString().sprintf(decimalFormat, isoValue);

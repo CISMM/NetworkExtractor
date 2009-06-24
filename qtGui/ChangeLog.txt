@@ -1,5 +1,10 @@
 2009-06-24  Cory Quammen <cquammen@cs.unc.edu>
 
+   * FibrinAppQt.cxx: Added display of file name in main window title bar
+   and in image information table.
+
+2009-06-24  Cory Quammen <cquammen@cs.unc.edu>
+
    * FibrinAppQt.cxx, FibrinAppQt.ui: Made labels clearer and added units.
 
 2009-06-23  Cory Quammen <cquammen@cs.unc.edu>
