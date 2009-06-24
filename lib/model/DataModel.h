@@ -87,6 +87,8 @@ public:
   void LoadImageFile(std::string fileName);
   void SaveFilteredImageFile(std::string fileName, std::string filterName, float scale);
 
+  std::string GetImageFileName();
+
   void SaveFiberOrientationImageFile(std::string fileName);
 
   void SaveFiberOrientationDataFile(std::string fileName);
@@ -167,6 +169,7 @@ public:
   void SetProgressCallback(ProgressCallback callback);
 
 protected:
+  std::string imageFileName;
   double fiberDiameter;
   double filteredImageScale;
   typename TImage::Pointer imageData;

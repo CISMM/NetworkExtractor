@@ -1,3 +1,8 @@
+2009-06-24  Cory Quammen <cquammen@cs.unc.edu>
+
+   * DataModel.h,.cxx: Added member variable for storing the image file name
+   and method for getting it.
+
 2009-06-23  Cory Quammen <cquammen@cs.unc.edu>
 
    * DataModel.cxx: Added 'typename' keyword in front of EigenVectorImageType,

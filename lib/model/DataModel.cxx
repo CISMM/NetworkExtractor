@@ -193,6 +193,7 @@ template <class TImage>
 void
 DataModel<TImage>
 ::LoadImageFile(std::string fileName) {
+  this->imageFileName = fileName;
   typename ScalarFileReaderType::Pointer reader = ScalarFileReaderType::New();
   reader->SetFileName(fileName.c_str());
   reader->Update();
@@ -264,6 +265,14 @@ DataModel<TImage>
     writer->SetFileName(fileName.c_str());
     writer->Update();
   }
+}
+
+
+template <class TImage>
+std::string
+DataModel<TImage>
+::GetImageFileName() {
+  return this->imageFileName;
 }
 
 
