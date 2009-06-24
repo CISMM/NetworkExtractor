@@ -42,7 +42,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QVTKWidget" name="qvtkWidget">
+       <widget class="QVTKWidget" name="qvtkWidget" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
@@ -76,7 +76,7 @@
      <x>0</x>
      <y>0</y>
      <width>1001</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -162,9 +162,9 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>-316</y>
-          <width>363</width>
-          <height>439</height>
+          <y>-408</y>
+          <width>357</width>
+          <height>514</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -274,7 +274,7 @@
                   <enum>Qt::LeftToRight</enum>
                  </property>
                  <property name="text">
-                  <string>Estimated fiber diameter (um):</string>
+                  <string>Estimated fiber diameter (µm):</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -372,7 +372,7 @@
                   <string>Minimum radius of fibers to look for.</string>
                  </property>
                  <property name="text">
-                  <string>Fiber radius minimum (um):</string>
+                  <string>Fiber radius minimum (µm):</string>
                  </property>
                 </widget>
                </item>
@@ -382,7 +382,7 @@
                   <string>Maximum radius of fibers to look for.</string>
                  </property>
                  <property name="text">
-                  <string>Fiber radius maximum (um):</string>
+                  <string>Fiber radius maximum (µm):</string>
                  </property>
                 </widget>
                </item>
@@ -476,7 +476,7 @@
                   <enum>Qt::LeftToRight</enum>
                  </property>
                  <property name="text">
-                  <string>Junction probe diameter (um):</string>
+                  <string>Junction probe diameter (µm):</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -596,9 +596,9 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>-71</y>
+          <y>-209</y>
           <width>363</width>
-          <height>274</height>
+          <height>331</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -947,9 +947,9 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>-36</y>
-          <width>363</width>
-          <height>134</height>
+          <y>-86</y>
+          <width>377</width>
+          <height>157</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_11">

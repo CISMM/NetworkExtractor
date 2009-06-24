@@ -81,14 +81,14 @@ FibrinAppQt::FibrinAppQt(QWidget* p)
   this->tableModel->setHeaderData(RIGHT_COLUMN, Qt::Horizontal, tr("Value"));
 
   QStandardItem* labelItems[8];
-  labelItems[0] = new QStandardItem(tr("Data minimum"));
-  labelItems[1] = new QStandardItem(tr("Data maximum"));
-  labelItems[2] = new QStandardItem(tr("X dimension"));
-  labelItems[3] = new QStandardItem(tr("Y dimension"));
-  labelItems[4] = new QStandardItem(tr("Z dimension"));
-  labelItems[5] = new QStandardItem(tr("X spacing"));
-  labelItems[6] = new QStandardItem(tr("Y spacing"));
-  labelItems[7] = new QStandardItem(tr("Z spacing"));
+  labelItems[0] = new QStandardItem(tr("Intensity minimum"));
+  labelItems[1] = new QStandardItem(tr("Intensity maximum"));
+  labelItems[2] = new QStandardItem(tr("X dimension (pixels)"));
+  labelItems[3] = new QStandardItem(tr("Y dimension (pixels)"));
+  labelItems[4] = new QStandardItem(tr("Z dimension (slices)"));
+  labelItems[5] = new QStandardItem(tr("X pixel size (µm)"));
+  labelItems[6] = new QStandardItem(tr("Y pixel size (µm)"));
+  labelItems[7] = new QStandardItem(tr("Z slice spacing (µm)"));
 
   for (int i = 0; i < 8; i++) {
     labelItems[i]->setEditable(false);
@@ -113,8 +113,10 @@ FibrinAppQt::FibrinAppQt(QWidget* p)
   // Restore GUI settings.
   this->readProgramSettings();
 
+#if 0
   // Initialize the XML library.
   LIBXML_TEST_VERSION
+#endif
 
   // Set up error dialog box.
   this->errorDialog.setModal(true);
@@ -127,8 +129,10 @@ FibrinAppQt::~FibrinAppQt() {
   delete this->visualization;
   delete this->tableModel;
 
+#if 0
   // Cleanup the XML library.
   xmlCleanupParser();
+#endif
 }
 
 
@@ -322,6 +326,7 @@ void FibrinAppQt::on_actionOpenView_triggered() {
   if (fileName == "")
     return;
 
+#if 0
   int rc;
   xmlDoc* doc = xmlReadFile(fileName.toStdString().c_str(), NULL, 0);
 
@@ -358,6 +363,7 @@ void FibrinAppQt::on_actionOpenView_triggered() {
   }
 
   xmlFreeDoc(doc);
+#endif
 
   this->ren->ResetCameraClippingRange();
   this->qvtkWidget->GetRenderWindow()->Render();
@@ -371,6 +377,7 @@ void FibrinAppQt::on_actionSaveView_triggered() {
   if (fileName == "")
     return;
 
+#if 0
   xmlTextWriterPtr writer;
   int rc;
   char charBuffer[20];
@@ -424,6 +431,7 @@ void FibrinAppQt::on_actionSaveView_triggered() {
   rc = xmlTextWriterEndDocument(writer);
 
   xmlFreeTextWriter(writer);
+#endif
 
 }
 

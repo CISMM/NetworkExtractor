@@ -1,3 +1,7 @@
+2009-06-24  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAppQt.cxx, FibrinAppQt.ui: Made labels clearer and added units.
+
 2009-06-23  Cory Quammen <cquammen@cs.unc.edu>
 
    * FibrinAppQt.h, Main.cxx: Fixed case problem in name of include file.
