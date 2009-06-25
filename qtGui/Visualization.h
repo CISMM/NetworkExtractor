@@ -19,16 +19,20 @@ public:
   void AddToRenderer(vtkRenderer* renderer);
 
   void SetShowOutline(bool show);
+  bool GetShowOutline();
   void ShowOutlineOn();
   void ShowOutlineOff();
 
   void SetIsosurfaceVisible(bool show);
+  bool GetIsosurfaceVisible();
+
   void SetIsoValue(double isoValue);
   double GetIsoValue();
 
   vtkAlgorithmOutput* GetIsosurfaceOutputPort();
 
   void SetFastIsosurfaceRendering(bool toggle);
+  bool GetFastIsosurfaceRendering();
   void FastIsosurfaceRenderingOn();
   void FastIsosurfaceRenderingOff();
 

@@ -20,6 +20,8 @@ Visualization
 void
 Visualization
 ::SetImageInputConnection(vtkAlgorithmOutput* input) {
+  input->GetProducer()->Modified();
+  input->GetProducer()->Update();
   this->outlineVisualization->SetInputConnection(input);
   this->imagePlaneVisualization->SetInputConnection(input);  
 }
@@ -28,6 +30,8 @@ Visualization
 void
 Visualization
 ::SetFilteredImageInputConnection(vtkAlgorithmOutput* input) {
+  input->GetProducer()->Modified();
+  input->GetProducer()->Update();
   this->isoVisualization->SetInputConnection(input);
 }
 
@@ -45,6 +49,13 @@ void
 Visualization
 ::SetShowOutline(bool show) {
   this->outlineVisualization->SetVisible(show);
+}
+
+
+bool
+Visualization
+::GetShowOutline() {
+  return this->outlineVisualization->GetVisible();
 }
 
 
@@ -66,6 +77,13 @@ void
 Visualization
 ::SetIsosurfaceVisible(bool show) {
   this->isoVisualization->SetVisible(show);
+}
+
+
+bool
+Visualization
+::GetIsosurfaceVisible() {
+  return this->isoVisualization->GetVisible();
 }
 
 
@@ -97,6 +115,13 @@ Visualization
     FastIsosurfaceRenderingOn();
   else
     FastIsosurfaceRenderingOff();
+}
+
+
+bool
+Visualization
+::GetFastIsosurfaceRendering() {
+  return this->isoVisualization->GetFastRenderingOn();
 }
 
 

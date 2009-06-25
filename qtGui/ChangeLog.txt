@@ -1,3 +1,16 @@
+2009-06-25  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Added faModel library that wasn't needed when
+   DataModel was a templated class.
+   
+   * FibrinAppQt.h,.cxx,.ui: Tons of changes to accommodate change from
+   template to non-template in DataModel. Ripped out XML saving/loading,
+   replaced with ConfigurationFileParser to process INI file format I
+   decided to go with. Added name of loaded file to program main window
+   titlebar.
+   
+   * Visualization.h,.cxx: Added getters for various visualization options.
+
 2009-06-24  Cory Quammen <cquammen@cs.unc.edu>
 
    * FibrinAppQt.cxx: Added display of file name in main window title bar

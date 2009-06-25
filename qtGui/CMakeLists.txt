@@ -70,6 +70,7 @@ TARGET_LINK_LIBRARIES( FibrinAnalysis
   ITKIO
   faFilter
   faIO
+  faModel
   faVisualization
 )
 

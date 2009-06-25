@@ -20,9 +20,6 @@ class FibrinAppQt : public QMainWindow, private Ui_MainWindow
 
 public:
 
-  // Convenience typedefs
-  typedef DataModel<Float3DImageType> DataModelType;
-
   // Constructor/Destructor
   FibrinAppQt(QWidget* parent = 0);
   virtual ~FibrinAppQt();
@@ -49,6 +46,9 @@ public slots:
 
   virtual void on_actionSaveFiberOrientationData_triggered();
 
+  virtual void on_actionOpenSession_triggered();
+  virtual void on_actionSaveSession_triggered();
+
   virtual void on_actionSavePicture_triggered();
   virtual void on_actionSaveRotationAnimation_triggered();
   virtual void on_actionSaveGeometry_triggered();
@@ -63,7 +63,7 @@ public slots:
   virtual void on_saveConnectedComponentsData_clicked();
   virtual void on_saveVolumeFractionEstimateData_clicked();
 
-  virtual void on_showIsosurfaceCheckbox_toggled(bool show);
+  virtual void on_showIsosurfaceCheckBox_toggled(bool show);
   virtual void on_isoValueEdit_textEdited(QString text);
   virtual void on_isoValueSlider_sliderMoved(int value);
   
@@ -82,17 +82,19 @@ public slots:
 
 protected:
   QStandardItemModel* tableModel;
-  DataModelType* dataModel;
+  DataModel* dataModel;
   Visualization* visualization;
 
-  void refreshUI();
+  void OpenFile(std::string fileName);
+
+  void RefreshUI();
 
 protected slots:
 
 private:
   vtkRenderer* ren;
 
-  DataModelType::FilterType filterType;
+  DataModel::FilterType filterType;
 
   QErrorMessage errorDialog;
    
