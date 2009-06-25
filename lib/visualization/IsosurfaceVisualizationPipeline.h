@@ -24,6 +24,7 @@ public:
   void SetColor(double r, double g, double b);
 
   void SetVisible(bool visible);
+  bool GetVisible();
 
   void ClipDataOn();
   void ClipDataOff();
@@ -40,6 +41,7 @@ public:
 
   void FastRenderingOn();
   void FastRenderingOff();
+  bool GetFastRenderingOn();
 
 protected:
   double isoValue;

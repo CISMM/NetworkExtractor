@@ -69,6 +69,13 @@ IsosurfaceVisualizationPipeline
 }
 
 
+bool
+IsosurfaceVisualizationPipeline
+::GetVisible() {
+  return this->isoActor->GetVisibility() == 1;
+}
+
+
 void
 IsosurfaceVisualizationPipeline
 ::ClipDataOn() {
@@ -176,3 +183,11 @@ IsosurfaceVisualizationPipeline
 ::FastRenderingOff() {
   this->isoMapper->ImmediateModeRenderingOn();
 }
+
+
+bool
+IsosurfaceVisualizationPipeline
+::GetFastRenderingOn() {
+  return this->isoMapper->GetImmediateModeRendering() == 0;
+}
+

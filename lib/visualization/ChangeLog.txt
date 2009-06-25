@@ -1,3 +1,13 @@
+2009-06-25  Cory Quammen <cquammen@cs.unc.edu>
+
+   * ImagePlaneVisualizationPipeline.cxx: Added call to Update() in the
+   vtkImageShiftScale algorithm in method SetInputConnection().
+   
+   * IsosurfaceVisualizationPipeline.h,.cxx: Added getters for visibility
+   and fast rendering mode.
+   
+   * OutlineVisualizationPipeline.h,.cxx: Added getter for visibility.
+
 2009-06-23  Cory Quammen <cquammen@cs.unc.edu>
 
    * ImagePlaneVisualizationPipeline.h, IsosurfaceVisualizationPipeline.h,

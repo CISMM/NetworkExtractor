@@ -48,6 +48,7 @@ ImagePlaneVisualizationPipeline
     this->shiftScaler->SetShift(0.0);
     this->shiftScaler->SetScale(1.0);
   }
+  this->shiftScaler->Update();
 }
 
 

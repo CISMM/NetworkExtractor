@@ -28,8 +28,17 @@ OutlineVisualizationPipeline
   renderer->AddActor(this->outlineActor);
 }
 
+
 void
 OutlineVisualizationPipeline
 ::SetVisible(bool visible) {
   this->outlineActor->SetVisibility(static_cast<int>(visible));
 }
+
+
+bool
+OutlineVisualizationPipeline
+::GetVisible() {
+  return this->outlineActor->GetVisibility() == 1;
+}
+

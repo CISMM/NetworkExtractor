@@ -18,6 +18,7 @@ public:
   virtual void AddToRenderer(vtkRenderer* renderer);
 
   void SetVisible(bool visible);
+  bool GetVisible();
 
 protected:
   vtkOutlineFilter* outlineFilter;
