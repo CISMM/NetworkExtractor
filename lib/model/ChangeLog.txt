@@ -1,5 +1,9 @@
 2009-06-25  Cory Quammen <cquammen@cs.unc.edu>
 
+   * CMakeLists.txt: Added link libraries for faModel.
+
+2009-06-25  Cory Quammen <cquammen@cs.unc.edu>
+
    * DataModel.h,.cxx: Made this class not a template (no need for it,
    slowed down compile times when editing just the controller and
    view classes.
