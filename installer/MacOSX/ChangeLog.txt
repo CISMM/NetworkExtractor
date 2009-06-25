@@ -1,3 +1,7 @@
+2009-06-25  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMake/MacOSXPackage.txt: Fixed closing tag on FOREACH command.
+
 2009-06-15  Cory Quammen <cquammen@cs.unc.edu>
 
    * CMake/: Directory for CMake files.

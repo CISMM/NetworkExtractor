@@ -27,7 +27,7 @@ FOREACH( PLUGIN ${QT_IMAGEFORMAT_PLUGINS} )
     "${PLUGIN}"
     DESTINATION ../PlugIns/imageformats
   )
-ENDFOREACH( LIBRARY )
+ENDFOREACH( PLUGIN )
 
 INSTALL( FILES
   "${FibrinAnalysis_SOURCE_DIR}/installer/MacOSX/qt.conf"
