@@ -1,3 +1,9 @@
+2009-06-25  Cory Quammen <cquammen@cs.unc.edu>
+
+   * DataModel.h,.cxx: Made this class not a template (no need for it,
+   slowed down compile times when editing just the controller and
+   view classes.
+
 2009-06-24  Cory Quammen <cquammen@cs.unc.edu>
 
    * DataModel.h,.cxx: Added member variable for storing the image file name

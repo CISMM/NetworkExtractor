@@ -25,14 +25,15 @@
 #include <itkSymmetricSecondRankTensor.h>
 #include <itkValuedRegionalMaximaImageFilter.h>
 
-class vtkAlgorithmOutput;
+#include <vtkAlgorithmOutput.h>;
 
 #include "ITKImageToVTKImage.h"
+#include "Types.h"
 
 // This is the data model for the Fibrin Analysis library.
-template <class TImage>
 class DataModel {
 
+  typedef Float3DImageType TImage;
   typedef TImage InputImageType;
 
   typedef void (*ProgressCallback)(float, const char *);
@@ -44,8 +45,8 @@ class DataModel {
 
   typedef itk::FixedArray<ComponentType, 3>       EigenValueType;
   typedef itk::Vector<ComponentType, 3>           EigenVectorType;
-  typedef typename itk::Image<EigenValueType, 3>  EigenValueImageType;
-  typedef typename itk::Image<EigenVectorType, 3> EigenVectorImageType;
+  typedef itk::Image<EigenValueType, 3>  EigenValueImageType;
+  typedef itk::Image<EigenVectorType, 3> EigenVectorImageType;
   typedef itk::MultiScaleHessianBasedMeasureImageFilter2<TImage, HessianImageType, EigenVectorImageType> MultiScaleHessianMeasureImageType;
   typedef itk::HessianToObjectnessMeasureImageFilter<HessianImageType, TImage> HessianToObjectnessFilterType;
   typedef itk::Hessian3DEigenAnalysisImageFilter<HessianImageType, EigenValueImageType, EigenVectorImageType> HessianEigenAnalysisFilterType;
@@ -55,7 +56,7 @@ class DataModel {
   typedef itk::ValuedRegionalMaximaImageFilter<TImage, TImage> JunctionnessLocalMaxFilterType;
   typedef itk::BinaryThresholdImageFilter<TImage, TImage> ThresholdFilterType;
   typedef itk::BinaryThinningImageFilter<TImage, TImage> SkeletonizationFilterType;
-  typedef typename SkeletonizationFilterType::Pointer SkeletonizationFilterTypePointer;
+  typedef SkeletonizationFilterType::Pointer SkeletonizationFilterTypePointer;
 
   typedef int ConnectedComponentOutputType;
   typedef itk::Image<ConnectedComponentOutputType, 3> ConnectedComponentOutputImageType;
@@ -126,8 +127,8 @@ public:
   void SetJunctionnessLocalMaxHeight(double height);
   double GetJunctionnessLocalMaxHeight();
 
-  void SetImageData(typename TImage::Pointer image);
-  typename TImage::Pointer GetImageData();
+  void SetImageData(TImage::Pointer image);
+  TImage::Pointer GetImageData();
 
   // Returns the VTK output port for the original scalar image data.
   vtkAlgorithmOutput* GetImageOutputPort();
@@ -172,21 +173,21 @@ protected:
   std::string imageFileName;
   double fiberDiameter;
   double filteredImageScale;
-  typename TImage::Pointer imageData;
+  TImage::Pointer imageData;
 
-  typename MinMaxType::Pointer minMaxFilter;
-  typename HessianEigenAnalysisFilterType::Pointer eigenAnalysisFilter;
+  MinMaxType::Pointer minMaxFilter;
+  HessianEigenAnalysisFilterType::Pointer eigenAnalysisFilter;
 
-  typename HessianFilterType::Pointer hessianFilter;
-  typename FibernessFilterType::Pointer fibernessFilter;
-  typename HessianToObjectnessFilterType::Pointer hessianToVesselnessFilter;
-  typename MultiScaleHessianMeasureImageType::Pointer multiscaleFibernessFilter;
-  typename ThresholdFilterType::Pointer multiscaleFibernessThresholdFilter;
+  HessianFilterType::Pointer hessianFilter;
+  FibernessFilterType::Pointer fibernessFilter;
+  HessianToObjectnessFilterType::Pointer hessianToVesselnessFilter;
+  MultiScaleHessianMeasureImageType::Pointer multiscaleFibernessFilter;
+  ThresholdFilterType::Pointer multiscaleFibernessThresholdFilter;
   SkeletonizationFilterTypePointer skeletonizationFilter;
-  typename ConnectedComponentFilterType::Pointer fibernessConnectedComponentsFilter;
-  typename MinMaxConnectedComponentFilterType::Pointer minMaxConnectedComponentsFilter;
-  typename JunctionnessFilterType::Pointer junctionnessFilter;
-  typename JunctionnessLocalMaxFilterType::Pointer junctionnessLocalMaxFilter;
+  ConnectedComponentFilterType::Pointer fibernessConnectedComponentsFilter;
+  MinMaxConnectedComponentFilterType::Pointer minMaxConnectedComponentsFilter;
+  JunctionnessFilterType::Pointer junctionnessFilter;
+  JunctionnessLocalMaxFilterType::Pointer junctionnessLocalMaxFilter;
 
   ITKImageToVTKImage<TImage>* inputImageITKToVTKFilter;
   ITKImageToVTKImage<TImage>* filteredImageITKToVTKFilter;
@@ -197,7 +198,5 @@ protected:
   ProgressCallback progressCallback;
 
 };
-
-#include "DataModel.cxx"
 
 #endif // _DATA_MODEL_H_
