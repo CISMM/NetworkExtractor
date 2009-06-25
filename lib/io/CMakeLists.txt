@@ -1,6 +1,6 @@
 SET(ioSrc
+  ConfigurationFileParser.cxx
   ITKImageToVTKImage.cxx
-  XMLHelper.cxx
 )
 
 INCLUDE_DIRECTORIES(

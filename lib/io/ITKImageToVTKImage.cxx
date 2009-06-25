@@ -48,4 +48,20 @@ ITKImageToVTKImage<TImage>
   return this->importer->GetOutputPort();
 }
 
+
+template <class TImage>
+void
+ITKImageToVTKImage<TImage>
+::Modified() {
+  this->importer->Modified();
+}
+
+
+template <class TImage>
+void
+ITKImageToVTKImage<TImage>
+::Update() {
+  this->importer->Update();
+}
+
 #endif // _ITK_IMAGE_TO_VTK_IMAGE_CXX_ 

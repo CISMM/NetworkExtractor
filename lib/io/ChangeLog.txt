@@ -1,3 +1,15 @@
+2009-06-25  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Added ConfigurationFileParser.cxx,
+   removed XMLHelper.cxx.
+   
+   * ConfigurationFileParser.h,.cxx: Class that supports reading
+   of INI-format settings files and retrieving settings by name.
+   
+   * ITKImageToVTKImage.h,.cxx: Added Modified and Update methods
+   that call methods with the same name on the vtkImageImport
+   object.
+
 2009-06-23  Cory Quammen <cquammen@cs.unc.edu>
 
    * ITKImageToVTKImage.h,.cxx, XMLHelper.h: Added newline at 

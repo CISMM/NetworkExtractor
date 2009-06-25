@@ -17,6 +17,10 @@ public:
   void SetInput(typename TImage::Pointer input);
 
   vtkAlgorithmOutput* GetOutputPort();
+
+  void Modified();
+
+  void Update();
 	
 protected:
   typename itk::VTKImageExport<TImage>::Pointer exporter;
