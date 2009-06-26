@@ -26,4 +26,5 @@ protected:
   
 };
 
-#endif _VISUALIZATION_PIPELINE_H_
+
+#endif // _VISUALIZATION_PIPELINE_H_

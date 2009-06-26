@@ -1,3 +1,11 @@
+2009-06-26  Cory Quammen <cquammen@cs.unc.edu>
+
+   * IsosurfaceVisualizationPipeline.cxx: Now defaults to using
+   display list instead of immediate mode rendering. Removed circular
+   pipeline connection.
+
+   * VisualizationPipeline.h: Formatting change.
+
 2009-06-25  Cory Quammen <cquammen@cs.unc.edu>
 
    * ImagePlaneVisualizationPipeline.cxx: Added call to Update() in the

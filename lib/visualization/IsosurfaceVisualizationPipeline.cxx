@@ -27,7 +27,7 @@ IsosurfaceVisualizationPipeline
 
   this->isoMapper = vtkPolyDataMapper::New();
   this->isoMapper->ScalarVisibilityOff();
-  this->isoMapper->ImmediateModeRenderingOn();
+  this->isoMapper->ImmediateModeRenderingOff();
   this->isoMapper->SetInputConnection(this->isoContourer->GetOutputPort()); //
 
   this->isoActor = vtkActor::New();
@@ -38,7 +38,7 @@ IsosurfaceVisualizationPipeline
 
   // Connect the input to the input algorithm.
   //this->isoMapper->SetInputConnection(this->inputAlgorithm->GetOutputPort());
-  this->imageClip->SetInputConnection(this->inputAlgorithm->GetOutputPort());
+  //this->imageClip->SetInputConnection(this->inputAlgorithm->GetOutputPort());
 }
 
 
