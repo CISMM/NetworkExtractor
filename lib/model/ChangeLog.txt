@@ -1,5 +1,9 @@
 2009-06-26  Cory Quammen <cquammen@cs.unc.edu>
 
+   * DataModel.cxx: Fixed typo - == instead of =.
+
+2009-06-26  Cory Quammen <cquammen@cs.unc.edu>
+
    * DataModel.h,.cxx: Added methods to set/get number of threads
    that ITK filters should use. Added environment variable method
    to set number of threads to use (defaults to 2 because most processors

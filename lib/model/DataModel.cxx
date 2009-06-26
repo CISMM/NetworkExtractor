@@ -175,7 +175,7 @@ DataModel
   if (var)
     numberOfThreads = atoi(var);
   if (numberOfThreads == 0)
-    numberOfThreads == 2;
+    numberOfThreads = 2;
   this->SetNumberOfThreads(numberOfThreads);
 }
 
