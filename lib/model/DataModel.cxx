@@ -5,6 +5,8 @@
 #pragma warning( disable : 4996 )
 #endif
 
+#include <cstdlib>
+
 #include "DataModel.h"
 #include "Types.h"
 
@@ -168,7 +170,13 @@ DataModel
   this->junctionnessFilter->AddObserver(itk::ProgressEvent(), junctionnessFilterProgressCommand);
   this->junctionnessLocalMaxFilter->AddObserver(itk::ProgressEvent(), junctionnessLocalMaxFilterProgressCommand);
 
-  itk::MultiThreader::SetGlobalMaximumNumberOfThreads(2);
+  int numberOfThreads = 2;
+  char *var = getenv("FIBRIN_ANALYSIS_THREADS");
+  if (var)
+    numberOfThreads = atoi(var);
+  if (numberOfThreads == 0)
+    numberOfThreads == 2;
+  this->SetNumberOfThreads(numberOfThreads);
 }
 
 
@@ -266,6 +274,21 @@ std::string
 DataModel
 ::GetImageFileName() {
   return this->imageFileName;
+}
+
+
+void
+DataModel
+::SetNumberOfThreads(int threads) {
+  itk::MultiThreader::SetGlobalDefaultNumberOfThreads(threads);
+  itk::MultiThreader::SetGlobalMaximumNumberOfThreads(threads);
+}
+
+
+int
+DataModel
+::GetNumberOfThreads() {
+  return itk::MultiThreader::GetGlobalMaximumNumberOfThreads();
 }
 
 

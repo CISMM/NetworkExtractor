@@ -25,7 +25,7 @@
 #include <itkSymmetricSecondRankTensor.h>
 #include <itkValuedRegionalMaximaImageFilter.h>
 
-#include <vtkAlgorithmOutput.h>;
+#include <vtkAlgorithmOutput.h>
 
 #include "ITKImageToVTKImage.h"
 #include "Types.h"
@@ -89,6 +89,9 @@ public:
   void SaveFilteredImageFile(std::string fileName, std::string filterName, float scale);
 
   std::string GetImageFileName();
+
+  void SetNumberOfThreads(int threads);
+  int  GetNumberOfThreads();
 
   void SaveFiberOrientationImageFile(std::string fileName);
 
@@ -199,4 +202,5 @@ protected:
 
 };
 
-#endif // _DATA_MODEL_H_
+// _DATA_MODEL_H_
+#endif

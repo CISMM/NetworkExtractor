@@ -1,3 +1,10 @@
+2009-06-26  Cory Quammen <cquammen@cs.unc.edu>
+
+   * DataModel.h,.cxx: Added methods to set/get number of threads
+   that ITK filters should use. Added environment variable method
+   to set number of threads to use (defaults to 2 because most processors
+   are dual core).
+
 2009-06-25  Cory Quammen <cquammen@cs.unc.edu>
 
    * CMakeLists.txt: Added link libraries for faModel.
