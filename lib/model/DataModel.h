@@ -148,8 +148,6 @@ public:
 
   void GetDimensions(int dimensions[3]);
 
-  void GetSpacing(double spacing[3]);
-
   void SetFilterToNone();
   void SetFilterToFrangiFiberness();
   void SetFilterToMultiscaleFiberness();
@@ -158,10 +156,12 @@ public:
   void SetFilterToJunctionness();
   void SetFilterToJunctionnessLocalMax();
 
+  void SetVoxelSpacing(double spacing[3]);
   void SetVoxelSpacing(int dimension, double spacing);
   void SetVoxelXSpacing(double spacing);
   void SetVoxelYSpacing(double spacing);
   void SetVoxelZSpacing(double spacing);
+  void GetVoxelSpacing(double spacing[3]);
 
   void SetFilteredImageScaleFactor(double scale);
   double GetFilteredImageScaleFactor();

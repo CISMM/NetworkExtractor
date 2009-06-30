@@ -170,13 +170,15 @@ DataModel
   this->junctionnessFilter->AddObserver(itk::ProgressEvent(), junctionnessFilterProgressCommand);
   this->junctionnessLocalMaxFilter->AddObserver(itk::ProgressEvent(), junctionnessLocalMaxFilterProgressCommand);
 
-  int numberOfThreads = 2;
+  // ITK will detect the number of cores on the system and set it by default.
+  // Here we can override that setting if the proper environment variable is
+  // set.
   char *var = getenv("FIBRIN_ANALYSIS_THREADS");
-  if (var)
-    numberOfThreads = atoi(var);
-  if (numberOfThreads == 0)
-    numberOfThreads = 2;
-  this->SetNumberOfThreads(numberOfThreads);
+  if (var) {
+    int numberOfThreads = atoi(var);
+    if (numberOfThreads > 0)
+      this->SetNumberOfThreads(numberOfThreads);
+  }
 }
 
 
@@ -606,23 +608,6 @@ DataModel
 
 void
 DataModel
-::GetSpacing(double spacing[3]) {
-  if (!this->GetImageData()) {
-    spacing[0] = 0;
-    spacing[1] = 0;
-    spacing[2] = 0;
-    return;
-  }
-
-  itk::Vector<double> thisSpacing = this->GetImageData()->GetSpacing();
-  spacing[0] = thisSpacing[0];
-  spacing[1] = thisSpacing[1];
-  spacing[2] = thisSpacing[2];
-}
-
-
-void
-DataModel
 ::SetFilterToNone() {
 
   if (this->imageData) {
@@ -720,6 +705,20 @@ DataModel
 
 void
 DataModel
+::SetVoxelSpacing(double spacing[3]) {
+  if (!this->imageData)
+    return;
+
+  this->imageData->SetSpacing(spacing);
+
+  this->inputImageITKToVTKFilter->GetOutputPort()->GetProducer()->Modified();
+  this->filteredImageITKToVTKFilter->GetOutputPort()->GetProducer()->Modified();
+  this->vectorImageITKToVTKFilter->GetOutputPort()->GetProducer()->Modified();
+}
+
+
+void
+DataModel
 ::SetVoxelSpacing(int dimension, double spacing) {
   if (!this->imageData)
     return;
@@ -752,6 +751,23 @@ void
 DataModel
 ::SetVoxelZSpacing(double spacing) {
   this->SetVoxelSpacing(2, spacing); 
+}
+
+
+void
+DataModel
+::GetVoxelSpacing(double spacing[3]) {
+  if (!this->GetImageData()) {
+    spacing[0] = 0;
+    spacing[1] = 0;
+    spacing[2] = 0;
+    return;
+  }
+
+  itk::Vector<double> thisSpacing = this->GetImageData()->GetSpacing();
+  spacing[0] = thisSpacing[0];
+  spacing[1] = thisSpacing[1];
+  spacing[2] = thisSpacing[2];
 }
 
 
