@@ -1,6 +1,12 @@
 PROJECT (FibrinAnalysis)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 
+# Set version information
+SET (FIBRIN_ANALYSIS_MAJOR_NUMBER "1")
+SET (FIBRIN_ANALYSIS_MINOR_NUMBER "0")
+SET (FIBRIN_ANALYSIS_REVISION_NUMBER "1")
+SET (FIBRIN_ANALYSIS_VERSION_STRING "${FIBRIN_ANALYSIS_MAJOR_NUMBER}.${FIBRIN_ANALYSIS_MINOR_NUMBER}.${FIBRIN_ANALYSIS_REVISION_NUMBER}")
+
 SET (EXECUTABLE_OUTPUT_PATH "${FibrinAnalysis_BINARY_DIR}/bin")
 SET (LIBRARY_OUTPUT_PATH "${FibrinAnalysis_BINARY_DIR}/lib")
 
@@ -66,7 +72,8 @@ INCLUDE_DIRECTORIES (
     ${FibrinAnalysis_SOURCE_DIR}/lib/filters/itk
     ${FibrinAnalysis_SOURCE_DIR}/lib/io
     ${FibrinAnalysis_SOURCE_DIR}/lib/model
-    ${FibrinAnalysis_SOURCE_DIR}/lib/visualization)
+    ${FibrinAnalysis_SOURCE_DIR}/lib/visualization
+    ${FibrinAnalysis_BINARY_DIR}/lib)
 #ADD_SUBDIRECTORY(apps)
 
 #######################################

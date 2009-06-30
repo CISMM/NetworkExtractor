@@ -1,3 +1,8 @@
+2009-06-30  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Added section to declare program version number.
+   Added another include directory to find the Version.h file.
+
 2009-06-14  Cory Quammen <cquammen@cs.unc.edu>
 
    * CMakeLists.txt: Removed some unnecessary INCLUDE_DIRECTORIES commands
