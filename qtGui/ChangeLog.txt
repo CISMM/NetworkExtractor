@@ -1,3 +1,14 @@
+2009-06-30  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Replaced hard-coded program version numbers with 
+   CMake variables with version info.
+   
+   * FibrinAppQt.h,.cxx: Changed "ImageFile" section in session file to
+   "Image". Added loading/saving of voxel spacing set by the user. Added
+   method to show an about box with program info.
+   
+   * FibrinAppQt.ui: Added About menu item.
+
 2009-06-25  Cory Quammen <cquammen@cs.unc.edu>
 
    * CMakeLists.txt: Added faModel library that wasn't needed when

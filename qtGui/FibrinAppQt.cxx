@@ -1,5 +1,6 @@
 #include "FibrinAppQt.h"
 #include "ConfigurationFileParser.h"
+#include "Version.h"
 
 #if defined(_WIN32) // Turn off deprecation warnings in Visual Studio
 #pragma warning( disable : 4996 )
@@ -140,9 +141,14 @@ void FibrinAppQt::on_actionOpenSession_triggered() {
   double doubleValue = 0.0;
 
   // Load image
-  stringValue = parser.GetValue("ImageFile", "fileName");
+  stringValue = parser.GetValue("Image", "fileName");
   printf("Opening %s\n", stringValue.c_str());
   this->OpenFile(stringValue);
+
+  // Load image settings
+  double doubleValue3[3];
+  parser.GetValueAsDouble3("Image", "voxelSpacing", doubleValue3);
+  this->dataModel->SetVoxelSpacing(doubleValue3);
 
   // Set up visualization pipeline.
   this->visualization->SetImageInputConnection(this->dataModel->GetImageOutputPort());
@@ -210,8 +216,11 @@ void FibrinAppQt::on_actionSaveSession_triggered() {
 
   fprintf(fp, "; Written by Fibrin Analysis\n\n");
 
-  fprintf(fp, "[ImageFile]\n");
+  fprintf(fp, "[Image]\n");
   fprintf(fp, "fileName=%s\n\n", this->dataModel->GetImageFileName().c_str());
+  double spacing[3];
+  this->dataModel->GetVoxelSpacing(spacing);
+  fprintf(fp, "voxelSpacing=%f %f %f\n", spacing[0], spacing[1], spacing[2]);
   
   fprintf(fp, "[MultiscaleFibernessFilter]\n");
   fprintf(fp, "alpha=%.3f\n", this->dataModel->GetMultiscaleFibernessAlphaCoefficient());
@@ -482,6 +491,20 @@ void FibrinAppQt::on_actionSaveView_triggered() {
   fprintf(fp, "UpVector=%.4f %.4f %.4f\n", upVector[0], upVector[1], upVector[2]);
 
   fclose(fp);
+}
+
+
+void FibrinAppQt::on_actionAboutFibrinAnalysis_triggered() {
+  QString version = QString().sprintf("%d.%d.%d", 
+				      FIBRIN_ANALYSIS_MAJOR_NUMBER,
+				      FIBRIN_ANALYSIS_MINOR_NUMBER,
+				      FIBRIN_ANALYSIS_REVISION_NUMBER);
+  QChar copyright(169);
+  QString title = QString("About Fibrin Analysis ").append(version);
+  QString text  = QString("Fibrin Analysis ").append(version).append("\n");
+  text.append(copyright).append(" 2009, UNC CISMM\n\n");
+  text.append("Developed by Cory Quammen");
+  QMessageBox::about(this, title, text);
 }
 
 
@@ -779,7 +802,7 @@ void FibrinAppQt::RefreshUI() {
   this->tableModel->item(4, 1)->setText(zDim);
 
   double spacing[3];
-  this->dataModel->GetSpacing(spacing);
+  this->dataModel->GetVoxelSpacing(spacing);
   QString xSpacing = QString().sprintf(decimalFormat, spacing[0]);
   this->tableModel->item(5, 1)->setText(xSpacing);
 

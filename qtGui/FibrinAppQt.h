@@ -58,6 +58,8 @@ public slots:
   virtual void on_actionOpenView_triggered();
   virtual void on_actionSaveView_triggered();
 
+  virtual void on_actionAboutFibrinAnalysis_triggered();
+
   virtual void on_imageFilterComboBox_currentIndexChanged(QString filterText);
 
   virtual void on_saveConnectedComponentsData_clicked();
