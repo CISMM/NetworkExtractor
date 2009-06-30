@@ -55,10 +55,13 @@ ENDFOREACH( LIBRARY )
 
 
 SET( CPACK_GENERATOR "Bundle" )
-SET( CPACK_BUNDLE_PLIST "${FibrinAnalysis_SOURCE_DIR}/installer/MacOSX/Info.plist" )
+SET( CPACK_BUNDLE_PLIST "${FibrinAnalysis_BINARY_DIR}/installer/MacOSX/Info.plist" )
+SET( FIBRIN_ANALYSIS_PROGRAM_NAME_WITH_VERSION "FibrinAnalysis ${FIBRIN_ANALYSIS_VERSION_STRING}" )
+CONFIGURE_FILE( "${FibrinAnalysis_SOURCE_DIR}/installer/MacOSX/Info.plist" 
+  "${CPACK_BUNDLE_PLIST}" )
 SET( CPACK_BUNDLE_STARTUP_COMMAND "FibrinAnalysis" )
 SET( CPACK_BUNDLE_ICON "${FibrinAnalysis_SOURCE_DIR}/installer/MacOSX/FibrinAnalysis.icns" )
 SET( CPACK_BUNDLE_STARTUP_COMMAND "${FibrinAnalysis_SOURCE_DIR}/installer/MacOSX/startup.sh" )
-SET( CPACK_BUNDLE_NAME "FibrinAnalysis" )
+SET( CPACK_BUNDLE_NAME "FibrinAnalysis ${FIBRIN_ANALYSIS_VERSION_STRING}" )
 
 SET( CPACK_PACKAGE_ICON "${FibrinAnalysis_SOURCE_DIR}/installer/MacOSX/FibrinAnalysis.icns" )

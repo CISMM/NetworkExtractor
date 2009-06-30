@@ -1,3 +1,14 @@
+2009-06-30  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMake/MacOSXPackage.txt: Added configuration of Info.plists file so
+   that version number of program is incorporated in several keys.
+   
+   * Info.plist: Added tags to file that get replaced with program 
+   version number.
+   
+   * startup.sh: Modified regular expression in file to handle executable
+   name with version number.
+
 2009-06-25  Cory Quammen <cquammen@cs.unc.edu>
 
    * CMake/MacOSXPackage.txt: Fixed closing tag on FOREACH command.

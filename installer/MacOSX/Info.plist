@@ -5,19 +5,19 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
-	<string>FibrinAnalysis</string>
+	<string>@FIBRIN_ANALYSIS_PROGRAM_NAME_WITH_VERSION@</string>
 	<key>CFBundleGetInfoString</key>
 	<string></string>
 	<key>CFBundleIconFile</key>
-	<string>FibrinAnalysis</string>
+	<string>@FIBRIN_ANALYSIS_PROGRAM_NAME_WITH_VERSION@</string>
 	<key>CFBundleIdentifier</key>
-	<string></string>
+	<string>org.cismm</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleLongVersionString</key>
 	<string></string>
 	<key>CFBundleName</key>
-	<string></string>
+	<string>@FIBRIN_ANALYSIS_PROGRAM_NAME_WITH_VERSION@</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
