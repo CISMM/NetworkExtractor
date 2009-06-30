@@ -1,3 +1,11 @@
+2009-06-30  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Added commands to configure Version.h.in file.
+   
+   * Version.h.in: CMake will read this file, replace some tokens in
+   it with CMake variables, and write it to a build directory. Contains
+   program version numbers.
+
 2009-06-23  Cory Quammen <cquammen@cs.unc.edu>
 
    * Types.h: Added newline at end of file and move comments
