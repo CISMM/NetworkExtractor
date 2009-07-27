@@ -1,5 +1,9 @@
 2009-07-27  Cory Quammen <cquammen@cs.unc.edu>
 
+   * FibrinAppQt.ui: Renamed to FibrinAnalysis.ui.
+
+2009-07-27  Cory Quammen <cquammen@cs.unc.edu>
+
    * installer/: Moved files here from FibrinAnalysis/installer and updated
    paths within those files to point to the new locations of certains files
    (icons, etc.).
