@@ -1,3 +1,9 @@
+2009-07-27  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Added Visualization.cxx source file.
+
+   * Visualization.h,.cxx: Moved to here from application directory.
+
 2009-06-26  Cory Quammen <cquammen@cs.unc.edu>
 
    * IsosurfaceVisualizationPipeline.cxx: Now defaults to using
