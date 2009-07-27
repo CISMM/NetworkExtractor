@@ -1,3 +1,13 @@
+2009-07-27  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Removed leftovers from when app was a wxWidgets app.
+
+   * installer/: Moved files in this directory to apps/FibrinAnalysis/installer.
+   
+   * qtGui/: Moved files in this directory to apps/FibrinAnalysis.
+   
+   * wxGui/: Axed this directory.
+
 2009-06-30  Cory Quammen <cquammen@cs.unc.edu>
 
    * CMakeLists.txt: Added section to declare program version number.

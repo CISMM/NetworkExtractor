@@ -1,5 +1,0 @@
-2009-06-15  Cory Quammen <cquammen@cs.unc.edu>
-
-   * IconImage128.png, IconImage256.png, IconImage512.png: SEM images of fibrin
-   from Laura Gray in Alisa Wolberg's lab to be used for icons. All are from the
-   same base image but have different sizes that some icon file formats can support.

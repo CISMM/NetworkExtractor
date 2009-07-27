@@ -1,1 +1,0 @@
-Fibrin Analysis is a program for segmenting and analyzing confocal images of fibrin networks.
