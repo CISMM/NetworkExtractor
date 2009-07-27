@@ -1,0 +1,236 @@
+2009-07-27  Cory Quammen <cquammen@cs.unc.edu>
+
+   * Moved files from FibrinAnalyis/qtGui to here. Renamed FibrinAppQt class
+   and filenames to FibrinAnalysis.
+
+2009-06-30  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Replaced hard-coded program version numbers with 
+   CMake variables with version info.
+   
+   * FibrinAppQt.h,.cxx: Changed "ImageFile" section in session file to
+   "Image". Added loading/saving of voxel spacing set by the user. Added
+   method to show an about box with program info.
+   
+   * FibrinAppQt.ui: Added About menu item.
+
+2009-06-25  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Added faModel library that wasn't needed when
+   DataModel was a templated class.
+   
+   * FibrinAppQt.h,.cxx,.ui: Tons of changes to accommodate change from
+   template to non-template in DataModel. Ripped out XML saving/loading,
+   replaced with ConfigurationFileParser to process INI file format I
+   decided to go with. Added name of loaded file to program main window
+   titlebar.
+   
+   * Visualization.h,.cxx: Added getters for various visualization options.
+
+2009-06-24  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAppQt.cxx: Added display of file name in main window title bar
+   and in image information table.
+
+2009-06-24  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAppQt.cxx, FibrinAppQt.ui: Made labels clearer and added units.
+
+2009-06-23  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAppQt.h, Main.cxx: Fixed case problem in name of include file.
+
+2009-06-17  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAppQt.h,.cxx: Added method to save fiber orientations to a
+   file. Added some more error checking on values in text boxes in the
+   GUI. Added handler for new image cropping checkbox.
+   
+   * FibrinAppQt.ui: Added lots of tool tips. Added widgets to turn
+   image cropping on/off and to set how many planes above and below
+   the image plane should be fed into the isosurface filter.
+   
+   * Visualization.h,.cxx: Added some glue methods between GUI and
+   the visualization pipelines.
+
+2009-06-15  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Added Windows resource file that sets the program
+   icon.
+
+2009-06-15  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Removed MACOSX_BUNDLE option from ADD_EXECUTABLE
+   because it interferes with the Bundle generator of CPack. Now includes
+   a top-level CMakeLists.txt file from the installer directory.
+   
+2009-06-14  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Added commands for getting packaging with CPack
+   mechanism to work.
+   
+   * FibrinAppQt.h,.cxx,.ui: Added some methods to convert between integral
+   slider positions and floating point isosurface values and vice versa
+   to get float slider behavior (will someday replace with David Feng's
+   float slider). Added message dialog to confirm that user wants to
+   close the program. Added ticks to sliders. Turned on editting of image
+   data properties table and added method to handle those changes.
+
+2009-06-10  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAppQt.cxx: Turned off some of the experimental junction finding
+   image filters for now. Added skeletonization filter. Added support for
+   new methods in the Visualization class that enable viewing the original
+   image data in the slice plane and the filtered data as an isosurface.
+   Added message box that asks for confirmation that user wanted to quit.
+   Added toggling of widgets for setting the fiberness threshold. Did
+   some variable renaming for greater consistency. Added reading/writing
+   of new fiberness threshold widget.
+   
+   * FibrinAppQt.ui: Added widgets for setting fiberness threshold. Moved
+   vertical spacers to make resizing of the various docks nicer. Added
+   keyboard shortcuts for menu items.
+   
+   * Visualization.h: Changed so that now there are two methods for setting
+   image data, one for the original input data, and one for the filtered
+   data. Right now, the original data is shown in a slice viewer and the
+   filtered data is shown as an isosurface. In the future, we could take
+   an arbitrary number of inputs and a property describing which visualization
+   mode to use.
+
+2009-06-08  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Changed name of the app to FibrinAnalysis from
+   FibrinAnalysisQt.
+   
+   * FibrinAppQt.h, .cxx: Added automatic saving of window size/position/visibility
+   settings between application launches. Put .TIF files in front of the
+   file-type list. Added a render call right after an image is loaded.
+   Added event handling for checkboxes that control visibility of isosurface
+   and image plane. Added event handling for image plane z-slice slider.
+   
+   * FibrinAppQt.ui: Added slider and text field for setting image z-slice
+   to show. Added checkboxes for toggling visibility of isosurface and
+   z-slice.
+   
+   * Visualization.h,.cxx: Added instance of image plane visualization.
+
+2009-06-01  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Minor formatting changes.
+   
+   * FibrinAppQt.h,.cxx: Added method for handling GUI changes to the
+   image filter drop-down menu (only parameters relevant to the currently
+   selected image filter are now shown). Did this by splitting up GUI
+   form elements into individual frames that can be shown or hidden at
+   will with one line of code. Now saving a filtered image file reads a
+   scale factor from the GUI.
+   
+   * FibrinAppQt.ui: Added separate image information dock widget.
+   Split up image filter settings widgets into different frames to
+   enable hiding/showing the appropriate widgets when the image filter
+   is changed. Added "Window" menu to show/hide dock widgets. Added
+   widgets to take image intensity scaling factor.
+
+2009-05-22  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAppQt.ui: Added scroll bars to controls panels. Separated
+   out buttons for calculating certain metrics to a separate dock.
+
+2009-05-22  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAppQt.cxx,.ui: Added widgets to set Frangi vesselness
+   filter coefficients and the glue between the widgets and the ITK
+   filter.
+
+2009-05-21  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAppQt.h,.cxx,.ui: Added option to compute threshold
+   fiberness measure. Added GUI widgets to set fiberness threshold.
+   Added a new section with widgets for computing certain metrics
+   as a function of z.
+
+2009-05-13  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAppQt.h,.cxx: Changed names of slots that respond to GUI
+   events so that Qt's moc performs the connection from widget to
+   slot automatically, that is, no explicit connect() function
+   call is needed.
+
+2009-05-13  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAppQt.cxx: Changed "vesselness" -> "fiberness".
+   
+   * FibrinAppQt.ui: Changed "vesselness" -> "fiberness". Removed
+   volume rendering option in display popup menu because the option
+   isn't implemented.
+
+2009-04-08  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAppQt.h,.cxx,.ui: Added filter type for finding the local
+   junctionness maxima. Added widgets for setting junction spherical
+   probe radius and vesselness threshold used in the junctionness
+   computation.
+
+2009-03-30  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAppQt.h,.cxx: Added DataModelType typedef for
+   convenience. Moved filter names from here to DataModel.h.
+
+2009-03-22  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAppQt.h,.cxx: Made the GUI aware of the junctionness
+   filter. Progress callback now takes a message to show so I can
+   see what filter is executing. Added ability to load stacks from
+   3D TIFs (ITK magically supports this, too).
+   
+   * Visualization.cxx: Added check in SetInputConnection to avoid
+   perturbing the visualization pipeline if the input to the 
+   isosurface is the same as the current input.
+
+2009-03-15  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAppQt.h,.cxx,.ui: Added menu command handlers for saving
+   filtered image data, saving a snapshot of the render window,
+   saving an animation of the current scene rotating 360 degrees, 
+   saving the isosurface geometry in .vtk format, and resetting the
+   default view. Added a progress callback to update the progress 
+   bar in the GUI. Added support for loading LSM images (ITK
+   supports this!). Added handling of checkbox that tells whether
+   fast rendering should be used (display lists).
+   
+   * Visualization.h,.cxx: Added methods for retrieving the isosurface
+   poly data and setting fast/slow rendering. 
+
+2009-03-11  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Added source for Visualization class. Added
+   faVisualization library dependency.
+   
+   * FibrinAppQt.h,.cxx: Added handlers for new GUI widgets. Moved
+   the visualization-specific stuff from here to the Visualization
+   class. Lots of changes to handle updated GUI elements. Improved
+   separation of initialization, event handling, and updating of
+   the GUI.
+   
+   * FibrinAppQt.ui: Replaced separate text entry fields displaying
+   info about the image with a single table of properties.
+   
+   * Visualization.h,.cxx: New class for handling all VTK-related
+   visualization stuff.
+
+2009-03-08  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Added faIO and faFilters library dependencies.
+   
+   * FibrinAppQt.h, .cxx: Added support for loading VTK image files
+   and creating isosurfaces from them.
+   
+   * FibrinAppQt.ui: Added widgets for displaying image information
+   and for changing the isovalue.
+
+2009-03-06  Cory Quammen <cquammen@cs.unc.edu>
+
+   * Initial checking of source files with a simple GUI
+   and simple geometry displayed in the VTK widget.
+   
