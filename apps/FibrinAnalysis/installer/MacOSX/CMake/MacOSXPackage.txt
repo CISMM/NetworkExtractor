@@ -64,4 +64,4 @@ SET( CPACK_BUNDLE_ICON "${FibrinAnalysis_SOURCE_DIR}/apps/FibrinAnalysis/install
 SET( CPACK_BUNDLE_STARTUP_COMMAND "${FibrinAnalysis_SOURCE_DIR}/apps/FibrinAnalysis/installer/MacOSX/startup.sh" )
 SET( CPACK_BUNDLE_NAME "FibrinAnalysis ${FIBRIN_ANALYSIS_VERSION_STRING}" )
 
-SET( CPACK_PACKAGE_ICON "${FibrinAnalysis_SOURCE_DIR}/installer/MacOSX/FibrinAnalysis.icns" )
+SET( CPACK_PACKAGE_ICON "${FibrinAnalysis_SOURCE_DIR}/apps/FibrinAnalysis/installer/MacOSX/FibrinAnalysis.icns" )
