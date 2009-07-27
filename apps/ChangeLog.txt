@@ -1,3 +1,11 @@
+2009-07-27  Cory Quammen <cquammen@cs.unc.edu>
+   
+   * FibrinAnalysis/: Added subdirectory for the application with GUI.
+
+   * CMakeLists.txt: Removed leftovers from back when this app used wxWidgets.
+   
+   * FibrinAnalysisApp.cxx: Removed.
+
 2008-04-14  Cory Quammen <cquammen@cs.unc.edu>
 
    * CMakeLists.txt: Added ITK libraries to do some basic
