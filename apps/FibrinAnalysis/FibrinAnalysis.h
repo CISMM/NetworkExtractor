@@ -62,8 +62,15 @@ public slots:
 
   virtual void on_imageFilterComboBox_currentIndexChanged(QString filterText);
 
+#if 0
   virtual void on_saveConnectedComponentsData_clicked();
   virtual void on_saveVolumeFractionEstimateData_clicked();
+#endif
+
+  virtual void on_showDirectionArrowCheckBox_toggled(bool state);
+  virtual void on_azimuthEdit_textEdited(QString text);
+  virtual void on_inclinationEdit_textEdited(QString text);
+  virtual void on_saveAngleHistogram_clicked();
 
   virtual void on_showIsosurfaceCheckBox_toggled(bool show);
   virtual void on_isoValueEdit_textEdited(QString text);
@@ -83,22 +90,24 @@ public slots:
     const QModelIndex& bottomRight);
 
 protected:
-  QStandardItemModel* tableModel;
-  DataModel* dataModel;
-  Visualization* visualization;
+  QStandardItemModel *m_TableModel;
+  DataModel          *m_DataModel;
+  Visualization      *m_Visualization;
 
   void OpenFile(std::string fileName);
 
   void RefreshUI();
 
+  void RefreshVisualization();
+
 protected slots:
 
 private:
-  vtkRenderer* ren;
+  vtkRenderer* m_Renderer;
 
-  DataModel::FilterType filterType;
+  DataModel::FilterType m_FilterType;
 
-  QErrorMessage errorDialog;
+  QErrorMessage m_ErrorDialog;
    
 };
 

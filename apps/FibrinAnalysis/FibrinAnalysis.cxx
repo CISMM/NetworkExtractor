@@ -49,18 +49,19 @@ FibrinAnalysis::FibrinAnalysis(QWidget* p)
  : QMainWindow(p) {
   setupUi(this);
 
-  this->filterType = DataModel::NO_FILTER_STRING;
+  m_FilterType = DataModel::NO_FILTER_STRING;
 
   // QT/VTK interact
-  this->ren = vtkRenderer::New();
-  this->qvtkWidget->GetRenderWindow()->AddRenderer(ren);
+  m_Renderer = vtkRenderer::New();
+  this->qvtkWidget->GetRenderWindow()->AddRenderer(m_Renderer);
 
   // Instantiate data model.
-  this->dataModel = new DataModel();
-  this->dataModel->SetProgressCallback(ProgressCallback);
+  m_DataModel = new DataModel();
+  m_DataModel->SetProgressCallback(ProgressCallback);
 
   // Instantiate visualization pipelines.
-  this->visualization = new Visualization();
+  m_Visualization = new Visualization();
+  m_Visualization->SetDirectionArrowVisible(false);
 
   this->imageFilterComboBox->addItem(QString(DataModel::NO_FILTER_STRING.c_str()));
   //this->imageFilterComboBox->addItem(QString(DataModel::FRANGI_FIBERNESS_FILTER_STRING.c_str()));
@@ -73,9 +74,9 @@ FibrinAnalysis::FibrinAnalysis(QWidget* p)
   // Create and populate table model.
   int LEFT_COLUMN = 0;
   int RIGHT_COLUMN = 1;
-  this->tableModel = new QStandardItemModel(8, 2, this);
-  this->tableModel->setHeaderData(LEFT_COLUMN,  Qt::Horizontal, tr("Property"));
-  this->tableModel->setHeaderData(RIGHT_COLUMN, Qt::Horizontal, tr("Value"));
+  m_TableModel = new QStandardItemModel(8, 2, this);
+  m_TableModel->setHeaderData(LEFT_COLUMN,  Qt::Horizontal, tr("Property"));
+  m_TableModel->setHeaderData(RIGHT_COLUMN, Qt::Horizontal, tr("Value"));
 
   QStandardItem* labelItems[9];
   labelItems[0] = new QStandardItem(tr("Intensity minimum"));
@@ -86,22 +87,22 @@ FibrinAnalysis::FibrinAnalysis(QWidget* p)
   labelItems[5] = new QStandardItem(tr("X pixel size (µm)"));
   labelItems[6] = new QStandardItem(tr("Y pixel size (µm)"));
   labelItems[7] = new QStandardItem(tr("Z slice spacing (µm)"));
-  labelItems[8] = new QStandardItem(tr("File name"));
+  labelItems[8] = new QStandardItem(tr("Z squish factor"));
 
-  for (int i = 0; i < 9; i++) {
+  for (unsigned int i = 0; i < sizeof(labelItems) / sizeof(QStandardItem*); i++) {
     labelItems[i]->setEditable(false);
-    this->tableModel->setItem(i, LEFT_COLUMN, labelItems[i]);
+    m_TableModel->setItem(i, LEFT_COLUMN, labelItems[i]);
 
     QStandardItem* item = new QStandardItem(tr(""));
 
     // Allow editing of voxel spacing.
     if (i < 5)
       item->setEditable(false);
-    this->tableModel->setItem(i, RIGHT_COLUMN, item);
+    m_TableModel->setItem(i, RIGHT_COLUMN, item);
   }
-  this->imageDataView->setModel(this->tableModel);
+  this->imageDataView->setModel(m_TableModel);
 
-  connect(tableModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), 
+  connect(m_TableModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), 
     this, SLOT(handle_tableModel_dataChanged(const QModelIndex&, const QModelIndex&)));
 
   QCoreApplication::setOrganizationName("CISMM");
@@ -112,15 +113,15 @@ FibrinAnalysis::FibrinAnalysis(QWidget* p)
   this->readProgramSettings();
 
   // Set up error dialog box.
-  this->errorDialog.setModal(true);
+  m_ErrorDialog.setModal(true);
 }
 
 
 // Destructor
 FibrinAnalysis::~FibrinAnalysis() {
-  delete this->dataModel;
-  delete this->visualization;
-  delete this->tableModel;
+  delete m_DataModel;
+  delete m_Visualization;
+  delete m_TableModel;
 }
 
 
@@ -148,52 +149,52 @@ void FibrinAnalysis::on_actionOpenSession_triggered() {
   // Load image settings
   double doubleValue3[3];
   parser.GetValueAsDouble3("Image", "voxelSpacing", doubleValue3);
-  this->dataModel->SetVoxelSpacing(doubleValue3);
+  m_DataModel->SetVoxelSpacing(doubleValue3);
 
   // Set up visualization pipeline.
-  this->visualization->SetImageInputConnection(this->dataModel->GetImageOutputPort());
-  this->visualization->SetFilteredImageInputConnection(this->dataModel->GetFilteredImageOutputPort());
+  m_Visualization->SetImageInputConnection(m_DataModel->GetImageOutputPort());
+  m_Visualization->SetFilteredImageInputConnection(m_DataModel->GetFilteredImageOutputPort());
 
   // Filter settings
   doubleValue = parser.GetValueAsDouble("MultiscaleFibernessFilter", "alpha");
-  this->dataModel->SetMultiscaleFibernessAlphaCoefficient(doubleValue);
+  m_DataModel->SetMultiscaleFibernessAlphaCoefficient(doubleValue);
   doubleValue = parser.GetValueAsDouble("MultiscaleFibernessFilter", "beta");
-  this->dataModel->SetMultiscaleFibernessBetaCoefficient(doubleValue);
+  m_DataModel->SetMultiscaleFibernessBetaCoefficient(doubleValue);
   doubleValue = parser.GetValueAsDouble("MultiscaleFibernessFilter", "gamma");
-  this->dataModel->SetMultiscaleFibernessGammaCoefficient(doubleValue);
+  m_DataModel->SetMultiscaleFibernessGammaCoefficient(doubleValue);
   doubleValue = parser.GetValueAsDouble("MultiscaleFibernessFilter", "minimumScale");
-  this->dataModel->SetMultiscaleFibernessMinimumScale(doubleValue);
+  m_DataModel->SetMultiscaleFibernessMinimumScale(doubleValue);
   doubleValue = parser.GetValueAsDouble("MultiscaleFibernessFilter", "maximumScale");
-  this->dataModel->SetMultiscaleFibernessMaximumScale(doubleValue);
+  m_DataModel->SetMultiscaleFibernessMaximumScale(doubleValue);
   intValue = parser.GetValueAsInt("MultiscaleFibernessFilter", "numberOfScales");
-  this->dataModel->SetMultiscaleFibernessNumberOfScales(intValue);
+  m_DataModel->SetMultiscaleFibernessNumberOfScales(intValue);
   doubleValue = parser.GetValueAsDouble("MultiscaleFibernessFilterThreshold", "threshold");
-  this->dataModel->SetMultiscaleFibernessThreshold(doubleValue);
+  m_DataModel->SetMultiscaleFibernessThreshold(doubleValue);
   doubleValue = parser.GetValueAsDouble("FilteredImageOutput", "intensityScaleFactor");
-  this->dataModel->SetFilteredImageScaleFactor(doubleValue);
+  m_DataModel->SetFilteredImageScaleFactor(doubleValue);
 
   // Display settings
   boolValue = parser.GetValueAsBool("Display", "isosurfaceVisible");
-  this->visualization->SetIsosurfaceVisible(boolValue);
+  m_Visualization->SetIsosurfaceVisible(boolValue);
   doubleValue = parser.GetValueAsDouble("Display", "isovalue");
-  this->visualization->SetIsoValue(doubleValue);
+  m_Visualization->SetIsoValue(doubleValue);
   boolValue = parser.GetValueAsBool("Display", "imagePlaneVisible");
-  this->visualization->SetImagePlaneVisible(boolValue);
+  m_Visualization->SetImagePlaneVisible(boolValue);
   intValue = parser.GetValueAsInt("Display", "zPlane");
-  this->visualization->SetZSlice(intValue);
+  m_Visualization->SetZSlice(intValue);
   boolValue = parser.GetValueAsBool("Display", "cropIsosurface");
-  this->visualization->SetCropIsosurface(boolValue);
+  m_Visualization->SetCropIsosurface(boolValue);
   intValue = parser.GetValueAsInt("Display", "keepPlanesAboveBelow");
-  this->visualization->SetKeepPlanesAboveBelowImagePlane(intValue);
+  m_Visualization->SetKeepPlanesAboveBelowImagePlane(intValue);
   boolValue = parser.GetValueAsBool("Display", "fastIsosurfaceRendering");
-  this->visualization->SetFastIsosurfaceRendering(boolValue);
+  m_Visualization->SetFastIsosurfaceRendering(boolValue);
   boolValue = parser.GetValueAsBool("Display", "showDataOutline");
-  this->visualization->SetShowOutline(boolValue);
+  m_Visualization->SetShowOutline(boolValue);
 
   this->RefreshUI();
 
   // Reset camera
-  this->ren->ResetCamera();
+  m_Renderer->ResetCamera();
   
   // Render
   this->qvtkWidget->GetRenderWindow()->Render();
@@ -217,33 +218,33 @@ void FibrinAnalysis::on_actionSaveSession_triggered() {
   fprintf(fp, "; Written by Fibrin Analysis\n\n");
 
   fprintf(fp, "[Image]\n");
-  fprintf(fp, "fileName=%s\n\n", this->dataModel->GetImageFileName().c_str());
+  fprintf(fp, "fileName=%s\n\n", m_DataModel->GetImageFileName().c_str());
   double spacing[3];
-  this->dataModel->GetVoxelSpacing(spacing);
+  m_DataModel->GetVoxelSpacing(spacing);
   fprintf(fp, "voxelSpacing=%f %f %f\n", spacing[0], spacing[1], spacing[2]);
   
   fprintf(fp, "[MultiscaleFibernessFilter]\n");
-  fprintf(fp, "alpha=%.3f\n", this->dataModel->GetMultiscaleFibernessAlphaCoefficient());
-  fprintf(fp, "beta=%.3f\n",  this->dataModel->GetMultiscaleFibernessBetaCoefficient());
-  fprintf(fp, "gamma=%.3f\n", this->dataModel->GetMultiscaleFibernessGammaCoefficient());
-  fprintf(fp, "minimumScale=%.3f\n", this->dataModel->GetMultiscaleFibernessMinimumScale());
-  fprintf(fp, "maximumScale=%.3f\n", this->dataModel->GetMultiscaleFibernessMaximumScale());
-  fprintf(fp, "numberOfScales=%d\n\n", this->dataModel->GetMultiscaleFibernessNumberOfScales());
+  fprintf(fp, "alpha=%.3f\n", m_DataModel->GetMultiscaleFibernessAlphaCoefficient());
+  fprintf(fp, "beta=%.3f\n",  m_DataModel->GetMultiscaleFibernessBetaCoefficient());
+  fprintf(fp, "gamma=%.3f\n", m_DataModel->GetMultiscaleFibernessGammaCoefficient());
+  fprintf(fp, "minimumScale=%.3f\n", m_DataModel->GetMultiscaleFibernessMinimumScale());
+  fprintf(fp, "maximumScale=%.3f\n", m_DataModel->GetMultiscaleFibernessMaximumScale());
+  fprintf(fp, "numberOfScales=%d\n\n", m_DataModel->GetMultiscaleFibernessNumberOfScales());
   fprintf(fp, "[MultiscaleFibernessFilterThreshold]\n");
-  fprintf(fp, "threshold=%.3f\n\n", this->dataModel->GetMultiscaleFibernessThreshold());
+  fprintf(fp, "threshold=%.3f\n\n", m_DataModel->GetMultiscaleFibernessThreshold());
 
   fprintf(fp, "[FilteredImageOutput]\n");
-  fprintf(fp, "intensityScaleFactor=%.3f\n\n", this->dataModel->GetFilteredImageScaleFactor());
+  fprintf(fp, "intensityScaleFactor=%.3f\n\n", m_DataModel->GetFilteredImageScaleFactor());
 
   fprintf(fp, "[Display]\n");
-  fprintf(fp, "isosurfaceVisible=%s\n", this->visualization->GetIsosurfaceVisible() ? "true" : "false");
-  fprintf(fp, "isovalue=%.3f\n", this->visualization->GetIsoValue());
-  fprintf(fp, "imagePlaneVisible=%s\n", this->visualization->GetImagePlaneVisible() ? "true" : "false");
-  fprintf(fp, "zPlane=%d\n", this->visualization->GetZSlice());
-  fprintf(fp, "cropIsosurface=%s\n", this->visualization->GetCropIsosurface() ? "true" : "false");
-  fprintf(fp, "keepPlanesAboveBelow=%d\n", this->visualization->GetKeepPlanesAboveBelowImagePlane());
-  fprintf(fp, "fastIsosurfaceRendering=%s\n", this->visualization->GetFastIsosurfaceRendering() ? "true" : "false");
-  fprintf(fp, "showDataOutline=%s\n", this->visualization->GetShowOutline() ? "true" : "false");
+  fprintf(fp, "isosurfaceVisible=%s\n", m_Visualization->GetIsosurfaceVisible() ? "true" : "false");
+  fprintf(fp, "isovalue=%.3f\n", m_Visualization->GetIsoValue());
+  fprintf(fp, "imagePlaneVisible=%s\n", m_Visualization->GetImagePlaneVisible() ? "true" : "false");
+  fprintf(fp, "zPlane=%d\n", m_Visualization->GetZSlice());
+  fprintf(fp, "cropIsosurface=%s\n", m_Visualization->GetCropIsosurface() ? "true" : "false");
+  fprintf(fp, "keepPlanesAboveBelow=%d\n", m_Visualization->GetKeepPlanesAboveBelowImagePlane());
+  fprintf(fp, "fastIsosurfaceRendering=%s\n", m_Visualization->GetFastIsosurfaceRendering() ? "true" : "false");
+  fprintf(fp, "showDataOutline=%s\n", m_Visualization->GetShowOutline() ? "true" : "false");
 
   fclose(fp);
 
@@ -264,23 +265,23 @@ void FibrinAnalysis::on_actionOpenImage_triggered() {
   this->OpenFile(fileName.toStdString());
 
   // Set isovalue to midpoint between data min and max
-  double min = this->dataModel->GetFilteredDataMinimum();
-  double max = this->dataModel->GetFilteredDataMaximum();
+  double min = m_DataModel->GetFilteredDataMinimum();
+  double max = m_DataModel->GetFilteredDataMaximum();
   double isoValue = 0.5*(min + max);
   QString isoValueString = QString().sprintf("%.4f", isoValue);
   this->isoValueEdit->setText(isoValueString);
   this->isoValueSlider->setValue(this->isoValueSliderPosition(isoValue));
 
   // Set up visualization pipeline.
-  this->visualization->SetImageInputConnection(this->dataModel->GetImageOutputPort());
-  this->visualization->SetFilteredImageInputConnection(this->dataModel->GetFilteredImageOutputPort());
-  this->visualization->SetIsoValue(isoValue);
+  m_Visualization->SetImageInputConnection(m_DataModel->GetImageOutputPort());
+  m_Visualization->SetFilteredImageInputConnection(m_DataModel->GetFilteredImageOutputPort());
+  m_Visualization->SetIsoValue(isoValue);
 
   // Refresh the UI
   this->RefreshUI();
 
   // Reset camera
-  this->ren->ResetCamera();
+  m_Renderer->ResetCamera();
   
   // Render
   this->qvtkWidget->GetRenderWindow()->Render();
@@ -289,7 +290,7 @@ void FibrinAnalysis::on_actionOpenImage_triggered() {
 
 void FibrinAnalysis::OpenFile(std::string fileName) {
   std::cout << "Loading file '" << fileName << "'" << std::endl;
-  this->dataModel->LoadImageFile(fileName);
+  m_DataModel->LoadImageFile(fileName);
   
   // Set status bar with info about the file.
   QString imageInfo("Loaded image '"); imageInfo.append(fileName.c_str()); imageInfo.append("'.");
@@ -303,7 +304,7 @@ void FibrinAnalysis::on_actionSaveFilteredImage_triggered() {
     return;
 
   float scaleFactor = this->filteredImageScaleEdit->text().toDouble();
-  this->dataModel->SaveFilteredImageFile(fileName.toStdString(), this->filterType, scaleFactor);
+  m_DataModel->SaveFilteredImageFile(fileName.toStdString(), m_FilterType, scaleFactor);
 
 }
 
@@ -313,18 +314,18 @@ void FibrinAnalysis::on_actionSaveFiberOrientationImage_triggered() {
   if (fileName == "")
     return;
 
-  this->dataModel->SaveFiberOrientationImageFile(fileName.toStdString());
+  m_DataModel->SaveFiberOrientationImageFile(fileName.toStdString());
 }
 
 
 void FibrinAnalysis::on_actionSaveFiberOrientationData_triggered() {
 
   // Allow saving only when skeletonization filter is selected.
-  if (this->filterType == DataModel::MULTISCALE_SKELETONIZATION_FILTER_STRING) {
+  if (m_FilterType == DataModel::MULTISCALE_SKELETONIZATION_FILTER_STRING) {
     QString fileName = QFileDialog::getSaveFileName(this, "Save Fiber Orientation Data", "", "CSV (*.csv);;");
     if (fileName == "")
       return;
-    this->dataModel->SaveFiberOrientationDataFile(fileName.toStdString());
+    m_DataModel->SaveFiberOrientationDataFile(fileName.toStdString());
 
   } else {
 
@@ -372,7 +373,7 @@ void FibrinAnalysis::on_actionSaveRotationAnimation_triggered() {
   vtkPNGWriter* writer = vtkPNGWriter::New();
   writer->SetInputConnection(capturer->GetOutputPort());
 
-  vtkCamera* camera = this->ren->GetActiveCamera();
+  vtkCamera* camera = m_Renderer->GetActiveCamera();
 
   int frames = 120;
   double angleIncrement = 360 / frames;
@@ -385,7 +386,7 @@ void FibrinAnalysis::on_actionSaveRotationAnimation_triggered() {
     writer->Write();
 
     camera->Azimuth(angleIncrement);
-    ren->ResetCameraClippingRange();
+    m_Renderer->ResetCameraClippingRange();
     qvtkWidget->GetRenderWindow()->Render();
 
     float progress = static_cast<float>(i) / static_cast<float>(frames);
@@ -404,7 +405,7 @@ void FibrinAnalysis::on_actionSaveGeometry_triggered() {
     return;
 
   vtkPolyDataWriter* writer = vtkPolyDataWriter::New();
-  writer->SetInputConnection(this->visualization->GetIsosurfaceOutputPort());
+  writer->SetInputConnection(m_Visualization->GetIsosurfaceOutputPort());
   writer->SetFileName(fileName.toStdString().c_str());
   writer->Write();
 
@@ -430,11 +431,11 @@ void FibrinAnalysis::on_actionExit_triggered() {
 
 
 void FibrinAnalysis::on_actionResetView_triggered() {
-  vtkCamera* camera = this->ren->GetActiveCamera();
+  vtkCamera* camera = m_Renderer->GetActiveCamera();
   camera->SetFocalPoint(0, 0, 0);
   camera->SetPosition(0, 0, 1);
   camera->SetViewUp(0, 1, 0);
-  this->ren->ResetCamera();
+  m_Renderer->ResetCamera();
   this->qvtkWidget->GetRenderWindow()->Render();
 }
 
@@ -446,7 +447,7 @@ void FibrinAnalysis::on_actionOpenView_triggered() {
   if (fileName == "")
     return;
 
-  vtkCamera* camera = this->ren->GetActiveCamera();
+  vtkCamera* camera = m_Renderer->GetActiveCamera();
 
   ConfigurationFileParser parser;
   parser.Parse(fileName.toStdString());
@@ -461,7 +462,7 @@ void FibrinAnalysis::on_actionOpenView_triggered() {
   parser.GetValueAsDouble3("Camera", "UpVector", values);
   camera->SetViewUp(values);
 
-  this->ren->ResetCameraClippingRange();
+  m_Renderer->ResetCameraClippingRange();
   this->qvtkWidget->GetRenderWindow()->Render();
 }
 
@@ -475,19 +476,19 @@ void FibrinAnalysis::on_actionSaveView_triggered() {
 
   FILE* fp = fopen(fileName.toStdString().c_str(), "w");
   if (fp == NULL) {
-    errorDialog.showMessage(tr("Could not write view file ").append(fileName));
+    m_ErrorDialog.showMessage(tr("Could not write view file ").append(fileName));
   }
 
   fprintf(fp, "; Written by Fibrin Analysis\n\n");
   fprintf(fp, "[Camera]\n");
 
-  double* position = this->ren->GetActiveCamera()->GetPosition();
+  double* position = m_Renderer->GetActiveCamera()->GetPosition();
   fprintf(fp, "Position=%.4f %.4f %.4f\n", position[0], position[1], position[2]);
 
-  double* focalPoint = this->ren->GetActiveCamera()->GetFocalPoint();
+  double* focalPoint = m_Renderer->GetActiveCamera()->GetFocalPoint();
   fprintf(fp, "FocalPoint=%.4f %.4f %.4f\n", focalPoint[0], focalPoint[1], focalPoint[2]);
 
-  double* upVector = this->ren->GetActiveCamera()->GetViewUp();
+  double* upVector = m_Renderer->GetActiveCamera()->GetViewUp();
   fprintf(fp, "UpVector=%.4f %.4f %.4f\n", upVector[0], upVector[1], upVector[2]);
 
   fclose(fp);
@@ -539,7 +540,7 @@ void FibrinAnalysis::on_imageFilterComboBox_currentIndexChanged(QString filterTe
 
 
 void FibrinAnalysis::on_showIsosurfaceCheckBox_toggled(bool show) {
-  this->visualization->SetIsosurfaceVisible(show);
+  m_Visualization->SetIsosurfaceVisible(show);
   this->qvtkWidget->GetRenderWindow()->Render();
 }
 
@@ -557,7 +558,7 @@ void FibrinAnalysis::on_isoValueSlider_sliderMoved(int value) {
 
 
 void FibrinAnalysis::on_showZPlaneCheckbox_toggled(bool show) {
-  this->visualization->SetImagePlaneVisible(show);
+  m_Visualization->SetImagePlaneVisible(show);
   this->qvtkWidget->GetRenderWindow()->Render();
 }
 
@@ -568,10 +569,10 @@ void FibrinAnalysis::on_zPlaneEdit_textEdited(QString text) {
 
   // Read z-slice.
   int dims[3];
-  this->dataModel->GetDimensions(dims);
+  m_DataModel->GetDimensions(dims);
   int slice = zPlaneEdit->text().toInt()-1;
   if (slice >= 0 && slice < dims[2]) {
-    this->visualization->SetZSlice(slice);
+    m_Visualization->SetZSlice(slice);
     this->qvtkWidget->GetRenderWindow()->Render();
   }
 }
@@ -583,15 +584,16 @@ void FibrinAnalysis::on_zPlaneSlider_sliderMoved(int value) {
 
   // Read z-slice.
   int dims[3];
-  this->dataModel->GetDimensions(dims);
+  m_DataModel->GetDimensions(dims);
   int slice = zPlaneEdit->text().toInt()-1;
   if (slice >= 0 && slice < dims[2]) {
-    this->visualization->SetZSlice(slice);
+    m_Visualization->SetZSlice(slice);
     this->qvtkWidget->GetRenderWindow()->Render();
   }
 }
 
 
+#if 0
 void FibrinAnalysis::on_saveConnectedComponentsData_clicked() {
   QString fileName = QFileDialog::getSaveFileName(this, 
     "Save Connected Component vs. Threshold Data", "", "TXT (*.txt);;");
@@ -601,7 +603,7 @@ void FibrinAnalysis::on_saveConnectedComponentsData_clicked() {
   double minThreshold = minThresholdEdit->text().toDouble();
   double maxThreshold = maxThresholdEdit->text().toDouble();
   double thresholdIncrement = 0.5;
-  this->dataModel->ComputeConnectedComponentsVsThresholdData(minThreshold,
+  m_DataModel->ComputeConnectedComponentsVsThresholdData(minThreshold,
     maxThreshold, thresholdIncrement, fileName.toStdString());
 }
 
@@ -613,25 +615,74 @@ void FibrinAnalysis::on_saveVolumeFractionEstimateData_clicked() {
     return;
 
   double threshold = fibernessThresholdEdit->text().toDouble();
-  this->dataModel->ComputeVolumeFractionEstimateVsZData(threshold, fileName.toStdString());
+  m_DataModel->ComputeVolumeFractionEstimateVsZData(threshold, fileName.toStdString());
+}
+#endif
+
+
+void FibrinAnalysis::on_azimuthEdit_textEdited(QString text) {
+  double azimuth = text.toDouble();
+  m_DataModel->SetReferenceDirectionAzimuth(azimuth);
+  m_Visualization->SetDirectionArrowAzimuth(azimuth);
+  RefreshVisualization();
+}
+
+
+void FibrinAnalysis::on_inclinationEdit_textEdited(QString text) {
+  double inclination = text.toDouble();
+  m_DataModel->SetReferenceDirectionInclination(inclination);
+  m_Visualization->SetDirectionArrowInclination(inclination);
+  RefreshVisualization();
+}
+
+
+void FibrinAnalysis::on_showDirectionArrowCheckBox_toggled(bool state) {
+  m_Visualization->SetDirectionArrowVisible(state);
+  RefreshVisualization();
+}
+
+
+void FibrinAnalysis::on_saveAngleHistogram_clicked() {
+  // Allow saving only when skeletonization filter is selected.
+  //if (m_FilterType == DataModel::MULTISCALE_SKELETONIZATION_FILTER_STRING) {
+  if (1) {
+    QString fileName = QFileDialog::getSaveFileName(this, "Save Fiber Angle Histogram", "", "CSV (*.csv);;");
+    if (fileName == "")
+      return;
+
+    double azimuth = azimuthEdit->text().toDouble();
+    double inclination = inclinationEdit->text().toDouble();
+    unsigned int bins = histogramBinsEdit->text().toUInt();
+    m_DataModel->SaveFiberAngleHistogram
+      (fileName.toStdString(), azimuth, inclination, bins);
+
+  } else {
+
+    // Notify the user that skeletonization filter must be selected.
+    QMessageBox messageBox;
+    messageBox.setText("Error");
+    messageBox.setInformativeText("You must have the Skeletonization filter selected in the Image Analysis dock to save the fiber orientation data.");
+    messageBox.setStandardButtons(QMessageBox::Ok);
+    messageBox.exec();
+  }
 }
 
 
 void FibrinAnalysis::on_showDataOutlineCheckBox_toggled(bool show) {
-  this->visualization->SetShowOutline(show);
-  this->qvtkWidget->GetRenderWindow()->Render();
+  m_Visualization->SetShowOutline(show);
+  qvtkWidget->GetRenderWindow()->Render();
 }
 
 
 void FibrinAnalysis::on_cropIsosurfaceCheckBox_toggled(bool crop) {
-  this->visualization->SetCropIsosurface(crop);
+  m_Visualization->SetCropIsosurface(crop);
   
   // Read z-slice.
   int dims[3];
-  this->dataModel->GetDimensions(dims);
+  m_DataModel->GetDimensions(dims);
   int slice = zPlaneEdit->text().toInt()-1;
   if (slice >= 0 && slice < dims[2]) {
-    this->visualization->SetZSlice(slice);
+    m_Visualization->SetZSlice(slice);
     this->qvtkWidget->GetRenderWindow()->Render();
   }
 }
@@ -641,73 +692,73 @@ void FibrinAnalysis::on_applyButton_clicked() {
 
   // Read fiber diameter.
   double fiberDiameter = this->fiberDiameterEdit->text().toDouble();
-  this->dataModel->SetFiberDiameter(fiberDiameter);
+  m_DataModel->SetFiberDiameter(fiberDiameter);
 
   double fibernessAlphaCoef = this->fibernessAlphaCoefficientEdit->text().toDouble();
-  this->dataModel->SetMultiscaleFibernessAlphaCoefficient(fibernessAlphaCoef);
+  m_DataModel->SetMultiscaleFibernessAlphaCoefficient(fibernessAlphaCoef);
 
   double fibernessBetaCoef = this->fibernessBetaCoefficientEdit->text().toDouble();
-  this->dataModel->SetMultiscaleFibernessBetaCoefficient(fibernessBetaCoef);
+  m_DataModel->SetMultiscaleFibernessBetaCoefficient(fibernessBetaCoef);
 
   double fibernessGammaCoef = this->fibernessGammaCoefficientEdit->text().toDouble();
-  this->dataModel->SetMultiscaleFibernessGammaCoefficient(fibernessGammaCoef);
+  m_DataModel->SetMultiscaleFibernessGammaCoefficient(fibernessGammaCoef);
 
   double fibernessScaleMinimum = this->fibernessScaleMinimumEdit->text().toDouble();
-  this->dataModel->SetMultiscaleFibernessMinimumScale(fibernessScaleMinimum);
+  m_DataModel->SetMultiscaleFibernessMinimumScale(fibernessScaleMinimum);
 
   double fibernessScaleMaximum = this->fibernessScaleMaximumEdit->text().toDouble();
-  this->dataModel->SetMultiscaleFibernessMaximumScale(fibernessScaleMaximum);
+  m_DataModel->SetMultiscaleFibernessMaximumScale(fibernessScaleMaximum);
 
   double fibernessNumberOfScales = this->fibernessNumberOfScalesEdit->text().toInt();
-  this->dataModel->SetMultiscaleFibernessNumberOfScales(fibernessNumberOfScales);
+  m_DataModel->SetMultiscaleFibernessNumberOfScales(fibernessNumberOfScales);
 
   double fibernessThreshold = this->fibernessThresholdEdit->text().toDouble();
-  this->dataModel->SetMultiscaleFibernessThreshold(fibernessThreshold);
+  m_DataModel->SetMultiscaleFibernessThreshold(fibernessThreshold);
 
   double junctionProbeDiameter = this->junctionProbeDiameterEdit->text().toDouble();
-  this->dataModel->SetJunctionProbeDiameter(junctionProbeDiameter);
+  m_DataModel->SetJunctionProbeDiameter(junctionProbeDiameter);
 
   double junctionFibernessThreshold = this->junctionFibernessThresholdEdit->text().toDouble();
-  this->dataModel->SetJunctionFibernessThreshold(junctionFibernessThreshold);
+  m_DataModel->SetJunctionFibernessThreshold(junctionFibernessThreshold);
 
   double junctionnessLocalMaxHeight = this->junctionnessLocalMaxHeightEdit->text().toDouble();
-  this->dataModel->SetJunctionnessLocalMaxHeight(junctionnessLocalMaxHeight);
+  m_DataModel->SetJunctionnessLocalMaxHeight(junctionnessLocalMaxHeight);
 
   double filteredImageScaleFactor = this->filteredImageScaleEdit->text().toDouble();
-  this->dataModel->SetFilteredImageScaleFactor(filteredImageScaleFactor);
+  m_DataModel->SetFilteredImageScaleFactor(filteredImageScaleFactor);
 
   ///////////////// Update image filters ////////////////
-  QString filterText = this->imageFilterComboBox->currentText();
-  if (filterText.toStdString() != this->filterType) {
-    if (filterText.toStdString() == DataModel::NO_FILTER_STRING) {
-      this->dataModel->SetFilterToNone();
-    } else if (filterText.toStdString() == DataModel::FRANGI_FIBERNESS_FILTER_STRING) {
-      this->dataModel->SetFilterToFrangiFiberness();
-    } else if (filterText.toStdString() == DataModel::MULTISCALE_FIBERNESS_FILTER_STRING) {
-      this->dataModel->SetFilterToMultiscaleFiberness();
-    } else if (filterText.toStdString() == DataModel::MULTISCALE_FIBERNESS_THRESHOLD_FILTER_STRING) {
-      this->dataModel->SetFilterToMultiscaleFibernessThreshold();
-    } else if (filterText.toStdString() == DataModel::MULTISCALE_SKELETONIZATION_FILTER_STRING) {
-      this->dataModel->SetFilterToMultiscaleSkeletonization();
-    } else if (filterText.toStdString() == DataModel::JUNCTIONNESS_FILTER_STRING) {
-      this->dataModel->SetFilterToJunctionness();
-    } else if (filterText.toStdString() == DataModel::JUNCTIONNESS_LOCAL_MAX_FILTER_STRING) {
-      this->dataModel->SetFilterToJunctionnessLocalMax();
+  QString text = this->imageFilterComboBox->currentText();
+  if (text.toStdString() != m_FilterType) {
+    if (text.toStdString() == DataModel::NO_FILTER_STRING) {
+      m_DataModel->SetFilterToNone();
+    } else if (text.toStdString() == DataModel::FRANGI_FIBERNESS_FILTER_STRING) {
+      m_DataModel->SetFilterToFrangiFiberness();
+    } else if (text.toStdString() == DataModel::MULTISCALE_FIBERNESS_FILTER_STRING) {
+      m_DataModel->SetFilterToMultiscaleFiberness();
+    } else if (text.toStdString() == DataModel::MULTISCALE_FIBERNESS_THRESHOLD_FILTER_STRING) {
+      m_DataModel->SetFilterToMultiscaleFibernessThreshold();
+    } else if (text.toStdString() == DataModel::MULTISCALE_SKELETONIZATION_FILTER_STRING) {
+      m_DataModel->SetFilterToMultiscaleSkeletonization();
+    } else if (text.toStdString() == DataModel::JUNCTIONNESS_FILTER_STRING) {
+      m_DataModel->SetFilterToJunctionness();
+    } else if (text.toStdString() == DataModel::JUNCTIONNESS_LOCAL_MAX_FILTER_STRING) {
+      m_DataModel->SetFilterToJunctionnessLocalMax();
     }
-    this->filterType = filterText.toStdString();
+    m_FilterType = text.toStdString();
   }
 
   // Read isovalue.
   double isoValue = this->isoValueEdit->text().toDouble();
-  this->visualization->SetIsoValue(isoValue);
+  m_Visualization->SetIsoValue(isoValue);
 
   // Read delta z.
   int keepPlanes = this->keepPlanesEdit->text().toInt();
-  this->visualization->SetKeepPlanesAboveBelowImagePlane(keepPlanes);
+  m_Visualization->SetKeepPlanesAboveBelowImagePlane(keepPlanes);
 
   // Read z-slice.
   int slice = this->zPlaneEdit->text().toInt()-1;
-  this->visualization->SetZSlice(slice);
+  m_Visualization->SetZSlice(slice);
 
   RefreshUI();
 }
@@ -718,22 +769,23 @@ void FibrinAnalysis::handle_tableModel_dataChanged(const QModelIndex& topLeft, c
     return;
   }
   
-  QStandardItem* item = this->tableModel->item(topLeft.row(), topLeft.column());
+  QStandardItem* item = m_TableModel->item(topLeft.row(), topLeft.column());
   double value = item->text().toDouble();
 
   int itemIndex = topLeft.row();
   if (itemIndex == 5) {
-    this->dataModel->SetVoxelXSpacing(value);
+    m_DataModel->SetVoxelXSpacing(value);
   } else if (itemIndex == 6) {
-    this->dataModel->SetVoxelYSpacing(value);
+    m_DataModel->SetVoxelYSpacing(value);
   } else if (itemIndex == 7) {
-    this->dataModel->SetVoxelZSpacing(value);
+    m_DataModel->SetVoxelZSpacing(value);
   } else if (itemIndex == 8) {
-    QFileInfo fileInfo(this->dataModel->GetImageFileName().c_str());
-    this->tableModel->item(8, 1)->setText(fileInfo.fileName());
+    // Set the z squish factor
+    m_DataModel->SetZSquishFactor(value);
   }
 
-  this->qvtkWidget->GetRenderWindow()->Render();
+  //this->qvtkWidget->GetRenderWindow()->Render();
+  RefreshUI();
 }
 
 
@@ -742,7 +794,7 @@ void FibrinAnalysis::RefreshUI() {
   ///////////////// Update GUI /////////////////
   
   // Update window title
-  QFileInfo fileInfo(this->dataModel->GetImageFileName().c_str());
+  QFileInfo fileInfo(m_DataModel->GetImageFileName().c_str());
   QString windowTitle("Fibrin Analysis");
   if (fileInfo.fileName() != "")
     windowTitle.append(tr(" - '").append(fileInfo.fileName()).append("'"));
@@ -751,104 +803,120 @@ void FibrinAnalysis::RefreshUI() {
   const char *decimalFormat = "%.3f";
   const char *intFormat = "%d";
 
-  QString fiberDiameter = QString().sprintf(decimalFormat, this->dataModel->GetFiberDiameter());
+  QString fiberDiameter = QString().sprintf(decimalFormat, m_DataModel->GetFiberDiameter());
   this->fiberDiameterEdit->setText(fiberDiameter);
 
-  QString fibernessAlphaCoef = QString().sprintf(decimalFormat, this->dataModel->GetMultiscaleFibernessAlphaCoefficient());
+  QString fibernessAlphaCoef = QString().sprintf(decimalFormat, m_DataModel->GetMultiscaleFibernessAlphaCoefficient());
   this->fibernessAlphaCoefficientEdit->setText(fibernessAlphaCoef);
 
-  QString fibernessBetaCoef = QString().sprintf(decimalFormat, this->dataModel->GetMultiscaleFibernessBetaCoefficient());
+  QString fibernessBetaCoef = QString().sprintf(decimalFormat, m_DataModel->GetMultiscaleFibernessBetaCoefficient());
   this->fibernessBetaCoefficientEdit->setText(fibernessBetaCoef);
 
-  QString fibernessGammaCoef = QString().sprintf(decimalFormat, this->dataModel->GetMultiscaleFibernessGammaCoefficient());
+  QString fibernessGammaCoef = QString().sprintf(decimalFormat, m_DataModel->GetMultiscaleFibernessGammaCoefficient());
   this->fibernessGammaCoefficientEdit->setText(fibernessGammaCoef);
 
-  QString fibernessScaleMinimum = QString().sprintf(decimalFormat, this->dataModel->GetMultiscaleFibernessMinimumScale());
+  QString fibernessScaleMinimum = QString().sprintf(decimalFormat, m_DataModel->GetMultiscaleFibernessMinimumScale());
   this->fibernessScaleMinimumEdit->setText(fibernessScaleMinimum);
 
-  QString fibernessScaleMaximum = QString().sprintf(decimalFormat, this->dataModel->GetMultiscaleFibernessMaximumScale());
+  QString fibernessScaleMaximum = QString().sprintf(decimalFormat, m_DataModel->GetMultiscaleFibernessMaximumScale());
   this->fibernessScaleMaximumEdit->setText(fibernessScaleMaximum);
 
-  QString fibernessScales = QString().sprintf(intFormat, this->dataModel->GetMultiscaleFibernessNumberOfScales());
+  QString fibernessScales = QString().sprintf(intFormat, m_DataModel->GetMultiscaleFibernessNumberOfScales());
   this->fibernessNumberOfScalesEdit->setText(fibernessScales);
 
-  QString fibernessThreshold = QString().sprintf(decimalFormat, this->dataModel->GetMultiscaleFibernessThreshold());
+  QString fibernessThreshold = QString().sprintf(decimalFormat, m_DataModel->GetMultiscaleFibernessThreshold());
   this->fibernessThresholdEdit->setText(fibernessThreshold);
   
-  QString junctionProbeFilterDiameter = QString().sprintf(decimalFormat, this->dataModel->GetJunctionProbeDiameter());
+  QString junctionProbeFilterDiameter = QString().sprintf(decimalFormat, m_DataModel->GetJunctionProbeDiameter());
   this->junctionProbeDiameterEdit->setText(junctionProbeFilterDiameter);
 
-  QString junctionFibernessThreshold = QString().sprintf(decimalFormat, this->dataModel->GetJunctionFibernessThreshold());
+  QString junctionFibernessThreshold = QString().sprintf(decimalFormat, m_DataModel->GetJunctionFibernessThreshold());
   this->junctionFibernessThresholdEdit->setText(junctionFibernessThreshold);
 
-  QString junctionnessLocalMaxHeight = QString().sprintf(decimalFormat, this->dataModel->GetJunctionnessLocalMaxHeight());
+  QString junctionnessLocalMaxHeight = QString().sprintf(decimalFormat, m_DataModel->GetJunctionnessLocalMaxHeight());
   this->junctionnessLocalMaxHeightEdit->setText(junctionnessLocalMaxHeight);
 
-  QString filteredImageScaleFactor = QString().sprintf(decimalFormat, this->dataModel->GetFilteredImageScaleFactor());
+  QString filteredImageScaleFactor = QString().sprintf(decimalFormat, m_DataModel->GetFilteredImageScaleFactor());
   this->filteredImageScaleEdit->setText(filteredImageScaleFactor);
 
-  QString dataMin = QString().sprintf(decimalFormat, this->dataModel->GetFilteredDataMinimum());
-  this->tableModel->item(0, 1)->setText(dataMin);
-  QString dataMax = QString().sprintf(decimalFormat, this->dataModel->GetFilteredDataMaximum());
-  this->tableModel->item(1, 1)->setText(dataMax);
+  azimuthEdit->setText(QString().sprintf(decimalFormat, m_DataModel->GetReferenceDirectionAzimuth()));
+  inclinationEdit->setText(QString().sprintf(decimalFormat, m_DataModel->GetReferenceDirectionInclination()));
+
+  QString dataMin = QString().sprintf(decimalFormat, m_DataModel->GetFilteredDataMinimum());
+  m_TableModel->item(0, 1)->setText(dataMin);
+  QString dataMax = QString().sprintf(decimalFormat, m_DataModel->GetFilteredDataMaximum());
+  m_TableModel->item(1, 1)->setText(dataMax);
 
   int dims[3];
-  this->dataModel->GetDimensions(dims);
+  m_DataModel->GetDimensions(dims);
   QString xDim = QString().sprintf("%d", dims[0]);
-  this->tableModel->item(2, 1)->setText(xDim);
+  m_TableModel->item(2, 1)->setText(xDim);
   QString yDim = QString().sprintf("%d", dims[1]);
-  this->tableModel->item(3, 1)->setText(yDim);
+  m_TableModel->item(3, 1)->setText(yDim);
   QString zDim = QString().sprintf("%d", dims[2]);
-  this->tableModel->item(4, 1)->setText(zDim);
+  m_TableModel->item(4, 1)->setText(zDim);
 
   double spacing[3];
-  this->dataModel->GetVoxelSpacing(spacing);
+  m_DataModel->GetVoxelSpacing(spacing);
   QString xSpacing = QString().sprintf(decimalFormat, spacing[0]);
-  this->tableModel->item(5, 1)->setText(xSpacing);
+  m_TableModel->item(5, 1)->setText(xSpacing);
 
   QString ySpacing = QString().sprintf(decimalFormat, spacing[1]);
-  this->tableModel->item(6, 1)->setText(ySpacing);
+  m_TableModel->item(6, 1)->setText(ySpacing);
 
   QString zSpacing = QString().sprintf(decimalFormat, spacing[2]);
-  this->tableModel->item(7, 1)->setText(zSpacing);
+  m_TableModel->item(7, 1)->setText(zSpacing);
 
-  QString fileName = QString(this->dataModel->GetImageFileName().c_str());
-  this->tableModel->item(8, 1)->setText(fileName);
+  QString zSquishFactor = 
+    QString().sprintf(decimalFormat, m_DataModel->GetZSquishFactor());    
+  m_TableModel->item(8, 1)->setText(zSquishFactor);
 
-  this->showIsosurfaceCheckBox->setChecked(this->visualization->GetIsosurfaceVisible());
+  this->showIsosurfaceCheckBox->setChecked(m_Visualization->GetIsosurfaceVisible());
 
-  double isoValue = this->visualization->GetIsoValue();
+  double isoValue = m_Visualization->GetIsoValue();
   QString isoValueString = QString().sprintf(decimalFormat, isoValue);
   this->isoValueEdit->setText(isoValueString);
   this->isoValueSlider->setValue(this->isoValueSliderPosition(isoValue));
 
-  this->showZPlaneCheckbox->setChecked(this->visualization->GetImagePlaneVisible());
+  this->showZPlaneCheckbox->setChecked(m_Visualization->GetImagePlaneVisible());
 
   // Update slice slider
   this->zPlaneSlider->setMinValue(1);
   this->zPlaneSlider->setMaxValue(dims[2]);
-  int zSlice = this->visualization->GetZSlice()+1;
+  int zSlice = m_Visualization->GetZSlice()+1;
   this->zPlaneSlider->setValue(zSlice);
   QString zPlaneString = QString().sprintf(intFormat, zSlice);
   this->zPlaneEdit->setText(zPlaneString);
 
   // Update cropping widgets
-  this->cropIsosurfaceCheckBox->setChecked(this->visualization->GetCropIsosurface());
-  QString keepPlanesString = QString().sprintf(intFormat, this->visualization->GetKeepPlanesAboveBelowImagePlane());
+  this->cropIsosurfaceCheckBox->setChecked(m_Visualization->GetCropIsosurface());
+  QString keepPlanesString = QString().sprintf(intFormat, m_Visualization->GetKeepPlanesAboveBelowImagePlane());
   this->keepPlanesEdit->setText(keepPlanesString);
 
-  this->fastRenderingCheckBox->setChecked(this->visualization->GetFastIsosurfaceRendering());
-  this->showDataOutlineCheckBox->setChecked(this->visualization->GetShowOutline());
+  this->fastRenderingCheckBox->setChecked(m_Visualization->GetFastIsosurfaceRendering());
+  this->showDataOutlineCheckBox->setChecked(m_Visualization->GetShowOutline());
 
+  RefreshVisualization();
+}
+
+
+void FibrinAnalysis::RefreshVisualization() {
 
   ///////////////// Update visualization stuff /////////////////
-  this->ren->RemoveAllViewProps();
+  m_Renderer->RemoveAllViewProps();
 
-  if (this->dataModel->GetImageData()) {
-    this->visualization->SetImageInputConnection(this->dataModel->GetImageOutputPort());
-    this->visualization->SetFilteredImageInputConnection(this->dataModel->GetFilteredImageOutputPort());
-    this->visualization->AddToRenderer(this->ren);
-    this->visualization->SetFastIsosurfaceRendering(this->fastRenderingCheckBox->isChecked());
+  if (m_DataModel->GetImageData()) {
+    double arrowCenter[3];
+    m_DataModel->GetImageCenter(arrowCenter);
+    m_Visualization->SetDirectionArrowCenter(arrowCenter);
+
+    double arrowScale = 0.333 * m_DataModel->GetMaxImageSize();
+    m_Visualization->SetDirectionArrowScale(arrowScale);
+
+    m_Visualization->SetImageInputConnection(m_DataModel->GetImageOutputPort());
+    m_Visualization->SetFilteredImageInputConnection(m_DataModel->GetFilteredImageOutputPort());
+    m_Visualization->AddToRenderer(m_Renderer);
+    m_Visualization->SetFastIsosurfaceRendering(this->fastRenderingCheckBox->isChecked());
   }
 
   this->qvtkWidget->GetRenderWindow()->Render();
@@ -915,16 +983,16 @@ void FibrinAnalysis::readProgramSettings() {
 
 
 int FibrinAnalysis::isoValueSliderPosition(double value) {
-  double dataMin = this->dataModel->GetFilteredDataMinimum();
-  double dataMax = this->dataModel->GetFilteredDataMaximum();
+  double dataMin = m_DataModel->GetFilteredDataMinimum();
+  double dataMax = m_DataModel->GetFilteredDataMaximum();
   double sliderMax = static_cast<double>(this->isoValueSlider->maximum());
   return static_cast<int>(sliderMax*((value-dataMin)/(dataMax-dataMin)));
 }
 
 
 double FibrinAnalysis::isoValueSliderValue(int position) {
-  double dataMin = this->dataModel->GetFilteredDataMinimum();
-  double dataMax = this->dataModel->GetFilteredDataMaximum();
+  double dataMin = m_DataModel->GetFilteredDataMinimum();
+  double dataMax = m_DataModel->GetFilteredDataMaximum();
   double sliderMax = static_cast<double>(this->isoValueSlider->maximum());
   return (static_cast<double>(position) / sliderMax) 
     * (dataMax - dataMin) + dataMin;
