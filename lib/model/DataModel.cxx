@@ -17,6 +17,10 @@
 #include <itkMultiThreader.h>
 #include <itkPoint.h>
 
+#ifndef M_PI
+#define M_PI 3.14159265
+#endif
+
 // Constants
 const DataModel::FilterType 
 DataModel::NO_FILTER_STRING("No filter");
@@ -42,133 +46,137 @@ DataModel::JUNCTIONNESS_LOCAL_MAX_FILTER_STRING("Junctionness Local Maxima");
 
 DataModel
 ::DataModel() {
-  this->fiberDiameter = 1.0f;
-  this->filteredImageScale = 1.0;
-  this->imageData = NULL;
+  m_FiberDiameter = 1.0f;
+  m_FilteredImageScale = 1.0;
+  m_RefDirectionAzimuth = 0.0;
+  m_RefDirectionInclination = 0.0;
+  m_ZSquishFactor = 1.0;
+
+  m_ImageData = NULL;
 
   // Fiberness filters.
-  this->hessianFilter = HessianFilterType::New();
+  m_HessianFilter = HessianFilterType::New();
 
-  this->eigenAnalysisFilter = HessianEigenAnalysisFilterType::New();
-  this->eigenAnalysisFilter->SetInput(this->hessianFilter->GetOutput());
+  m_EigenAnalysisFilter = HessianEigenAnalysisFilterType::New();
+  m_EigenAnalysisFilter->SetInput(this->m_HessianFilter->GetOutput());
   
-  this->fibernessFilter = FibernessFilterType::New();
-  this->fibernessFilter->SetInput(this->eigenAnalysisFilter->GetEigenValues());
+  m_FibernessFilter = FibernessFilterType::New();
+  m_FibernessFilter->SetInput(this->m_EigenAnalysisFilter->GetEigenValues());
 
-  this->hessianToVesselnessFilter = HessianToObjectnessFilterType::New();
-  this->hessianToVesselnessFilter->SetObjectDimension(1);
-  this->hessianToVesselnessFilter->ScaleObjectnessMeasureOff();
-  this->hessianToVesselnessFilter->SetBrightObject(true);
+  m_HessianToVesselnessFilter = HessianToObjectnessFilterType::New();
+  m_HessianToVesselnessFilter->SetObjectDimension(1);
+  m_HessianToVesselnessFilter->ScaleObjectnessMeasureOff();
+  m_HessianToVesselnessFilter->SetBrightObject(true);
 
-  this->multiscaleFibernessFilter = MultiScaleHessianMeasureImageType::New();
-  this->multiscaleFibernessFilter->GenerateHessianOutputOff();
-  this->multiscaleFibernessFilter->GenerateScalesOutputOff();
-  this->multiscaleFibernessFilter->GenerateEigenvectorOutputOn();
-  this->multiscaleFibernessFilter->SetSigmaMinimum(0.5);
-  this->multiscaleFibernessFilter->SetSigmaMaximum(1.5);
-  this->multiscaleFibernessFilter->SetSigmaStepMethodToEquispaced();
-  this->multiscaleFibernessFilter->SetNumberOfSigmaSteps(11);
-  this->multiscaleFibernessFilter->SetHessianToMeasureFilter(this->hessianToVesselnessFilter);
+  m_MultiscaleFibernessFilter = MultiScaleHessianMeasureImageType::New();
+  m_MultiscaleFibernessFilter->GenerateHessianOutputOff();
+  m_MultiscaleFibernessFilter->GenerateScalesOutputOff();
+  m_MultiscaleFibernessFilter->GenerateEigenvectorOutputOn();
+  m_MultiscaleFibernessFilter->SetSigmaMinimum(0.5);
+  m_MultiscaleFibernessFilter->SetSigmaMaximum(1.5);
+  m_MultiscaleFibernessFilter->SetSigmaStepMethodToEquispaced();
+  m_MultiscaleFibernessFilter->SetNumberOfSigmaSteps(11);
+  m_MultiscaleFibernessFilter->SetHessianToMeasureFilter(this->m_HessianToVesselnessFilter);
 
-  this->minMaxFilter = MinMaxType::New();
+  m_MinMaxFilter = MinMaxType::New();
 
-  this->multiscaleFibernessThresholdFilter = ThresholdFilterType::New();
-  this->multiscaleFibernessThresholdFilter->SetInput(this->multiscaleFibernessFilter->GetOutput());
-  this->multiscaleFibernessThresholdFilter->SetInsideValue(0.0);
-  this->multiscaleFibernessThresholdFilter->SetOutsideValue(1.0);
-  this->multiscaleFibernessThresholdFilter->SetLowerThreshold(0.0);
-  this->multiscaleFibernessThresholdFilter->SetUpperThreshold(0.0);
+  m_MultiscaleFibernessThresholdFilter = ThresholdFilterType::New();
+  m_MultiscaleFibernessThresholdFilter->SetInput(m_MultiscaleFibernessFilter->GetOutput());
+  m_MultiscaleFibernessThresholdFilter->SetInsideValue(0.0);
+  m_MultiscaleFibernessThresholdFilter->SetOutsideValue(1.0);
+  m_MultiscaleFibernessThresholdFilter->SetLowerThreshold(0.0);
+  m_MultiscaleFibernessThresholdFilter->SetUpperThreshold(0.0);
 
-  this->skeletonizationFilter = SkeletonizationFilterType::New();
-  this->skeletonizationFilter->SetInput(this->multiscaleFibernessThresholdFilter->GetOutput());
+  m_SkeletonizationFilter = SkeletonizationFilterType::New();
+  m_SkeletonizationFilter->SetInput(this->m_MultiscaleFibernessThresholdFilter->GetOutput());
 
-  this->fibernessConnectedComponentsFilter = ConnectedComponentFilterType::New();
-  this->fibernessConnectedComponentsFilter->SetInput(this->multiscaleFibernessThresholdFilter->GetOutput());
-  this->fibernessConnectedComponentsFilter->FullyConnectedOn();
+  m_FibernessConnectedComponentsFilter = ConnectedComponentFilterType::New();
+  m_FibernessConnectedComponentsFilter->SetInput(m_MultiscaleFibernessThresholdFilter->GetOutput());
+  m_FibernessConnectedComponentsFilter->FullyConnectedOn();
 
-  this->minMaxConnectedComponentsFilter = MinMaxConnectedComponentFilterType::New();
+  m_MinMaxConnectedComponentsFilter = MinMaxConnectedComponentFilterType::New();
 
-  this->junctionnessFilter = JunctionnessFilterType::New();
-  this->junctionnessFilter->SetEigenVectorInput(this->eigenAnalysisFilter->GetEigenVectors());
-  this->junctionnessFilter->SetVesselnessInput(this->fibernessFilter->GetOutput());
+  m_JunctionnessFilter = JunctionnessFilterType::New();
+  m_JunctionnessFilter->SetEigenVectorInput(m_EigenAnalysisFilter->GetEigenVectors());
+  m_JunctionnessFilter->SetVesselnessInput(m_FibernessFilter->GetOutput());
 
-  this->junctionnessLocalMaxFilter = JunctionnessLocalMaxFilterType::New();
-  this->junctionnessLocalMaxFilter->SetInput(this->junctionnessFilter->GetOutput());
-  this->junctionnessLocalMaxFilter->FullyConnectedOn();
+  m_JunctionnessLocalMaxFilter = JunctionnessLocalMaxFilterType::New();
+  m_JunctionnessLocalMaxFilter->SetInput(m_JunctionnessFilter->GetOutput());
+  m_JunctionnessLocalMaxFilter->FullyConnectedOn();
 
-  this->inputImageITKToVTKFilter = new ITKImageToVTKImage<TImage>();
-  this->filteredImageITKToVTKFilter = new ITKImageToVTKImage<TImage>();
-  this->vectorImageITKToVTKFilter = new ITKImageToVTKImage<EigenVectorImageType>();
-  this->progressCallback = NULL;
+  m_InputImageITKToVTKFilter = new ITKImageToVTKImage<TImage>();
+  m_FilteredImageITKToVTKFilter = new ITKImageToVTKImage<TImage>();
+  m_VectorImageITKToVTKFilter = new ITKImageToVTKImage<EigenVectorImageType>();
+  progressCallback = NULL;
 
     // Hook up progress reporter for the filters.
-  itk::MemberCommand< DataModel >::Pointer hessianFilterProgressCommand 
+  itk::MemberCommand< DataModel >::Pointer m_HessianFilterProgressCommand 
     = itk::MemberCommand< DataModel >::New();
 
-  itk::MemberCommand< DataModel >::Pointer eigenAnalysisFilterProgressCommand 
+  itk::MemberCommand< DataModel >::Pointer m_EigenAnalysisFilterProgressCommand 
     = itk::MemberCommand< DataModel >::New();
 
-  itk::MemberCommand< DataModel >::Pointer fibernessFilterProgressCommand 
+  itk::MemberCommand< DataModel >::Pointer m_FibernessFilterProgressCommand 
     = itk::MemberCommand< DataModel >::New();
 
-  itk::MemberCommand< DataModel >::Pointer multiscaleFibernessFilterProgressCommand 
+  itk::MemberCommand< DataModel >::Pointer m_MultiscaleFibernessFilterProgressCommand 
     = itk::MemberCommand< DataModel >::New();
 
   itk::MemberCommand< DataModel >::Pointer fibernessThresholdFilterProgressCommand
     = itk::MemberCommand< DataModel >::New();
 
-  itk::MemberCommand< DataModel >::Pointer skeletonizationFilterProgressCommand
+  itk::MemberCommand< DataModel >::Pointer m_SkeletonizationFilterProgressCommand
     = itk::MemberCommand< DataModel >::New();
 
-  itk::MemberCommand< DataModel >::Pointer fibernessConnectedComponentsFilterProgressCommand
+  itk::MemberCommand< DataModel >::Pointer m_FibernessConnectedComponentsFilterProgressCommand
     = itk::MemberCommand< DataModel >::New();
 
-  itk::MemberCommand< DataModel >::Pointer junctionnessFilterProgressCommand 
+  itk::MemberCommand< DataModel >::Pointer m_JunctionnessFilterProgressCommand 
     = itk::MemberCommand< DataModel >::New();
 
-  itk::MemberCommand< DataModel >::Pointer junctionnessLocalMaxFilterProgressCommand
+  itk::MemberCommand< DataModel >::Pointer m_JunctionnessLocalMaxFilterProgressCommand
     = itk::MemberCommand< DataModel >::New();
 
   // Set the callback function for each of the progress reporters.
-  hessianFilterProgressCommand->SetCallbackFunction(this, &DataModel::UpdateProgress);
-  eigenAnalysisFilterProgressCommand->SetCallbackFunction(this, &DataModel::UpdateProgress);
-  fibernessFilterProgressCommand->SetCallbackFunction(this, &DataModel::UpdateProgress);
-  multiscaleFibernessFilterProgressCommand->SetCallbackFunction(this, &DataModel::UpdateProgress);
+  m_HessianFilterProgressCommand->SetCallbackFunction(this, &DataModel::UpdateProgress);
+  m_EigenAnalysisFilterProgressCommand->SetCallbackFunction(this, &DataModel::UpdateProgress);
+  m_FibernessFilterProgressCommand->SetCallbackFunction(this, &DataModel::UpdateProgress);
+  m_MultiscaleFibernessFilterProgressCommand->SetCallbackFunction(this, &DataModel::UpdateProgress);
   fibernessThresholdFilterProgressCommand->SetCallbackFunction(this, &DataModel::UpdateProgress);
-  skeletonizationFilterProgressCommand->SetCallbackFunction(this, &DataModel::UpdateProgress);
-  fibernessConnectedComponentsFilterProgressCommand->SetCallbackFunction(this, &DataModel::UpdateProgress);
-  junctionnessFilterProgressCommand->SetCallbackFunction(this, &DataModel::UpdateProgress);
-  junctionnessLocalMaxFilterProgressCommand->SetCallbackFunction(this, &DataModel::UpdateProgress);
+  m_SkeletonizationFilterProgressCommand->SetCallbackFunction(this, &DataModel::UpdateProgress);
+  m_FibernessConnectedComponentsFilterProgressCommand->SetCallbackFunction(this, &DataModel::UpdateProgress);
+  m_JunctionnessFilterProgressCommand->SetCallbackFunction(this, &DataModel::UpdateProgress);
+  m_JunctionnessLocalMaxFilterProgressCommand->SetCallbackFunction(this, &DataModel::UpdateProgress);
 
   // Attach a MetaDataObject with the name of the filter to each rilter.
-  itk::EncapsulateMetaData<std::string >(hessianFilter->GetMetaDataDictionary(),
+  itk::EncapsulateMetaData<std::string >(m_HessianFilter->GetMetaDataDictionary(),
     "filterName", std::string("Hessian Filter"));
-  itk::EncapsulateMetaData<std::string >(eigenAnalysisFilter->GetMetaDataDictionary(),
+  itk::EncapsulateMetaData<std::string >(m_EigenAnalysisFilter->GetMetaDataDictionary(),
     "filterName", std::string("Eigen Analysis Filter"));
-  itk::EncapsulateMetaData<std::string >(fibernessFilter->GetMetaDataDictionary(),
+  itk::EncapsulateMetaData<std::string >(m_FibernessFilter->GetMetaDataDictionary(),
     "filterName", std::string("Fiberness Filter"));
-  itk::EncapsulateMetaData<std::string >(multiscaleFibernessFilter->GetMetaDataDictionary(),
+  itk::EncapsulateMetaData<std::string >(m_MultiscaleFibernessFilter->GetMetaDataDictionary(),
     "filterName", std::string("Multiscale Fiberness Filter"));
-  itk::EncapsulateMetaData<std::string >(multiscaleFibernessThresholdFilter->GetMetaDataDictionary(),
+  itk::EncapsulateMetaData<std::string >(m_MultiscaleFibernessThresholdFilter->GetMetaDataDictionary(),
     "filterName", std::string("Fiberness Threshold Filter"));
-  itk::EncapsulateMetaData<std::string >(skeletonizationFilter->GetMetaDataDictionary(),
+  itk::EncapsulateMetaData<std::string >(m_SkeletonizationFilter->GetMetaDataDictionary(),
     "filterName", std::string("Skeletonization Filter"));
-  itk::EncapsulateMetaData<std::string >(fibernessConnectedComponentsFilter->GetMetaDataDictionary(),
+  itk::EncapsulateMetaData<std::string >(m_FibernessConnectedComponentsFilter->GetMetaDataDictionary(),
     "filterName", std::string("Fiberness Connected Components Filter"));
-  itk::EncapsulateMetaData<std::string >(junctionnessFilter->GetMetaDataDictionary(),
+  itk::EncapsulateMetaData<std::string >(m_JunctionnessFilter->GetMetaDataDictionary(),
     "filterName", std::string("Junctionness Filter"));
-  itk::EncapsulateMetaData<std::string>(junctionnessLocalMaxFilter->GetMetaDataDictionary(),
+  itk::EncapsulateMetaData<std::string>(m_JunctionnessLocalMaxFilter->GetMetaDataDictionary(),
     "filterName", std::string("Junctionness Local Max Filter"));
 
-  this->hessianFilter->AddObserver(itk::ProgressEvent(), hessianFilterProgressCommand);
-  this->eigenAnalysisFilter->AddObserver(itk::ProgressEvent(), eigenAnalysisFilterProgressCommand);
-  this->fibernessFilter->AddObserver(itk::ProgressEvent(), fibernessFilterProgressCommand);
-  this->multiscaleFibernessFilter->AddObserver(itk::ProgressEvent(), multiscaleFibernessFilterProgressCommand);
-  this->multiscaleFibernessThresholdFilter->AddObserver(itk::ProgressEvent(), fibernessThresholdFilterProgressCommand);
-  this->skeletonizationFilter->AddObserver(itk::ProgressEvent(), skeletonizationFilterProgressCommand);
-  this->fibernessConnectedComponentsFilter->AddObserver(itk::ProgressEvent(), fibernessConnectedComponentsFilterProgressCommand);
-  this->junctionnessFilter->AddObserver(itk::ProgressEvent(), junctionnessFilterProgressCommand);
-  this->junctionnessLocalMaxFilter->AddObserver(itk::ProgressEvent(), junctionnessLocalMaxFilterProgressCommand);
+  m_HessianFilter->AddObserver(itk::ProgressEvent(), m_HessianFilterProgressCommand);
+  m_EigenAnalysisFilter->AddObserver(itk::ProgressEvent(), m_EigenAnalysisFilterProgressCommand);
+  m_FibernessFilter->AddObserver(itk::ProgressEvent(), m_FibernessFilterProgressCommand);
+  m_MultiscaleFibernessFilter->AddObserver(itk::ProgressEvent(), m_MultiscaleFibernessFilterProgressCommand);
+  m_MultiscaleFibernessThresholdFilter->AddObserver(itk::ProgressEvent(), fibernessThresholdFilterProgressCommand);
+  m_SkeletonizationFilter->AddObserver(itk::ProgressEvent(), m_SkeletonizationFilterProgressCommand);
+  m_FibernessConnectedComponentsFilter->AddObserver(itk::ProgressEvent(), m_FibernessConnectedComponentsFilterProgressCommand);
+  m_JunctionnessFilter->AddObserver(itk::ProgressEvent(), m_JunctionnessFilterProgressCommand);
+  m_JunctionnessLocalMaxFilter->AddObserver(itk::ProgressEvent(), m_JunctionnessLocalMaxFilterProgressCommand);
 
   // ITK will detect the number of cores on the system and set it by default.
   // Here we can override that setting if the proper environment variable is
@@ -177,36 +185,36 @@ DataModel
   if (var) {
     int numberOfThreads = atoi(var);
     if (numberOfThreads > 0)
-      this->SetNumberOfThreads(numberOfThreads);
+      SetNumberOfThreads(numberOfThreads);
   }
 }
 
 
 DataModel
 ::~DataModel() {
-  delete this->inputImageITKToVTKFilter;
-  delete this->filteredImageITKToVTKFilter;
-  delete this->vectorImageITKToVTKFilter;
+  delete m_InputImageITKToVTKFilter;
+  delete m_FilteredImageITKToVTKFilter;
+  delete m_VectorImageITKToVTKFilter;
 }
 
 
 void
 DataModel
 ::LoadImageFile(std::string fileName) {
-  this->imageFileName = fileName;
+  this->m_ImageFileName = fileName;
   ScalarFileReaderType::Pointer reader = ScalarFileReaderType::New();
   reader->SetFileName(fileName.c_str());
   reader->Update();
-  this->SetImageData(reader->GetOutput());
+  SetImageData(reader->GetOutput());
 
   // Connect this image data to the various pipelines.
-  this->minMaxFilter->SetImage(this->imageData);
-  this->minMaxFilter->Compute();
+  m_MinMaxFilter->SetImage(m_ImageData);
+  m_MinMaxFilter->Compute();
 
-  this->inputImageITKToVTKFilter->Modified();
-  this->inputImageITKToVTKFilter->Update();
-  this->filteredImageITKToVTKFilter->Modified();
-  this->filteredImageITKToVTKFilter->Update();
+  m_InputImageITKToVTKFilter->Modified();
+  m_InputImageITKToVTKFilter->Update();
+  m_FilteredImageITKToVTKFilter->Modified();
+  m_FilteredImageITKToVTKFilter->Update();
 }
 
 
@@ -221,19 +229,19 @@ DataModel
     scaler->SetScale(scale);
 
     if (filterName == NO_FILTER_STRING) {
-      scaler->SetInput(this->imageData);
+      scaler->SetInput(m_ImageData);
     } else if (filterName == FRANGI_FIBERNESS_FILTER_STRING) {
-      scaler->SetInput(this->fibernessFilter->GetOutput());
+      scaler->SetInput(m_FibernessFilter->GetOutput());
     } else if (filterName == MULTISCALE_FIBERNESS_FILTER_STRING) {
-      scaler->SetInput(this->multiscaleFibernessFilter->GetOutput());
+      scaler->SetInput(m_MultiscaleFibernessFilter->GetOutput());
     } else if (filterName == MULTISCALE_FIBERNESS_THRESHOLD_FILTER_STRING) {
-      scaler->SetInput(this->multiscaleFibernessThresholdFilter->GetOutput());
+      scaler->SetInput(m_MultiscaleFibernessThresholdFilter->GetOutput());
     } else if (filterName == MULTISCALE_SKELETONIZATION_FILTER_STRING) {
-      scaler->SetInput(this->skeletonizationFilter->GetOutput());
+      scaler->SetInput(m_SkeletonizationFilter->GetOutput());
     } else if (filterName == JUNCTIONNESS_FILTER_STRING) {
-      scaler->SetInput(this->junctionnessFilter->GetOutput());
+      scaler->SetInput(m_JunctionnessFilter->GetOutput());
     } else if (filterName == JUNCTIONNESS_LOCAL_MAX_FILTER_STRING) {
-      scaler->SetInput(this->junctionnessLocalMaxFilter->GetOutput());
+      scaler->SetInput(m_JunctionnessLocalMaxFilter->GetOutput());
     } else {
       return;
     }
@@ -250,19 +258,19 @@ DataModel
 
     ScalarFileWriterType::Pointer writer = ScalarFileWriterType::New();
     if (filterName == NO_FILTER_STRING)
-      writer->SetInput(this->imageData);
+      writer->SetInput(m_ImageData);
     else if (filterName == FRANGI_FIBERNESS_FILTER_STRING)
-      writer->SetInput(this->fibernessFilter->GetOutput());
+      writer->SetInput(m_FibernessFilter->GetOutput());
     else if (filterName == MULTISCALE_FIBERNESS_FILTER_STRING)
-      writer->SetInput(this->multiscaleFibernessFilter->GetOutput());
+      writer->SetInput(m_MultiscaleFibernessFilter->GetOutput());
     else if (filterName == MULTISCALE_FIBERNESS_THRESHOLD_FILTER_STRING)
-      writer->SetInput(this->multiscaleFibernessThresholdFilter->GetOutput());
+      writer->SetInput(m_MultiscaleFibernessThresholdFilter->GetOutput());
     else if (filterName == MULTISCALE_SKELETONIZATION_FILTER_STRING)
-      writer->SetInput(this->skeletonizationFilter->GetOutput());
+      writer->SetInput(m_SkeletonizationFilter->GetOutput());
     else if (filterName == JUNCTIONNESS_FILTER_STRING)
-      writer->SetInput(this->junctionnessFilter->GetOutput());
+      writer->SetInput(m_JunctionnessFilter->GetOutput());
     else if (filterName == JUNCTIONNESS_LOCAL_MAX_FILTER_STRING)
-      writer->SetInput(this->junctionnessLocalMaxFilter->GetOutput());
+      writer->SetInput(m_JunctionnessLocalMaxFilter->GetOutput());
     else
       return;
 
@@ -275,7 +283,7 @@ DataModel
 std::string
 DataModel
 ::GetImageFileName() {
-  return this->imageFileName;
+  return m_ImageFileName;
 }
 
 
@@ -298,7 +306,7 @@ void
 DataModel
 ::SaveFiberOrientationImageFile(std::string fileName) {
   VectorFileWriterType::Pointer writer = VectorFileWriterType::New();
-  writer->SetInput(this->multiscaleFibernessFilter->GetEigenvectorOutput());
+  writer->SetInput(m_MultiscaleFibernessFilter->GetEigenvectorOutput());
   writer->SetFileName(fileName.c_str());
   writer->Update();
   writer->Write();
@@ -308,10 +316,10 @@ DataModel
 void
 DataModel
 ::SaveFiberOrientationDataFile(std::string fileName) {
-  InputImageType::Pointer skeletonImage = this->skeletonizationFilter->GetOutput();
+  InputImageType::Pointer skeletonImage = m_SkeletonizationFilter->GetOutput();
   itk::ImageRegionIteratorWithIndex<InputImageType> sit(skeletonImage,skeletonImage->GetLargestPossibleRegion());
 
-  const EigenVectorImageType* eigenvectorImage = this->multiscaleFibernessFilter->GetEigenvectorOutput();
+  const EigenVectorImageType* eigenvectorImage = m_MultiscaleFibernessFilter->GetEigenvectorOutput();
   itk::ImageRegionConstIteratorWithIndex<EigenVectorImageType> eit(eigenvectorImage,eigenvectorImage->GetLargestPossibleRegion());
 
   sit.GoToBegin();
@@ -325,9 +333,17 @@ DataModel
     if (sit.Value() > 0.0) {
       itk::Index<3> index = eit.GetIndex();
       itk::Point<float, 3> point;
-      imageData->TransformIndexToPhysicalPoint(index, point);
+      m_ImageData->TransformIndexToPhysicalPoint(index, point);
       EigenVectorType eigenvector = eit.Value();
-      fprintf(fp, "%f,%f,%f,%f,%f,%f\n", point[0], point[1], point[2], eigenvector[0], eigenvector[1], eigenvector[2]);
+      double ex = eigenvector[0];
+      double ey = eigenvector[1];
+      double ez = eigenvector[2] / m_ZSquishFactor;
+
+      // Renormalize
+      double len = sqrt(ex*ex + ey*ey + ez*ez);
+      ex /= len;   ey /= len;   ez /= len;
+
+      fprintf(fp, "%f,%f,%f,%f,%f,%f\n", point[0], point[1], point[2], ex, ey, ez);
 
     }
 
@@ -341,12 +357,84 @@ DataModel
 
 void
 DataModel
+::SaveFiberAngleHistogram(std::string fileName, double azimuth,
+			  double inclination, unsigned int bins) {
+
+  if (bins < 2)
+    bins = 2;
+
+  // Allocate and initialize the histogram
+  unsigned int *hist = new unsigned int[bins];
+  for (unsigned int i = 0; i < bins; i++) hist[i] = 0;
+
+  // Calculate the angle spread of each histogram bin
+  float angleIncrement = 90.0f / static_cast<float>(bins);
+
+  // Convert from azimuth-inclination to 3D Euclidean vector
+  double phi   = M_PI * m_RefDirectionAzimuth / 180.0;
+  double theta = M_PI * (90-m_RefDirectionInclination) / 180.0;
+  double rx = cos(phi) * sin(theta);
+  double ry = sin(phi) * sin(theta);
+  double rz = cos(theta);
+
+  InputImageType::Pointer skeletonImage = m_SkeletonizationFilter->GetOutput();
+  itk::ImageRegionIteratorWithIndex<InputImageType> sit(skeletonImage,skeletonImage->GetLargestPossibleRegion());
+
+  const EigenVectorImageType* eigenvectorImage = m_MultiscaleFibernessFilter->GetEigenvectorOutput();
+  itk::ImageRegionConstIteratorWithIndex<EigenVectorImageType> eit(eigenvectorImage,eigenvectorImage->GetLargestPossibleRegion());
+
+  sit.GoToBegin();
+  eit.GoToBegin();
+
+  while(!eit.IsAtEnd()) {
+    if (sit.Value() > 0.0) {
+      EigenVectorType e = eit.Value();
+
+      // We need to rescale the z-component of the vector by the inverse
+      // of the z-squish factor.
+      double ex = e[0];
+      double ey = e[1];
+      double ez = e[2] / m_ZSquishFactor;
+      
+      // Renormalize
+      double len = sqrt(ex*ex + ey*ey + ez*ez);
+      ex /= len;   ey /= len;   ez /= len;
+      
+      // Compute the angle in degrees.
+      double angle = 180.0*acos(fabs(ex*rx + ey*ry + ez*rz)) / M_PI;
+
+      // Update the histogram, which goes from 0 to 90 degrees.
+      unsigned int theBin = static_cast<unsigned int>(angle / angleIncrement);
+      if (theBin < 0)     theBin = 0;
+      if (theBin >= bins) theBin = bins - 1;
+      hist[theBin]++;
+    }
+
+    ++sit;
+    ++eit;
+  }
+
+  // Open file and write out the histogram.
+  FILE *fp = fopen(fileName.c_str(), "w");
+  fprintf(fp, "Angle (deg.),Count\n");
+
+  for (unsigned int i = 0; i < bins; i++) {
+    float angle = angleIncrement * static_cast<float>(i);
+    fprintf(fp, "%.2f, %d\n", angle, hist[i]);
+  }
+
+  fclose(fp);
+}
+
+
+void
+DataModel
 ::SetFiberDiameter(double diameter) {
-  if (diameter != this->fiberDiameter) {
-    this->fiberDiameter = diameter;
+  if (diameter != m_FiberDiameter) {
+    m_FiberDiameter = diameter;
 
     // Set sigma on the Hessian filter.
-    this->hessianFilter->SetSigma(0.5*diameter);
+    m_HessianFilter->SetSigma(0.5*diameter);
   }
 }
 
@@ -354,11 +442,11 @@ DataModel
 void
 DataModel
 ::SetMultiscaleFibernessAlphaCoefficient(double alpha) {
-  if (alpha != this->fibernessFilter->GetAlpha())
-    this->fibernessFilter->SetAlpha(alpha);
-  if (alpha != this->hessianToVesselnessFilter->GetAlpha()) {
-    this->hessianToVesselnessFilter->SetAlpha(alpha);
-    this->multiscaleFibernessFilter->Modified();
+  if (alpha != m_FibernessFilter->GetAlpha())
+    m_FibernessFilter->SetAlpha(alpha);
+  if (alpha != m_HessianToVesselnessFilter->GetAlpha()) {
+    m_HessianToVesselnessFilter->SetAlpha(alpha);
+    m_MultiscaleFibernessFilter->Modified();
   }
 }
 
@@ -366,18 +454,18 @@ DataModel
 double
 DataModel
 ::GetMultiscaleFibernessAlphaCoefficient() {
-  return this->fibernessFilter->GetAlpha();
+  return m_FibernessFilter->GetAlpha();
 }
 
 
 void
 DataModel
 ::SetMultiscaleFibernessBetaCoefficient(double beta) {
-  if (beta != this->fibernessFilter->GetBeta())
-    this->fibernessFilter->SetBeta(beta);
-  if (beta != this->hessianToVesselnessFilter->GetBeta()) {
-    this->hessianToVesselnessFilter->SetBeta(beta);
-    this->multiscaleFibernessFilter->Modified();
+  if (beta != m_FibernessFilter->GetBeta())
+    m_FibernessFilter->SetBeta(beta);
+  if (beta != m_HessianToVesselnessFilter->GetBeta()) {
+    m_HessianToVesselnessFilter->SetBeta(beta);
+    m_MultiscaleFibernessFilter->Modified();
   }
 }
 
@@ -385,18 +473,18 @@ DataModel
 double
 DataModel
 ::GetMultiscaleFibernessBetaCoefficient() {
-  return this->fibernessFilter->GetBeta();
+  return m_FibernessFilter->GetBeta();
 }
 
 
 void
 DataModel
 ::SetMultiscaleFibernessGammaCoefficient(double gamma) {
-  if (gamma != this->fibernessFilter->GetGamma())
-    this->fibernessFilter->SetGamma(gamma);
-  if (gamma != this->hessianToVesselnessFilter->GetGamma()) {
-    this->hessianToVesselnessFilter->SetGamma(gamma);
-    this->multiscaleFibernessFilter->Modified();
+  if (gamma != m_FibernessFilter->GetGamma())
+    m_FibernessFilter->SetGamma(gamma);
+  if (gamma != m_HessianToVesselnessFilter->GetGamma()) {
+    m_HessianToVesselnessFilter->SetGamma(gamma);
+    m_MultiscaleFibernessFilter->Modified();
   }
 }
 
@@ -404,15 +492,15 @@ DataModel
 double
 DataModel
 ::GetMultiscaleFibernessGammaCoefficient() {
-  return this->fibernessFilter->GetGamma();
+  return m_FibernessFilter->GetGamma();
 }
 
 
 void
 DataModel
 ::SetMultiscaleFibernessMinimumScale(double minimum) {
-  if (minimum != this->multiscaleFibernessFilter->GetSigmaMinimum()) {
-    this->multiscaleFibernessFilter->SetSigmaMinimum(minimum);
+  if (minimum != m_MultiscaleFibernessFilter->GetSigmaMinimum()) {
+    m_MultiscaleFibernessFilter->SetSigmaMinimum(minimum);
   }
 }
 
@@ -420,15 +508,15 @@ DataModel
 double
 DataModel
 ::GetMultiscaleFibernessMinimumScale() {
-  return this->multiscaleFibernessFilter->GetSigmaMinimum();
+  return m_MultiscaleFibernessFilter->GetSigmaMinimum();
 }
 
 
 void
 DataModel
 ::SetMultiscaleFibernessMaximumScale(double maximum) {
-  if (maximum != this->multiscaleFibernessFilter->GetSigmaMaximum()) {
-    this->multiscaleFibernessFilter->SetSigmaMaximum(maximum);
+  if (maximum != m_MultiscaleFibernessFilter->GetSigmaMaximum()) {
+    m_MultiscaleFibernessFilter->SetSigmaMaximum(maximum);
   }
 }
 
@@ -436,43 +524,43 @@ DataModel
 double
 DataModel
 ::GetMultiscaleFibernessMaximumScale() {
-  return this->multiscaleFibernessFilter->GetSigmaMaximum();
+  return m_MultiscaleFibernessFilter->GetSigmaMaximum();
 }
 
 
 void
 DataModel
 ::SetMultiscaleFibernessNumberOfScales(int numberOfScales) {
-  this->multiscaleFibernessFilter->SetNumberOfSigmaSteps(numberOfScales);
+  m_MultiscaleFibernessFilter->SetNumberOfSigmaSteps(numberOfScales);
 }
 
 
 int
 DataModel
 ::GetMultiscaleFibernessNumberOfScales() {
-  return this->multiscaleFibernessFilter->GetNumberOfSigmaSteps();
+  return m_MultiscaleFibernessFilter->GetNumberOfSigmaSteps();
 }
 
 
 void
 DataModel
 ::SetMultiscaleFibernessThreshold(double threshold) {
-  this->multiscaleFibernessThresholdFilter->SetLowerThreshold(0.0);
-  this->multiscaleFibernessThresholdFilter->SetUpperThreshold(threshold);
+  m_MultiscaleFibernessThresholdFilter->SetLowerThreshold(0.0);
+  m_MultiscaleFibernessThresholdFilter->SetUpperThreshold(threshold);
 }
 
 
 double
 DataModel
 ::GetMultiscaleFibernessThreshold() {
-  return this->multiscaleFibernessThresholdFilter->GetUpperThreshold();
+  return m_MultiscaleFibernessThresholdFilter->GetUpperThreshold();
 }
 
 
 double
 DataModel
 ::GetFiberDiameter() {
-  return this->fiberDiameter;
+  return m_FiberDiameter;
 }
 
 
@@ -480,8 +568,8 @@ void
 DataModel
 ::SetJunctionProbeDiameter(double diameter) {
   // Set probe radius on the junctionness filter.
-  if (0.5*diameter != this->junctionnessFilter->GetRadius()) {
-    this->junctionnessFilter->SetRadius(0.5*diameter);
+  if (0.5*diameter != m_JunctionnessFilter->GetRadius()) {
+    m_JunctionnessFilter->SetRadius(0.5*diameter);
   }
 }
 
@@ -489,15 +577,15 @@ DataModel
 double
 DataModel
 ::GetJunctionProbeDiameter() {
-  return 2.0*this->junctionnessFilter->GetRadius();
+  return 2.0*m_JunctionnessFilter->GetRadius();
 }
 
 
 void
 DataModel
 ::SetJunctionFibernessThreshold(double threshold) {
-  if (threshold != this->junctionnessFilter->GetVesselnessThreshold()) {
-    this->junctionnessFilter->SetVesselnessThreshold(threshold);
+  if (threshold != m_JunctionnessFilter->GetVesselnessThreshold()) {
+    m_JunctionnessFilter->SetVesselnessThreshold(threshold);
   }
 }
 
@@ -505,7 +593,7 @@ DataModel
 double
 DataModel
 ::GetJunctionFibernessThreshold() {
-  return this->junctionnessFilter->GetVesselnessThreshold();
+  return m_JunctionnessFilter->GetVesselnessThreshold();
 }
 
 
@@ -513,8 +601,8 @@ DataModel
 void
 DataModel
 ::SetJunctionnessLocalMaxHeight(double height) {
-  //if (height != this->junctionnessLocalMaxFilter->GetHeight()) {
-  //  this->junctionnessLocalMaxFilter->SetHeight(height);
+  //if (height != m_JunctionnessLocalMaxFilter->GetHeight()) {
+  //  m_JunctionnessLocalMaxFilter->SetHeight(height);
   //}
 }
 
@@ -523,7 +611,7 @@ DataModel
 double
 DataModel
 ::GetJunctionnessLocalMaxHeight() {
-  //return this->junctionnessLocalMaxFilter->GetHeight();
+  //return m_JunctionnessLocalMaxFilter->GetHeight();
   return 0;
 }
 
@@ -531,65 +619,65 @@ DataModel
 void 
 DataModel
 ::SetImageData(TImage::Pointer image) {
-  this->imageData = image;
+  m_ImageData = image;
 
-  this->hessianFilter->SetInput(this->imageData);
-  this->multiscaleFibernessFilter->SetInput(this->imageData);
+  m_HessianFilter->SetInput(m_ImageData);
+  m_MultiscaleFibernessFilter->SetInput(m_ImageData);
 
   // Set image data.
-  this->inputImageITKToVTKFilter->SetInput(this->imageData);
+  m_InputImageITKToVTKFilter->SetInput(m_ImageData);
 
   // Set filtered image data to input image initially.
-  this->filteredImageITKToVTKFilter->SetInput(this->imageData);
+  m_FilteredImageITKToVTKFilter->SetInput(m_ImageData);
 }
 
 
 DataModel::TImage::Pointer
 DataModel
 ::GetImageData() {
-  return this->imageData;
+  return m_ImageData;
 }
 
 
 vtkAlgorithmOutput*
 DataModel
 ::GetImageOutputPort() {
-  return this->inputImageITKToVTKFilter->GetOutputPort();
+  return m_InputImageITKToVTKFilter->GetOutputPort();
 }
 
 
 vtkAlgorithmOutput*
 DataModel
 ::GetFilteredImageOutputPort() {
-  return this->filteredImageITKToVTKFilter->GetOutputPort();
+  return m_FilteredImageITKToVTKFilter->GetOutputPort();
 }
 
 
 vtkAlgorithmOutput*
 DataModel
 ::GetVectorOutputPort() {
-  return this->vectorImageITKToVTKFilter->GetOutputPort();
+  return m_VectorImageITKToVTKFilter->GetOutputPort();
 }
 
 
 double
 DataModel
 ::GetFilteredDataMinimum() {
-  return minMaxFilter->GetMinimum();
+  return m_MinMaxFilter->GetMinimum();
 }
 
 
 double
 DataModel
 ::GetFilteredDataMaximum() {
-  return minMaxFilter->GetMaximum();
+  return m_MinMaxFilter->GetMaximum();
 }
 
 
 void
 DataModel
 ::GetDimensions(int dimensions[3]) {
-  if (!this->GetImageData()) {
+  if (!GetImageData()) {
     dimensions[0] = 0;
     dimensions[1] = 0;
     dimensions[2] = 0;
@@ -597,7 +685,7 @@ DataModel
   }
 
   UShort3DImageType::RegionType region 
-      = this->GetImageData()->GetLargestPossibleRegion();
+      = GetImageData()->GetLargestPossibleRegion();
   itk::Size<3> size = region.GetSize();
 
   dimensions[0] = size[0];
@@ -610,11 +698,11 @@ void
 DataModel
 ::SetFilterToNone() {
 
-  if (this->imageData) {
-    this->minMaxFilter->SetImage(this->imageData);
-    this->minMaxFilter->Compute();
+  if (m_ImageData) {
+    m_MinMaxFilter->SetImage(m_ImageData);
+    m_MinMaxFilter->Compute();
     
-    this->filteredImageITKToVTKFilter->SetInput(this->imageData);
+    m_FilteredImageITKToVTKFilter->SetInput(m_ImageData);
   }
 }
 
@@ -623,13 +711,13 @@ void
 DataModel
 ::SetFilterToFrangiFiberness() {
 
-  if (!this->imageData)
+  if (!m_ImageData)
     return;
 
-  this->fibernessFilter->Update();
-  this->minMaxFilter->SetImage(this->fibernessFilter->GetOutput());
-  this->minMaxFilter->Compute();
-  this->filteredImageITKToVTKFilter->SetInput(this->fibernessFilter->GetOutput());
+  m_FibernessFilter->Update();
+  m_MinMaxFilter->SetImage(m_FibernessFilter->GetOutput());
+  m_MinMaxFilter->Compute();
+  m_FilteredImageITKToVTKFilter->SetInput(m_FibernessFilter->GetOutput());
 }
 
 
@@ -637,13 +725,13 @@ void
 DataModel
 ::SetFilterToMultiscaleFiberness() {
 
-  if (!this->imageData)
+  if (!m_ImageData)
     return;
 
-  this->multiscaleFibernessFilter->Update();
-  this->minMaxFilter->SetImage(this->multiscaleFibernessFilter->GetOutput());
-  this->minMaxFilter->Compute();
-  this->filteredImageITKToVTKFilter->SetInput(this->multiscaleFibernessFilter->GetOutput());
+  m_MultiscaleFibernessFilter->Update();
+  m_MinMaxFilter->SetImage(m_MultiscaleFibernessFilter->GetOutput());
+  m_MinMaxFilter->Compute();
+  m_FilteredImageITKToVTKFilter->SetInput(m_MultiscaleFibernessFilter->GetOutput());
 }
 
 
@@ -651,13 +739,13 @@ void
 DataModel
 ::SetFilterToMultiscaleFibernessThreshold() {
 
-  if (!this->imageData)
+  if (!m_ImageData)
     return;
 
-  this->multiscaleFibernessThresholdFilter->Update();
-  this->minMaxFilter->SetImage(this->multiscaleFibernessThresholdFilter->GetOutput());
-  this->minMaxFilter->Compute();
-  this->filteredImageITKToVTKFilter->SetInput(this->multiscaleFibernessThresholdFilter->GetOutput());
+  m_MultiscaleFibernessThresholdFilter->Update();
+  m_MinMaxFilter->SetImage(m_MultiscaleFibernessThresholdFilter->GetOutput());
+  m_MinMaxFilter->Compute();
+  m_FilteredImageITKToVTKFilter->SetInput(m_MultiscaleFibernessThresholdFilter->GetOutput());
 }
 
 
@@ -665,11 +753,11 @@ void
 DataModel
 ::SetFilterToMultiscaleSkeletonization() {
 
-  if (!this->imageData)
+  if (!m_ImageData)
     return;
 
-  this->skeletonizationFilter->Update();
-  this->filteredImageITKToVTKFilter->SetInput(this->skeletonizationFilter->GetOutput());
+  m_SkeletonizationFilter->Update();
+  m_FilteredImageITKToVTKFilter->SetInput(m_SkeletonizationFilter->GetOutput());
 }
 
 
@@ -677,15 +765,15 @@ void
 DataModel
 ::SetFilterToJunctionness() {
 
-  if (!this->imageData)
+  if (!m_ImageData)
     return;
 
-  this->junctionnessFilter->Update();
-  this->minMaxFilter->SetImage(this->junctionnessFilter->GetOutput());
-  this->minMaxFilter->Compute();
-  this->filteredImageITKToVTKFilter->SetInput(this->junctionnessFilter->GetOutput());
-  this->vectorImageITKToVTKFilter->SetInput(
-    this->junctionnessFilter->GetEigenVectorInput());
+  m_JunctionnessFilter->Update();
+  m_MinMaxFilter->SetImage(m_JunctionnessFilter->GetOutput());
+  m_MinMaxFilter->Compute();
+  m_FilteredImageITKToVTKFilter->SetInput(m_JunctionnessFilter->GetOutput());
+  m_VectorImageITKToVTKFilter->SetInput(
+    m_JunctionnessFilter->GetEigenVectorInput());
 }
 
 
@@ -693,95 +781,194 @@ void
 DataModel
 ::SetFilterToJunctionnessLocalMax() {
 
-  if (!this->imageData)
+  if (!m_ImageData)
     return;
   
-  this->junctionnessLocalMaxFilter->Update();
-  this->minMaxFilter->SetImage(this->junctionnessFilter->GetOutput());
-  this->minMaxFilter->Compute();
-  this->filteredImageITKToVTKFilter->SetInput(this->junctionnessLocalMaxFilter->GetOutput());
+  m_JunctionnessLocalMaxFilter->Update();
+  m_MinMaxFilter->SetImage(m_JunctionnessFilter->GetOutput());
+  m_MinMaxFilter->Compute();
+  m_FilteredImageITKToVTKFilter->SetInput(m_JunctionnessLocalMaxFilter->GetOutput());
 }
 
 
 void
 DataModel
 ::SetVoxelSpacing(double spacing[3]) {
-  if (!this->imageData)
+  if (!m_ImageData)
     return;
 
-  this->imageData->SetSpacing(spacing);
+  for (int i = 0; i < 3; i++)
+    SetVoxelSpacing(i, spacing[i]);
 
-  this->inputImageITKToVTKFilter->GetOutputPort()->GetProducer()->Modified();
-  this->filteredImageITKToVTKFilter->GetOutputPort()->GetProducer()->Modified();
-  this->vectorImageITKToVTKFilter->GetOutputPort()->GetProducer()->Modified();
+#if 0
+  double squishedSpacing[3];
+  for (int i = 0; i < 3; i++) squishedSpacing[i] = spacing[i];
+  squishedSpacing[2] *= m_ZSquishFactor;
+
+  m_ImageData->SetSpacing(spacing);
+
+  m_InputImageITKToVTKFilter->GetOutputPort()->GetProducer()->Modified();
+  m_FilteredImageITKToVTKFilter->GetOutputPort()->GetProducer()->Modified();
+  m_VectorImageITKToVTKFilter->GetOutputPort()->GetProducer()->Modified();
+#endif
 }
 
 
 void
 DataModel
 ::SetVoxelSpacing(int dimension, double spacing) {
-  if (!this->imageData)
+  if (!m_ImageData)
     return;
 
-  TImage::SpacingType currentSpacing = this->imageData->GetSpacing();
+  TImage::SpacingType currentSpacing = m_ImageData->GetSpacing();
   currentSpacing[dimension] = spacing;
-  this->imageData->SetSpacing(currentSpacing);
 
-  this->inputImageITKToVTKFilter->GetOutputPort()->GetProducer()->Modified();
-  this->filteredImageITKToVTKFilter->GetOutputPort()->GetProducer()->Modified();
-  this->vectorImageITKToVTKFilter->GetOutputPort()->GetProducer()->Modified();
+  if (dimension == 2)
+    currentSpacing[dimension] *= m_ZSquishFactor;
+  m_ImageData->SetSpacing(currentSpacing);
+
+  m_InputImageITKToVTKFilter->GetOutputPort()->GetProducer()->Modified();
+  m_FilteredImageITKToVTKFilter->GetOutputPort()->GetProducer()->Modified();
+  m_VectorImageITKToVTKFilter->GetOutputPort()->GetProducer()->Modified();
 }
 
 
 void
 DataModel
 ::SetVoxelXSpacing(double spacing) {
-  this->SetVoxelSpacing(0, spacing); 
+  SetVoxelSpacing(0, spacing); 
 }
 
 
 void
 DataModel
 ::SetVoxelYSpacing(double spacing) {
-  this->SetVoxelSpacing(1, spacing); 
+  SetVoxelSpacing(1, spacing); 
 }
 
 
 void
 DataModel
 ::SetVoxelZSpacing(double spacing) {
-  this->SetVoxelSpacing(2, spacing); 
+  SetVoxelSpacing(2, spacing); 
 }
 
 
 void
 DataModel
 ::GetVoxelSpacing(double spacing[3]) {
-  if (!this->GetImageData()) {
+  if (!GetImageData()) {
     spacing[0] = 0;
     spacing[1] = 0;
     spacing[2] = 0;
     return;
   }
 
-  itk::Vector<double> thisSpacing = this->GetImageData()->GetSpacing();
+  itk::Vector<double> thisSpacing = GetImageData()->GetSpacing();
   spacing[0] = thisSpacing[0];
   spacing[1] = thisSpacing[1];
-  spacing[2] = thisSpacing[2];
+  spacing[2] = thisSpacing[2]/m_ZSquishFactor;
+}
+
+
+void
+DataModel
+::GetImageCenter(double center[3]) {
+  double spacing[3];
+  GetVoxelSpacing(spacing);
+  int dimensions[3];
+  GetDimensions(dimensions);
+
+  for (int i = 0; i < 3; i++) {
+    center[i] = 0.5*(spacing[i]*static_cast<double>(dimensions[i]-1));
+  }
+}
+
+
+double
+DataModel
+::GetMaxImageSize() {
+  double spacing[3];
+  GetVoxelSpacing(spacing);
+  int dimensions[3];
+  GetDimensions(dimensions);  
+
+  double maxSize = 0.0;
+  for (int i = 0; i < 3; i++) {
+    double size = spacing[i] * static_cast<double>(dimensions[i]-1);
+    if (size > maxSize)
+      maxSize = size;
+  }
+
+  return maxSize;
+}
+
+
+void
+DataModel
+::SetReferenceDirectionAzimuth(double azimuth) {
+  m_RefDirectionAzimuth = azimuth;
+
+  double phi   = M_PI * m_RefDirectionAzimuth / 180.0;
+  double theta = M_PI * (90-m_RefDirectionInclination) / 180.0;
+  double rx = cos(phi) * sin(theta);
+  double ry = sin(phi) * sin(theta);
+  double rz = cos(theta);
+  std::cout << "r: " << rx << ", " << ry << ", " << rz << std::endl;
+}
+
+
+double
+DataModel
+::GetReferenceDirectionAzimuth() {
+  return m_RefDirectionAzimuth;
+}
+
+
+void
+DataModel
+::SetReferenceDirectionInclination(double inclination) {
+  m_RefDirectionInclination = inclination;
+}
+
+
+double
+DataModel
+::GetReferenceDirectionInclination() {
+  return m_RefDirectionInclination;
+}
+
+
+void
+DataModel
+::SetZSquishFactor(double squishFactor) {
+  double spacing[3];
+  GetVoxelSpacing(spacing);
+  spacing[2] /= m_ZSquishFactor;
+  SetVoxelSpacing(2, squishFactor*spacing[2]); 
+
+  m_ZSquishFactor = squishFactor;
+}
+
+
+double
+DataModel
+::GetZSquishFactor() {
+  return m_ZSquishFactor;
 }
 
 
 void
 DataModel
 ::SetFilteredImageScaleFactor(double scale) {
-  this->filteredImageScale = scale;
+  m_FilteredImageScale = scale;
 }
 
 
 double
 DataModel
 ::GetFilteredImageScaleFactor() {
-  return this->filteredImageScale;
+  return m_FilteredImageScale;
 }
 
 
@@ -795,19 +982,19 @@ DataModel
   for (double thresholdValue = minThreshold; thresholdValue <= maxThreshold; thresholdValue += thresholdIncrement) {
     
     // Compute number of connected components.
-    this->multiscaleFibernessThresholdFilter->SetLowerThreshold(0);
-    this->multiscaleFibernessThresholdFilter->SetUpperThreshold(thresholdValue);
-    this->multiscaleFibernessThresholdFilter->Modified();
+    m_MultiscaleFibernessThresholdFilter->SetLowerThreshold(0);
+    m_MultiscaleFibernessThresholdFilter->SetUpperThreshold(thresholdValue);
+    m_MultiscaleFibernessThresholdFilter->Modified();
 
     try {
-      this->fibernessConnectedComponentsFilter->Update();
+      m_FibernessConnectedComponentsFilter->Update();
     } catch (...) {
       std::cout << "Exception caught in DataModel::ComputeConnectedComponentsVsThresholdData" << std::endl;
     }
     
-    this->minMaxConnectedComponentsFilter->SetImage(this->fibernessConnectedComponentsFilter->GetOutput());
-    this->minMaxConnectedComponentsFilter->Compute();
-    int connectedComponents = this->minMaxConnectedComponentsFilter->GetMaximum();
+    m_MinMaxConnectedComponentsFilter->SetImage(m_FibernessConnectedComponentsFilter->GetOutput());
+    m_MinMaxConnectedComponentsFilter->Compute();
+    int connectedComponents = m_MinMaxConnectedComponentsFilter->GetMaximum();
 
     printf("%f\t%d\n", thresholdValue, connectedComponents);
     fprintf(fp, "%f\t%d\n", thresholdValue, connectedComponents);
@@ -823,13 +1010,13 @@ DataModel
   FILE *fp = fopen(fileName.c_str(), "w");
   fprintf(fp, "z\tvolumeFraction\n");
 
-  this->multiscaleFibernessThresholdFilter->SetLowerThreshold(0);
-  this->multiscaleFibernessThresholdFilter->SetUpperThreshold(threshold);
-  this->multiscaleFibernessThresholdFilter->Modified();
+  m_MultiscaleFibernessThresholdFilter->SetLowerThreshold(0);
+  m_MultiscaleFibernessThresholdFilter->SetUpperThreshold(threshold);
+  m_MultiscaleFibernessThresholdFilter->Modified();
 
   itk::AccumulateImageFilter< TImage, TImage >::Pointer accumulateFilter1 =
     itk::AccumulateImageFilter< TImage, TImage >::New();
-  accumulateFilter1->SetInput(this->multiscaleFibernessThresholdFilter->GetOutput());
+  accumulateFilter1->SetInput(m_MultiscaleFibernessThresholdFilter->GetOutput());
   accumulateFilter1->SetAccumulateDimension(0);
 
   itk::AccumulateImageFilter<TImage, TImage>::Pointer accumulateFilter2 =
@@ -847,7 +1034,7 @@ DataModel
 
   // Compute number of pixels above the fiberness threshold value.
   int dims[3];
-  this->GetDimensions(dims);
+  GetDimensions(dims);
 
   TImage::PixelType pixelsPerSlice 
     = static_cast< TImage::PixelType >(dims[0]*dims[1]);
@@ -870,7 +1057,7 @@ DataModel
 void
 DataModel
 ::SetProgressCallback(ProgressCallback callback) {
-  this->progressCallback = callback;
+  progressCallback = callback;
 }
 
 
@@ -878,12 +1065,12 @@ void
 DataModel
 ::UpdateProgress(itk::Object* object, const itk::EventObject& event) {
   itk::ProcessObject* processObject = dynamic_cast<itk::ProcessObject*>(object);
-  if (this->progressCallback) {
+  if (progressCallback) {
     std::string filterName;
     itk::ExposeMetaData(object->GetMetaDataDictionary(), "filterName", filterName);
     std::string message("Running ");
     message.append(filterName);
-    this->progressCallback(processObject->GetProgress(), message.c_str());
+    progressCallback(processObject->GetProgress(), message.c_str());
     std::cout << message << ": " 
       << processObject->GetProgress() << std::endl;
   }

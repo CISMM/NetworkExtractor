@@ -97,6 +97,9 @@ public:
 
   void SaveFiberOrientationDataFile(std::string fileName);
 
+  void SaveFiberAngleHistogram(std::string fileName, double azimuth,
+			       double inclination, unsigned int bins);
+
   void SetFiberDiameter(double diameter);
   double GetFiberDiameter();
 
@@ -163,6 +166,18 @@ public:
   void SetVoxelZSpacing(double spacing);
   void GetVoxelSpacing(double spacing[3]);
 
+  void GetImageCenter(double center[3]);
+  double GetMaxImageSize();
+
+  void   SetReferenceDirectionAzimuth(double azimuth);
+  double GetReferenceDirectionAzimuth();
+
+  void   SetReferenceDirectionInclination(double inclination);
+  double GetReferenceDirectionInclination();
+
+  void   SetZSquishFactor(double squishFactor);
+  double GetZSquishFactor();
+
   void SetFilteredImageScaleFactor(double scale);
   double GetFilteredImageScaleFactor();
 
@@ -173,28 +188,32 @@ public:
   void SetProgressCallback(ProgressCallback callback);
 
 protected:
-  std::string imageFileName;
-  double fiberDiameter;
-  double filteredImageScale;
-  TImage::Pointer imageData;
+  std::string m_ImageFileName;
+  double      m_FiberDiameter;
+  double      m_FilteredImageScale;
+  double      m_RefDirectionAzimuth;
+  double      m_RefDirectionInclination;
+  double      m_ZSquishFactor;
 
-  MinMaxType::Pointer minMaxFilter;
-  HessianEigenAnalysisFilterType::Pointer eigenAnalysisFilter;
+  TImage::Pointer m_ImageData;
 
-  HessianFilterType::Pointer hessianFilter;
-  FibernessFilterType::Pointer fibernessFilter;
-  HessianToObjectnessFilterType::Pointer hessianToVesselnessFilter;
-  MultiScaleHessianMeasureImageType::Pointer multiscaleFibernessFilter;
-  ThresholdFilterType::Pointer multiscaleFibernessThresholdFilter;
-  SkeletonizationFilterTypePointer skeletonizationFilter;
-  ConnectedComponentFilterType::Pointer fibernessConnectedComponentsFilter;
-  MinMaxConnectedComponentFilterType::Pointer minMaxConnectedComponentsFilter;
-  JunctionnessFilterType::Pointer junctionnessFilter;
-  JunctionnessLocalMaxFilterType::Pointer junctionnessLocalMaxFilter;
+  MinMaxType::Pointer m_MinMaxFilter;
+  HessianEigenAnalysisFilterType::Pointer m_EigenAnalysisFilter;
 
-  ITKImageToVTKImage<TImage>* inputImageITKToVTKFilter;
-  ITKImageToVTKImage<TImage>* filteredImageITKToVTKFilter;
-  ITKImageToVTKImage<EigenVectorImageType>* vectorImageITKToVTKFilter;
+  HessianFilterType::Pointer m_HessianFilter;
+  FibernessFilterType::Pointer m_FibernessFilter;
+  HessianToObjectnessFilterType::Pointer m_HessianToVesselnessFilter;
+  MultiScaleHessianMeasureImageType::Pointer m_MultiscaleFibernessFilter;
+  ThresholdFilterType::Pointer m_MultiscaleFibernessThresholdFilter;
+  SkeletonizationFilterTypePointer m_SkeletonizationFilter;
+  ConnectedComponentFilterType::Pointer m_FibernessConnectedComponentsFilter;
+  MinMaxConnectedComponentFilterType::Pointer m_MinMaxConnectedComponentsFilter;
+  JunctionnessFilterType::Pointer m_JunctionnessFilter;
+  JunctionnessLocalMaxFilterType::Pointer m_JunctionnessLocalMaxFilter;
+
+  ITKImageToVTKImage<TImage>* m_InputImageITKToVTKFilter;
+  ITKImageToVTKImage<TImage>* m_FilteredImageITKToVTKFilter;
+  ITKImageToVTKImage<EigenVectorImageType>* m_VectorImageITKToVTKFilter;
 
   void UpdateProgress(itk::Object* object, const itk::EventObject& event);
 

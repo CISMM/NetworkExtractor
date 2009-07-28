@@ -1,3 +1,16 @@
+2009-07-28  Cory Quammen <cquammen@cs.unc.edu>
+
+   * DataModel.h,.cxx: Changed variable names to match m_VariableName format.
+   Added methods to set/get reference vector as well as a vertical scaling
+   factor for the image. Added method to compute a histogram of fiber angles
+   from a reference vector and write it out to a CSV file. Supports arbitrary
+   number of bins. Added a variable to set the vertical scaling of the image
+   (which is separate from setting the z-spacing of the voxels). The vertical
+   scaling is something of a hack to make fibers in confocal images, which are
+   stretched in z because of the point-spread function, look more like round
+   fibers. The vertical scaling factor is inverted when computing the angle
+   histogram and writing the fiber orientations to a file.
+
 2009-06-30  Cory Quammen <cquammen@cs.unc.edu>
 
    * DataModel.h,.cxx: Changed GetSpacing to GetVoxelSpacing.
