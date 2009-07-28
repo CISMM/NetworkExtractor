@@ -30,11 +30,11 @@ public:
 
 protected:
 
-  vtkSmartPointer<vtkImageShiftScale> shiftScaler;
+  vtkSmartPointer<vtkImageShiftScale> m_ShiftScaler;
 
-  vtkSmartPointer<vtkImageActor> imageActor;
+  vtkSmartPointer<vtkImageActor> m_ImageActor;
 
-  bool autoRescalingOn;
+  bool m_AutoRescalingOn;
 
 };
 

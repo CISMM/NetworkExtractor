@@ -19,9 +19,9 @@ public:
   virtual void AddToRenderer(vtkRenderer* renderer) = 0;
   
 protected:
-  vtkAlgorithmOutput* input;
+  vtkAlgorithmOutput* m_Input;
 
-  vtkAlgorithm* inputAlgorithm;
+  vtkAlgorithm* m_InputAlgorithm;
   void SetInputAlgorithm(vtkAlgorithm* algorithm);
   
 };

@@ -1,6 +1,7 @@
 #ifndef _VISUALIZATION_H_
 #define _VISUALIZATION_H_
 
+#include "ArrowVisualizationPipeline.h"
 #include "OutlineVisualizationPipeline.h"
 #include "ImagePlaneVisualizationPipeline.h"
 #include "IsosurfaceVisualizationPipeline.h"
@@ -48,13 +49,27 @@ public:
   void SetKeepPlanesAboveBelowImagePlane(int keep);
   int  GetKeepPlanesAboveBelowImagePlane();
 
+  void   SetDirectionArrowAzimuth(double azimuth);
+  double GetDirectionArrowAzimuth();
+
+  void   SetDirectionArrowInclination(double inclination);
+  double GetDirectionArrowInclination();
+
+  void   SetDirectionArrowCenter(double center[3]);
+  void   SetDirectionArrowScale(double scale);
+
+  void   SetDirectionArrowVisible(bool show);
+  bool   GetDirectionArrowVisible();
+
 protected:
 
-  OutlineVisualizationPipeline* outlineVisualization;
+  ArrowVisualizationPipeline* m_ArrowVisualization;
 
-  IsosurfaceVisualizationPipeline* isoVisualization;
+  OutlineVisualizationPipeline* m_OutlineVisualization;
 
-  ImagePlaneVisualizationPipeline* imagePlaneVisualization;
+  IsosurfaceVisualizationPipeline* m_IsoVisualization;
+
+  ImagePlaneVisualizationPipeline* m_ImagePlaneVisualization;
 };
 
 #endif // _VISUALIZATION_H_

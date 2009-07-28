@@ -3,42 +3,42 @@
 
 OutlineVisualizationPipeline
 ::OutlineVisualizationPipeline() {
-  this->outlineFilter = vtkOutlineFilter::New();
+  m_OutlineFilter = vtkOutlineFilter::New();
 
-  this->SetInputAlgorithm(this->outlineFilter);
+  this->SetInputAlgorithm(m_OutlineFilter);
 
-  this->outlineMapper = vtkPolyDataMapper::New();
-  this->outlineMapper->SetInputConnection(this->outlineFilter->GetOutputPort());
-  this->outlineActor = vtkActor::New();
-  this->outlineActor->SetMapper(this->outlineMapper);
+  m_OutlineMapper = vtkPolyDataMapper::New();
+  m_OutlineMapper->SetInputConnection(m_OutlineFilter->GetOutputPort());
+  m_OutlineActor = vtkActor::New();
+  m_OutlineActor->SetMapper(m_OutlineMapper);
 }
 
 
 OutlineVisualizationPipeline
 ::~OutlineVisualizationPipeline() {
-  this->outlineFilter->Delete();
-  this->outlineMapper->Delete();
-  this->outlineActor->Delete();
+  m_OutlineFilter->Delete();
+  m_OutlineMapper->Delete();
+  m_OutlineActor->Delete();
 }
 
 
 void
 OutlineVisualizationPipeline
 ::AddToRenderer(vtkRenderer* renderer) {
-  renderer->AddActor(this->outlineActor);
+  renderer->AddActor(m_OutlineActor);
 }
 
 
 void
 OutlineVisualizationPipeline
 ::SetVisible(bool visible) {
-  this->outlineActor->SetVisibility(static_cast<int>(visible));
+  m_OutlineActor->SetVisibility(static_cast<int>(visible));
 }
 
 
 bool
 OutlineVisualizationPipeline
 ::GetVisible() {
-  return this->outlineActor->GetVisibility() == 1;
+  return m_OutlineActor->GetVisibility() == 1;
 }
 

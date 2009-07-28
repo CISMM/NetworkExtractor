@@ -1,3 +1,18 @@
+2009-07-28  Cory Quammen <cquammen@cs.unc.edu>
+
+   * ArrowVisualizationPipeline.h,.cxx: New visualization class for showing
+   a single arrow.
+   
+   * CMakeLists.txt: Added ArrowVisualizationPipeline.cxx to list of source
+   files.
+   
+   * ImagePlaneVisualizationPipeline.h,.cxx, IsosurfaceVisualizationPipeline.h,.cxx,
+   OutlineVisualizationPipeline.h,.cxx, VisualizationPipeline.h,.cxx: 
+   Changed member variable names to be consistent with m_VariableName style.
+   
+   * Visualization.h,.cxx: Added ArrowVisualizationPipeline and methods for
+   forwarding parameters to that visualization.
+
 2009-07-27  Cory Quammen <cquammen@cs.unc.edu>
 
    * CMakeLists.txt: Added Visualization.cxx source file.

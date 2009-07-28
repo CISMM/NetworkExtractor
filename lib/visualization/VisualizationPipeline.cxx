@@ -9,6 +9,8 @@
 
 VisualizationPipeline
 ::VisualizationPipeline() {
+  m_Input = NULL;
+  m_InputAlgorithm = NULL;
 }
 
 
@@ -20,23 +22,26 @@ VisualizationPipeline
 void
 VisualizationPipeline
 ::SetInputConnection(vtkAlgorithmOutput* input) {
-  this->input = input;
-  this->inputAlgorithm->SetInputConnection(input);
+  m_Input = input;
+
+  if (m_InputAlgorithm) {
+    m_InputAlgorithm->SetInputConnection(m_Input);
   
-  // Need this here for visualizations to update properly.
-  this->inputAlgorithm->Update();
+    // Need this here for visualizations to update properly.
+    m_InputAlgorithm->Update();
+  }
 }
 
 
 void
 VisualizationPipeline
 ::SetInputAlgorithm(vtkAlgorithm* algorithm) {
-  this->inputAlgorithm = algorithm;
+  m_InputAlgorithm = algorithm;
 }
 
 
 vtkAlgorithmOutput*
 VisualizationPipeline
 ::GetInputConnection() {
-  return this->input;
+  return m_Input;
 }

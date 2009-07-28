@@ -12,33 +12,30 @@
 
 IsosurfaceVisualizationPipeline
 ::IsosurfaceVisualizationPipeline() {
-  this->isoValue = 0.0;
-  this->zPlane = 0;
-  this->deltaZ = 2;
+  m_IsoValue = 0.0;
+  m_ZPlane = 0;
+  m_DeltaZ = 2;
   
   // Set up pipeline.
-  this->imageClip = vtkImageClip::New();
-  this->imageClip->ClipDataOff();
+  m_ImageClip = vtkImageClip::New();
+  m_ImageClip->ClipDataOff();
 
-  this->isoContourer = vtkContourFilter::New();
-  this->isoContourer->SetNumberOfContours(1);
-  this->isoContourer->SetValue(0, this->isoValue);
-  this->isoContourer->SetInputConnection(this->imageClip->GetOutputPort());
+  m_IsoContourer = vtkContourFilter::New();
+  m_IsoContourer->SetNumberOfContours(1);
+  m_IsoContourer->SetValue(0, m_IsoValue);
+  m_IsoContourer->SetInputConnection(m_ImageClip->GetOutputPort());
 
-  this->isoMapper = vtkPolyDataMapper::New();
-  this->isoMapper->ScalarVisibilityOff();
-  this->isoMapper->ImmediateModeRenderingOff();
-  this->isoMapper->SetInputConnection(this->isoContourer->GetOutputPort()); //
+  m_IsoMapper = vtkPolyDataMapper::New();
+  m_IsoMapper->ScalarVisibilityOff();
+  m_IsoMapper->ImmediateModeRenderingOff();
+  m_IsoMapper->SetInputConnection(m_IsoContourer->GetOutputPort()); //
 
-  this->isoActor = vtkActor::New();
-  this->isoActor->SetMapper(this->isoMapper);
+  m_IsoActor = vtkActor::New();
+  m_IsoActor->SetMapper(m_IsoMapper);
 
   // It is essential to set the inputAlgorithm
-  this->SetInputAlgorithm(imageClip);
+  SetInputAlgorithm(m_ImageClip);
 
-  // Connect the input to the input algorithm.
-  //this->isoMapper->SetInputConnection(this->inputAlgorithm->GetOutputPort());
-  //this->imageClip->SetInputConnection(this->inputAlgorithm->GetOutputPort());
 }
 
 
@@ -50,78 +47,77 @@ IsosurfaceVisualizationPipeline
 void
 IsosurfaceVisualizationPipeline
 ::AddToRenderer(vtkRenderer* renderer) {
-  this->isoContourer->Modified();
-  renderer->AddActor(this->isoActor);
+  m_IsoContourer->Modified();
+  renderer->AddActor(m_IsoActor);
 }
 
 
 void
 IsosurfaceVisualizationPipeline
 ::SetColor(double r, double g, double b) {
-  this->isoActor->GetProperty()->SetColor(r, g, b);
+  m_IsoActor->GetProperty()->SetColor(r, g, b);
 }
 
 
 void
 IsosurfaceVisualizationPipeline
 ::SetVisible(bool visible) {
-  this->isoActor->SetVisibility(visible ? 1 : 0);
+  m_IsoActor->SetVisibility(visible ? 1 : 0);
 }
 
 
 bool
 IsosurfaceVisualizationPipeline
 ::GetVisible() {
-  return this->isoActor->GetVisibility() == 1;
+  return m_IsoActor->GetVisibility() == 1;
 }
 
 
 void
 IsosurfaceVisualizationPipeline
 ::ClipDataOn() {
-  this->imageClip->ClipDataOn();
+  m_ImageClip->ClipDataOn();
 }
 
 
 void
 IsosurfaceVisualizationPipeline
 ::ClipDataOff() {
-  this->imageClip->ClipDataOff();
+  m_ImageClip->ClipDataOff();
 }
 
 
 void
 IsosurfaceVisualizationPipeline
 ::SetClipData(bool clip) {
-  this->imageClip->SetClipData(clip ? 1 : 0);
+  m_ImageClip->SetClipData(clip ? 1 : 0);
 }
 
 
 bool
 IsosurfaceVisualizationPipeline
 ::GetClipData() {
-  return this->imageClip->GetClipData() == 1;
+  return m_ImageClip->GetClipData() == 1;
 }
 
 
 void
 IsosurfaceVisualizationPipeline
 ::SetZPlane(int zPlane) {
-  this->zPlane = zPlane;
+  m_ZPlane = zPlane;
   int dims[3];
-  this->imageClip->GetImageDataInput(0)->GetDimensions(dims);
+  m_ImageClip->GetImageDataInput(0)->GetDimensions(dims);
 
-  if (this->imageClip->GetClipData()) {
-    int minZ = zPlane - this->deltaZ;
+  if (m_ImageClip->GetClipData()) {
+    int minZ = zPlane - m_DeltaZ;
     if (minZ < 0) 
       minZ = 0;
-    int maxZ = zPlane + this->deltaZ;
+    int maxZ = zPlane + m_DeltaZ;
     if (maxZ >= dims[2]) 
       maxZ = dims[2]-1;
-    this->imageClip->SetOutputWholeExtent(0, dims[0]-1, 0, dims[1]-1, minZ, maxZ);
-    std::cout << deltaZ << ", " << minZ << ", " << maxZ << std::endl;
+    m_ImageClip->SetOutputWholeExtent(0, dims[0]-1, 0, dims[1]-1, minZ, maxZ);
   } else {
-    this->imageClip->SetOutputWholeExtent(0, dims[0]-1, 0, dims[1]-1, 0, dims[2]-1);
+    m_ImageClip->SetOutputWholeExtent(0, dims[0]-1, 0, dims[1]-1, 0, dims[2]-1);
   }
 
 }
@@ -130,64 +126,64 @@ IsosurfaceVisualizationPipeline
 int
 IsosurfaceVisualizationPipeline
 ::GetZPlane() {
-  return this->zPlane;
+  return m_ZPlane;
 }
 
 
 void
 IsosurfaceVisualizationPipeline
 ::SetDeltaZ(int deltaZ) {
-  this->deltaZ = deltaZ;
+  m_DeltaZ = deltaZ;
 }
 
 
 int
 IsosurfaceVisualizationPipeline
 ::GetDeltaZ() {
-  return this->deltaZ;
+  return m_DeltaZ;
 }
 
 
 void
 IsosurfaceVisualizationPipeline
 ::SetIsoValue(double isoValue) {
-  this->isoValue = isoValue;
-  this->isoContourer->SetValue(0, this->isoValue);
-  this->isoContourer->Modified();
+  m_IsoValue = isoValue;
+  m_IsoContourer->SetValue(0, m_IsoValue);
+  m_IsoContourer->Modified();
 }
 
 
 double
 IsosurfaceVisualizationPipeline
 ::GetIsoValue() {
-  return this->isoValue;
+  return m_IsoValue;
 }
 
 
 vtkAlgorithmOutput*
 IsosurfaceVisualizationPipeline
 ::GetIsosurfaceOutputPort() {
-  return this->isoContourer->GetOutputPort();
+  return m_IsoContourer->GetOutputPort();
 }
 
 
 void
 IsosurfaceVisualizationPipeline
 ::FastRenderingOn() {
-  this->isoMapper->ImmediateModeRenderingOff();
+  m_IsoMapper->ImmediateModeRenderingOff();
 }
 
 
 void
 IsosurfaceVisualizationPipeline
 ::FastRenderingOff() {
-  this->isoMapper->ImmediateModeRenderingOn();
+  m_IsoMapper->ImmediateModeRenderingOn();
 }
 
 
 bool
 IsosurfaceVisualizationPipeline
 ::GetFastRenderingOn() {
-  return this->isoMapper->GetImmediateModeRendering() == 0;
+  return m_IsoMapper->GetImmediateModeRendering() == 0;
 }
 

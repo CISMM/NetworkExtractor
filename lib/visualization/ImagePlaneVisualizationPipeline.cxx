@@ -11,16 +11,16 @@ ImagePlaneVisualizationPipeline
 ::ImagePlaneVisualizationPipeline() {
 
   // Set up pipeline.
-  this->shiftScaler = vtkSmartPointer<vtkImageShiftScale>::New();
-  this->shiftScaler->SetOutputScalarTypeToUnsignedChar();
-  this->shiftScaler->ClampOverflowOn();
+  m_ShiftScaler = vtkSmartPointer<vtkImageShiftScale>::New();
+  m_ShiftScaler->SetOutputScalarTypeToUnsignedChar();
+  m_ShiftScaler->ClampOverflowOn();
 
   // It is essential to set the input algorithm.
-  this->SetInputAlgorithm(this->shiftScaler);
+  SetInputAlgorithm(m_ShiftScaler);
 
-  this->imageActor = vtkSmartPointer<vtkImageActor>::New();
-  this->imageActor->InterpolateOn();
-  this->imageActor->SetInput(this->shiftScaler->GetOutput());
+  m_ImageActor = vtkSmartPointer<vtkImageActor>::New();
+  m_ImageActor->InterpolateOn();
+  m_ImageActor->SetInput(m_ShiftScaler->GetOutput());
 }
 
 
@@ -32,60 +32,60 @@ ImagePlaneVisualizationPipeline
 void
 ImagePlaneVisualizationPipeline
 ::SetInputConnection(vtkAlgorithmOutput* input) {
-  this->input = input;
-  this->inputAlgorithm->SetInputConnection(input);
+  m_Input = input;
+  m_InputAlgorithm->SetInputConnection(input);
 
     // Update shift/scale filter automatically if auto-rescaling is on.
-  if (this->autoRescalingOn) {
+  if (m_AutoRescalingOn) {
     // Gotta be a better way to do this.
     input->GetProducer()->Update();
     vtkImageData* originalImage 
       = vtkImageData::SafeDownCast(input->GetProducer()->GetOutputDataObject(0));
     double* scalarRange = originalImage->GetScalarRange();
-    this->shiftScaler->SetShift(-scalarRange[0]);
-    this->shiftScaler->SetScale(255.0 / (scalarRange[1] - scalarRange[0]));
+    m_ShiftScaler->SetShift(-scalarRange[0]);
+    m_ShiftScaler->SetScale(255.0 / (scalarRange[1] - scalarRange[0]));
   } else {
-    this->shiftScaler->SetShift(0.0);
-    this->shiftScaler->SetScale(1.0);
+    m_ShiftScaler->SetShift(0.0);
+    m_ShiftScaler->SetScale(1.0);
   }
-  this->shiftScaler->Update();
+  m_ShiftScaler->Update();
 }
 
 
 void
 ImagePlaneVisualizationPipeline
 ::AddToRenderer(vtkRenderer* renderer) {
-  renderer->AddActor(this->imageActor);
+  renderer->AddActor(m_ImageActor);
 }
 
 
 void
 ImagePlaneVisualizationPipeline
 ::SetVisible(bool visible) {
-  this->imageActor->SetVisibility(visible ? 1 : 0);
+  m_ImageActor->SetVisibility(visible ? 1 : 0);
 }
 
 
 bool
 ImagePlaneVisualizationPipeline
 ::GetVisible() {
-  return this->imageActor->GetVisibility() == 1;
+  return m_ImageActor->GetVisibility() == 1;
 }
 
 
 void
 ImagePlaneVisualizationPipeline
 ::SetSliceNumber(int sliceNumber) {
-  int* extent = this->imageActor->GetInput()->GetWholeExtent();
-  this->imageActor->SetDisplayExtent(extent[0], extent[1],
-				     extent[2], extent[3],
-				     sliceNumber, sliceNumber);
-  this->imageActor->Modified();
+  int* extent = m_ImageActor->GetInput()->GetWholeExtent();
+  m_ImageActor->SetDisplayExtent(extent[0], extent[1],
+			       extent[2], extent[3],
+			       sliceNumber, sliceNumber);
+  m_ImageActor->Modified();
 }
 
 
 int
 ImagePlaneVisualizationPipeline
 ::GetSliceNumber() {
-  return this->imageActor->GetZSlice();
+  return m_ImageActor->GetZSlice();
 }

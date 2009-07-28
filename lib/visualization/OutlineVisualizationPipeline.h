@@ -21,9 +21,9 @@ public:
   bool GetVisible();
 
 protected:
-  vtkOutlineFilter* outlineFilter;
-  vtkPolyDataMapper* outlineMapper;
-  vtkActor* outlineActor;
+  vtkOutlineFilter*  m_OutlineFilter;
+  vtkPolyDataMapper* m_OutlineMapper;
+  vtkActor*          m_OutlineActor;
 
 };
 

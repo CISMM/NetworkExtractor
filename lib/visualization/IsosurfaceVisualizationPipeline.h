@@ -14,9 +14,9 @@ class IsosurfaceVisualizationPipeline : public VisualizationPipeline  {
 
 public:
   IsosurfaceVisualizationPipeline();
-  ~IsosurfaceVisualizationPipeline();
+  virtual ~IsosurfaceVisualizationPipeline();
 
-  void AddToRenderer(vtkRenderer* renderer);
+  virtual void AddToRenderer(vtkRenderer* renderer);
 
   void SetIsoValue(double isoValue);
   double GetIsoValue();
@@ -44,19 +44,19 @@ public:
   bool GetFastRenderingOn();
 
 protected:
-  double isoValue;
+  double m_IsoValue;
 
-  int zPlane;
+  int m_ZPlane;
 
-  int deltaZ;
+  int m_DeltaZ;
 
-  vtkImageClip* imageClip;
+  vtkImageClip* m_ImageClip;
 
-  vtkContourFilter* isoContourer;
+  vtkContourFilter* m_IsoContourer;
 
-  vtkPolyDataMapper* isoMapper;
+  vtkPolyDataMapper* m_IsoMapper;
   
-  vtkActor* isoActor;
+  vtkActor* m_IsoActor;
 
 };
 

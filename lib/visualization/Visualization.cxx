@@ -2,18 +2,20 @@
 
 Visualization
 ::Visualization() {
-  this->outlineVisualization = new OutlineVisualizationPipeline();
-  this->isoVisualization = new IsosurfaceVisualizationPipeline();
-  this->isoVisualization->SetColor(0.0, 1.0, 0.0);
-  this->imagePlaneVisualization = new ImagePlaneVisualizationPipeline();
+  m_ArrowVisualization   = new ArrowVisualizationPipeline();
+  m_OutlineVisualization = new OutlineVisualizationPipeline();
+  m_IsoVisualization     = new IsosurfaceVisualizationPipeline();
+  m_IsoVisualization->SetColor(0.0, 1.0, 0.0);
+  m_ImagePlaneVisualization = new ImagePlaneVisualizationPipeline();
 }
 
 
 Visualization
 ::~Visualization() {
-  delete this->outlineVisualization;
-  delete this->isoVisualization;
-  delete this->imagePlaneVisualization;
+  delete m_ArrowVisualization;
+  delete m_OutlineVisualization;
+  delete m_IsoVisualization;
+  delete m_ImagePlaneVisualization;
 }
 
 
@@ -22,8 +24,10 @@ Visualization
 ::SetImageInputConnection(vtkAlgorithmOutput* input) {
   input->GetProducer()->Modified();
   input->GetProducer()->Update();
-  this->outlineVisualization->SetInputConnection(input);
-  this->imagePlaneVisualization->SetInputConnection(input);  
+
+  m_ArrowVisualization->SetInputConnection(input);
+  m_OutlineVisualization->SetInputConnection(input);
+  m_ImagePlaneVisualization->SetInputConnection(input);  
 }
 
 
@@ -32,79 +36,80 @@ Visualization
 ::SetFilteredImageInputConnection(vtkAlgorithmOutput* input) {
   input->GetProducer()->Modified();
   input->GetProducer()->Update();
-  this->isoVisualization->SetInputConnection(input);
+  m_IsoVisualization->SetInputConnection(input);
 }
 
 
 void
 Visualization
 ::AddToRenderer(vtkRenderer* renderer) {
-  this->outlineVisualization->AddToRenderer(renderer);
-  this->isoVisualization->AddToRenderer(renderer);
-  this->imagePlaneVisualization->AddToRenderer(renderer);
+  m_ArrowVisualization->AddToRenderer(renderer);
+  m_OutlineVisualization->AddToRenderer(renderer);
+  m_IsoVisualization->AddToRenderer(renderer);
+  m_ImagePlaneVisualization->AddToRenderer(renderer);
 }
 
 
 void
 Visualization
 ::SetShowOutline(bool show) {
-  this->outlineVisualization->SetVisible(show);
+  m_OutlineVisualization->SetVisible(show);
 }
 
 
 bool
 Visualization
 ::GetShowOutline() {
-  return this->outlineVisualization->GetVisible();
+  return m_OutlineVisualization->GetVisible();
 }
 
 
 void
 Visualization
 ::ShowOutlineOn() {
-  this->SetShowOutline(true);
+  SetShowOutline(true);
 }
 
 
 void
 Visualization
 ::ShowOutlineOff() {
-  this->SetShowOutline(false);
+  SetShowOutline(false);
 }
 
 
 void
 Visualization
 ::SetIsosurfaceVisible(bool show) {
-  this->isoVisualization->SetVisible(show);
+  m_IsoVisualization->SetVisible(show);
 }
 
 
 bool
 Visualization
 ::GetIsosurfaceVisible() {
-  return this->isoVisualization->GetVisible();
+  return m_IsoVisualization->GetVisible();
 }
 
 
 void
 Visualization
 ::SetIsoValue(double isoValue) {
-  this->isoVisualization->SetIsoValue(isoValue);
+  m_IsoVisualization->SetIsoValue(isoValue);
 }
 
 
 double
 Visualization
 ::GetIsoValue() {
-  return this->isoVisualization->GetIsoValue();
+  return m_IsoVisualization->GetIsoValue();
 }
 
 
 vtkAlgorithmOutput*
 Visualization
 ::GetIsosurfaceOutputPort() {
-  return this->isoVisualization->GetIsosurfaceOutputPort();
+  return m_IsoVisualization->GetIsosurfaceOutputPort();
 }
 
 
@@ -121,76 +126,132 @@ Visualization
 bool
 Visualization
 ::GetFastIsosurfaceRendering() {
-  return this->isoVisualization->GetFastRenderingOn();
+  return m_IsoVisualization->GetFastRenderingOn();
 }
 
 
 void
 Visualization
 ::FastIsosurfaceRenderingOn() {
-  this->isoVisualization->FastRenderingOn();
+  m_IsoVisualization->FastRenderingOn();
 }
 
 
 void
 Visualization
 ::FastIsosurfaceRenderingOff() {
-  this->isoVisualization->FastRenderingOff();
+  m_IsoVisualization->FastRenderingOff();
 }
 
 
 void
 Visualization
 ::SetZSlice(int slice) {
-  this->imagePlaneVisualization->SetSliceNumber(slice);
-  this->isoVisualization->SetZPlane(slice);
+  m_ImagePlaneVisualization->SetSliceNumber(slice);
+  m_IsoVisualization->SetZPlane(slice);
 }
 
 
 int
 Visualization
 ::GetZSlice() {
-  return this->isoVisualization->GetZPlane();
+  return m_IsoVisualization->GetZPlane();
 }
 
 
 void
 Visualization
 ::SetCropIsosurface(bool crop) {
-  this->isoVisualization->SetClipData(crop);
+  m_IsoVisualization->SetClipData(crop);
 }
 
 
 bool
 Visualization
 ::GetCropIsosurface() {
-  return this->isoVisualization->GetClipData();
+  return m_IsoVisualization->GetClipData();
 }
 
 
 void
 Visualization
 ::SetKeepPlanesAboveBelowImagePlane(int keep) {
-  this->isoVisualization->SetDeltaZ(keep);
+  m_IsoVisualization->SetDeltaZ(keep);
 }
 
 
 int
 Visualization
 ::GetKeepPlanesAboveBelowImagePlane() {
-  return this->isoVisualization->GetDeltaZ();
+  return m_IsoVisualization->GetDeltaZ();
+}
+
+
+void
+Visualization
+::SetDirectionArrowAzimuth(double azimuth) {
+  m_ArrowVisualization->SetAzimuth(azimuth);
+}
+
+
+double
+Visualization
+::GetDirectionArrowAzimuth() {
+  return m_ArrowVisualization->GetAzimuth();
+}
+
+
+void
+Visualization
+::SetDirectionArrowInclination(double inclination) {
+  m_ArrowVisualization->SetInclination(inclination);
+}
+
+
+double
+Visualization
+::GetDirectionArrowInclination() {
+  return m_ArrowVisualization->GetInclination();
+}
+
+
+void
+Visualization
+::SetDirectionArrowCenter(double center[3]) {
+  m_ArrowVisualization->SetCenter(center);
+}
+
+
+void
+Visualization
+::SetDirectionArrowScale(double scale) {
+  m_ArrowVisualization->SetScale(scale);
+}
+
+
+void
+Visualization
+::SetDirectionArrowVisible(bool show) {
+  m_ArrowVisualization->SetVisible(show);
+}
+
+
+bool
+Visualization
+::GetDirectionArrowVisible() {
+  return m_ArrowVisualization->GetVisible();
 }
 
 
 void
 Visualization
 ::SetImagePlaneVisible(bool show) {
-  this->imagePlaneVisualization->SetVisible(show);
+  m_ImagePlaneVisualization->SetVisible(show);
 }
 
 
 bool
 Visualization
 ::GetImagePlaneVisible() {
-  return this->imagePlaneVisualization->GetVisible();
+  return m_ImagePlaneVisualization->GetVisible();
 }
