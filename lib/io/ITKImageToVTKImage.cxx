@@ -61,6 +61,10 @@ template <class TImage>
 void
 ITKImageToVTKImage<TImage>
 ::Update() {
+  this->importer->InvokePipelineModifiedCallbacks();
+  this->importer->InvokeUpdateInformationCallbacks();
+  this->importer->InvokeExecuteInformationCallbacks();
+  this->importer->InvokeExecuteDataCallbacks();
   this->importer->Update();
 }
 

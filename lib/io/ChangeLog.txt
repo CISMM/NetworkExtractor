@@ -1,3 +1,8 @@
+2009-08-11  Cory Quammen <cquammen@cs.unc.edu>
+
+   * ITKImageToVTKImage.cxx: Added explicit invocation of callbacks on the
+   vtkImageImport class within the Update() method.
+
 2009-06-25  Cory Quammen <cquammen@cs.unc.edu>
 
    * CMakeLists.txt: Added ConfigurationFileParser.cxx,
