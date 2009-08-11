@@ -102,8 +102,10 @@ FibrinAnalysis::FibrinAnalysis(QWidget* p)
   }
   this->imageDataView->setModel(m_TableModel);
 
+#if 0
   connect(m_TableModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), 
     this, SLOT(handle_tableModel_dataChanged(const QModelIndex&, const QModelIndex&)));
+#endif
 
   QCoreApplication::setOrganizationName("CISMM");
   QCoreApplication::setOrganizationDomain("cismm.org");
@@ -748,17 +750,37 @@ void FibrinAnalysis::on_applyButton_clicked() {
     m_FilterType = text.toStdString();
   }
 
-  // Read isovalue.
-  double isoValue = this->isoValueEdit->text().toDouble();
-  m_Visualization->SetIsoValue(isoValue);
+  ///////////////// Update image spacing settings ////////////////
+  int index = 5;
+  int column = 1;
+  QStandardItem *item = NULL;
+  
+  // Get image spacing
+  double spacing[3];
 
-  // Read delta z.
-  int keepPlanes = this->keepPlanesEdit->text().toInt();
-  m_Visualization->SetKeepPlanesAboveBelowImagePlane(keepPlanes);
+  item = m_TableModel->item(index++, column);
+  spacing[0] = item->text().toDouble();
 
-  // Read z-slice.
-  int slice = this->zPlaneEdit->text().toInt()-1;
-  m_Visualization->SetZSlice(slice);
+  item = m_TableModel->item(index++, column);
+  spacing[1] = item->text().toDouble();
+
+  item = m_TableModel->item(index++, column);
+  spacing[2] = item->text().toDouble();
+
+  m_DataModel->SetVoxelSpacing(spacing);
+
+  double zSquish = 1.0;
+  item = m_TableModel->item(index++, column);
+  zSquish = item->text().toDouble();
+  m_DataModel->SetZSquishFactor(zSquish);
+
+  // Update visualization settings
+  int resampledDimensions[3];
+  m_DataModel->GetResampledDimensions(resampledDimensions);
+  int slice = zPlaneEdit->text().toInt()-1;
+  if (slice >= 0 && slice < resampledDimensions[2]) {
+    m_Visualization->SetZSlice(slice);
+  }
 
   RefreshUI();
 }
@@ -784,7 +806,8 @@ void FibrinAnalysis::handle_tableModel_dataChanged(const QModelIndex& topLeft, c
     m_DataModel->SetZSquishFactor(value);
   }
 
-  //this->qvtkWidget->GetRenderWindow()->Render();
+  m_DataModel->MarkPipelineAsModified();
+
   RefreshUI();
 }
 
@@ -871,30 +894,30 @@ void FibrinAnalysis::RefreshUI() {
     QString().sprintf(decimalFormat, m_DataModel->GetZSquishFactor());    
   m_TableModel->item(8, 1)->setText(zSquishFactor);
 
-  this->showIsosurfaceCheckBox->setChecked(m_Visualization->GetIsosurfaceVisible());
+  showIsosurfaceCheckBox->setChecked(m_Visualization->GetIsosurfaceVisible());
 
   double isoValue = m_Visualization->GetIsoValue();
   QString isoValueString = QString().sprintf(decimalFormat, isoValue);
-  this->isoValueEdit->setText(isoValueString);
-  this->isoValueSlider->setValue(this->isoValueSliderPosition(isoValue));
+  isoValueEdit->setText(isoValueString);
+  isoValueSlider->setValue(this->isoValueSliderPosition(isoValue));
 
-  this->showZPlaneCheckbox->setChecked(m_Visualization->GetImagePlaneVisible());
+  showZPlaneCheckbox->setChecked(m_Visualization->GetImagePlaneVisible());
 
   // Update slice slider
-  this->zPlaneSlider->setMinValue(1);
-  this->zPlaneSlider->setMaxValue(dims[2]);
+  zPlaneSlider->setMinValue(1);
+  zPlaneSlider->setMaxValue(dims[2]);
   int zSlice = m_Visualization->GetZSlice()+1;
-  this->zPlaneSlider->setValue(zSlice);
+  zPlaneSlider->setValue(zSlice);
   QString zPlaneString = QString().sprintf(intFormat, zSlice);
-  this->zPlaneEdit->setText(zPlaneString);
+  zPlaneEdit->setText(zPlaneString);
 
   // Update cropping widgets
-  this->cropIsosurfaceCheckBox->setChecked(m_Visualization->GetCropIsosurface());
+  cropIsosurfaceCheckBox->setChecked(m_Visualization->GetCropIsosurface());
   QString keepPlanesString = QString().sprintf(intFormat, m_Visualization->GetKeepPlanesAboveBelowImagePlane());
-  this->keepPlanesEdit->setText(keepPlanesString);
+  keepPlanesEdit->setText(keepPlanesString);
 
-  this->fastRenderingCheckBox->setChecked(m_Visualization->GetFastIsosurfaceRendering());
-  this->showDataOutlineCheckBox->setChecked(m_Visualization->GetShowOutline());
+  fastRenderingCheckBox->setChecked(m_Visualization->GetFastIsosurfaceRendering());
+  showDataOutlineCheckBox->setChecked(m_Visualization->GetShowOutline());
 
   RefreshVisualization();
 }

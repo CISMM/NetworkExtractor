@@ -1,3 +1,15 @@
+2009-08-11  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAnalysis.cxx: Disconnected handler for image data table because 
+   nothing needs to be handled. Image spacing is now updated only when the
+   Apply button is clicked because resampling to get cubic voxels
+   can take too long if it is done immediately after the one dimensions spacing
+   is changed. RefreshUI now updates the UI elements controlling visualization
+   settings.
+   
+   * FibrinAnalysis.ui: Fiddled with control panel window widths so that
+   horizontal sliders appear less.
+
 2009-07-28  Cory Quammen <cquammen@cs.unc.edu>
 
    * FibrinAnalysis.ui: Added controls for computing fiber angle histogram from
