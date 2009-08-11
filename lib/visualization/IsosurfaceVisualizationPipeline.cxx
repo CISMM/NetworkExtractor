@@ -103,22 +103,34 @@ IsosurfaceVisualizationPipeline
 
 void
 IsosurfaceVisualizationPipeline
-::SetZPlane(int zPlane) {
-  m_ZPlane = zPlane;
+::UpdateClipping() {
+  m_InputAlgorithm->GetInputDataObject(0, 0)->Update();
+  int *extent = m_InputAlgorithm->GetInputDataObject(0, 0)->GetWholeExtent();
   int dims[3];
-  m_ImageClip->GetImageDataInput(0)->GetDimensions(dims);
+  dims[0] = extent[1] - extent[0] + 1;
+  dims[1] = extent[3] - extent[2] + 1;
+  dims[2] = extent[5] - extent[4] + 1;
 
   if (m_ImageClip->GetClipData()) {
-    int minZ = zPlane - m_DeltaZ;
+    int minZ = m_ZPlane - m_DeltaZ;
     if (minZ < 0) 
       minZ = 0;
-    int maxZ = zPlane + m_DeltaZ;
+    int maxZ = m_ZPlane + m_DeltaZ;
     if (maxZ >= dims[2]) 
       maxZ = dims[2]-1;
     m_ImageClip->SetOutputWholeExtent(0, dims[0]-1, 0, dims[1]-1, minZ, maxZ);
   } else {
     m_ImageClip->SetOutputWholeExtent(0, dims[0]-1, 0, dims[1]-1, 0, dims[2]-1);
   }
+}
+
+
+void
+IsosurfaceVisualizationPipeline
+::SetZPlane(int zPlane) {
+  m_ZPlane = zPlane;
+
+  UpdateClipping();
 
 }
 
@@ -148,6 +160,11 @@ void
 IsosurfaceVisualizationPipeline
 ::SetIsoValue(double isoValue) {
   m_IsoValue = isoValue;
+
+  // Update input to the image clipping algorithm and update the clipping
+  // extent.
+  UpdateClipping();
+
   m_IsoContourer->SetValue(0, m_IsoValue);
   m_IsoContourer->Modified();
 }

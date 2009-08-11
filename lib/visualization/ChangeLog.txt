@@ -1,3 +1,12 @@
+2009-08-11  Cory Quammen <cquammen@cs.unc.edu>
+
+   * ImagePlaneVisualizationPipeline.cxx: Added update of image input in the
+   SetSliceNumber() method.
+   
+   * IsosurfaceVisualizationPipeline.h,.cxx: Added UpdateClipping() method to
+   get the most up-to-date input image data extent within SetIsoValue() and
+   SetZPlane().
+
 2009-07-28  Cory Quammen <cquammen@cs.unc.edu>
 
    * ArrowVisualizationPipeline.h,.cxx: New visualization class for showing

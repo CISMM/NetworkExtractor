@@ -31,6 +31,8 @@ public:
   void SetClipData(bool clip);
   bool GetClipData();
 
+  void UpdateClipping();
+
   void SetZPlane(int zPlane);
   int GetZPlane();
 

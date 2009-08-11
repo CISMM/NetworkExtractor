@@ -76,6 +76,7 @@ ImagePlaneVisualizationPipeline
 void
 ImagePlaneVisualizationPipeline
 ::SetSliceNumber(int sliceNumber) {
+  m_ImageActor->GetInput()->Update();
   int* extent = m_ImageActor->GetInput()->GetWholeExtent();
   m_ImageActor->SetDisplayExtent(extent[0], extent[1],
 			       extent[2], extent[3],
