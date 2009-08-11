@@ -575,7 +575,7 @@ void FibrinAnalysis::on_zPlaneEdit_textEdited(QString text) {
   int slice = zPlaneEdit->text().toInt()-1;
   if (slice >= 0 && slice < dims[2]) {
     m_Visualization->SetZSlice(slice);
-    this->qvtkWidget->GetRenderWindow()->Render();
+    qvtkWidget->GetRenderWindow()->Render();
   }
 }
 
@@ -590,7 +590,7 @@ void FibrinAnalysis::on_zPlaneSlider_sliderMoved(int value) {
   int slice = zPlaneEdit->text().toInt()-1;
   if (slice >= 0 && slice < dims[2]) {
     m_Visualization->SetZSlice(slice);
-    this->qvtkWidget->GetRenderWindow()->Render();
+    qvtkWidget->GetRenderWindow()->Render();
   }
 }
 
@@ -774,7 +774,10 @@ void FibrinAnalysis::on_applyButton_clicked() {
   zSquish = item->text().toDouble();
   m_DataModel->SetZSquishFactor(zSquish);
 
-  // Update visualization settings
+  ///////////////// Update visualization settings /////////////////
+  double isoValue = isoValueEdit->text().toDouble();
+  m_Visualization->SetIsoValue(isoValue);
+
   int resampledDimensions[3];
   m_DataModel->GetResampledDimensions(resampledDimensions);
   int slice = zPlaneEdit->text().toInt()-1;

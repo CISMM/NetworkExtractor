@@ -1,5 +1,10 @@
 2009-08-11  Cory Quammen <cquammen@cs.unc.edu>
 
+   * FibrinAnalysis.cxx: Added setting of isovalue from GUI, which must have
+   gotten chopped out during some refactoring.
+
+2009-08-11  Cory Quammen <cquammen@cs.unc.edu>
+
    * FibrinAnalysis.cxx: Disconnected handler for image data table because 
    nothing needs to be handled. Image spacing is now updated only when the
    Apply button is clicked because resampling to get cubic voxels
