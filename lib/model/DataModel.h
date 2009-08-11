@@ -21,6 +21,7 @@
 #include <itkMatrix.h>
 #include <itkMinimumMaximumImageCalculator.h>
 #include <itkMultiScaleHessianBasedMeasureImageFilter2.h>
+#include <itkResampleImageFilter.h>
 #include <itkShiftScaleImageFilter.h>
 #include <itkSymmetricSecondRankTensor.h>
 #include <itkValuedRegionalMaximaImageFilter.h>
@@ -38,6 +39,7 @@ class DataModel {
 
   typedef void (*ProgressCallback)(float, const char *);
   typedef float ComponentType;
+  typedef itk::ResampleImageFilter<TImage, TImage, double> ResampleFilterType;
   typedef itk::MinimumMaximumImageCalculator<TImage> MinMaxType;
   typedef itk::SymmetricSecondRankTensor<ComponentType, ::itk::GetImageDimension<TImage>::ImageDimension> HessianType;
   typedef itk::Image<HessianType, ::itk::GetImageDimension<TImage>::ImageDimension> HessianImageType;
@@ -150,6 +152,7 @@ public:
   double GetFilteredDataMaximum();
 
   void GetDimensions(int dimensions[3]);
+  void GetResampledDimensions(int dimensions[3]);
 
   void SetFilterToNone();
   void SetFilterToFrangiFiberness();
@@ -185,6 +188,8 @@ public:
     double thresholdIncrement, std::string fileName);
   void ComputeVolumeFractionEstimateVsZData(double threshold, std::string fileName);
 
+  void MarkPipelineAsModified();
+
   void SetProgressCallback(ProgressCallback callback);
 
 protected:
@@ -197,23 +202,24 @@ protected:
 
   TImage::Pointer m_ImageData;
 
-  MinMaxType::Pointer m_MinMaxFilter;
-  HessianEigenAnalysisFilterType::Pointer m_EigenAnalysisFilter;
+  ResampleFilterType::Pointer                m_ResampleFilter;
+  MinMaxType::Pointer                        m_MinMaxFilter;
+  HessianEigenAnalysisFilterType::Pointer    m_EigenAnalysisFilter;
 
-  HessianFilterType::Pointer m_HessianFilter;
-  FibernessFilterType::Pointer m_FibernessFilter;
-  HessianToObjectnessFilterType::Pointer m_HessianToVesselnessFilter;
+  HessianFilterType::Pointer                 m_HessianFilter;
+  FibernessFilterType::Pointer               m_FibernessFilter;
+  HessianToObjectnessFilterType::Pointer     m_HessianToVesselnessFilter;
   MultiScaleHessianMeasureImageType::Pointer m_MultiscaleFibernessFilter;
   ThresholdFilterType::Pointer m_MultiscaleFibernessThresholdFilter;
   SkeletonizationFilterTypePointer m_SkeletonizationFilter;
   ConnectedComponentFilterType::Pointer m_FibernessConnectedComponentsFilter;
   MinMaxConnectedComponentFilterType::Pointer m_MinMaxConnectedComponentsFilter;
-  JunctionnessFilterType::Pointer m_JunctionnessFilter;
-  JunctionnessLocalMaxFilterType::Pointer m_JunctionnessLocalMaxFilter;
+  JunctionnessFilterType::Pointer            m_JunctionnessFilter;
+  JunctionnessLocalMaxFilterType::Pointer    m_JunctionnessLocalMaxFilter;
 
-  ITKImageToVTKImage<TImage>* m_InputImageITKToVTKFilter;
-  ITKImageToVTKImage<TImage>* m_FilteredImageITKToVTKFilter;
-  ITKImageToVTKImage<EigenVectorImageType>* m_VectorImageITKToVTKFilter;
+  ITKImageToVTKImage<TImage>*                m_InputImageITKToVTKFilter;
+  ITKImageToVTKImage<TImage>*                m_FilteredImageITKToVTKFilter;
+  ITKImageToVTKImage<EigenVectorImageType>*  m_VectorImageITKToVTKFilter;
 
   void UpdateProgress(itk::Object* object, const itk::EventObject& event);
 
