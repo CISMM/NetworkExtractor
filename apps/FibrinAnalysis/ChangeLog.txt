@@ -1,5 +1,11 @@
 2009-08-11  Cory Quammen <cquammen@cs.unc.edu>
 
+   * FibrinAnalysis.h,.cxx: Factored out common code for bounds checking when
+   setting the z-plane into a single method, SetZPlane(). Fixed z-slider GUI so
+   that it now goes to the full z-range of the resampled image.
+
+2009-08-11  Cory Quammen <cquammen@cs.unc.edu>
+
    * FibrinAnalysis.cxx: Added setting of isovalue from GUI, which must have
    gotten chopped out during some refactoring.
 

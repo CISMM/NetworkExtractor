@@ -100,6 +100,8 @@ protected:
 
   void RefreshVisualization();
 
+  void SetZPlane(int plane);
+
 protected slots:
 
 private:

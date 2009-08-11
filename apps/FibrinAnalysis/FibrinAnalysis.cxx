@@ -566,32 +566,34 @@ void FibrinAnalysis::on_showZPlaneCheckbox_toggled(bool show) {
 
 
 void FibrinAnalysis::on_zPlaneEdit_textEdited(QString text) {
-  int value = static_cast<int>(text.toDouble()) - 1;
-  this->zPlaneSlider->setValue(value);
+  int value = static_cast<int>(text.toDouble());
+  zPlaneSlider->setValue(value);
 
-  // Read z-slice.
-  int dims[3];
-  m_DataModel->GetDimensions(dims);
-  int slice = zPlaneEdit->text().toInt()-1;
-  if (slice >= 0 && slice < dims[2]) {
-    m_Visualization->SetZSlice(slice);
-    qvtkWidget->GetRenderWindow()->Render();
-  }
+  SetZPlane(value);
 }
 
 
 void FibrinAnalysis::on_zPlaneSlider_sliderMoved(int value) {
   QString text = QString().sprintf("%d", value);
-  this->zPlaneEdit->setText(text);
+  zPlaneEdit->setText(text);
 
-  // Read z-slice.
+  SetZPlane(value);
+}
+
+
+void FibrinAnalysis::SetZPlane(int plane) {
   int dims[3];
-  m_DataModel->GetDimensions(dims);
-  int slice = zPlaneEdit->text().toInt()-1;
-  if (slice >= 0 && slice < dims[2]) {
-    m_Visualization->SetZSlice(slice);
-    qvtkWidget->GetRenderWindow()->Render();
+  m_DataModel->GetResampledDimensions(dims);
+  plane--;
+  if (plane >= 0 && plane < dims[2]) {
+    m_Visualization->SetZSlice(plane);
+  } else if (plane < 0) {
+    m_Visualization->SetZSlice(0);
+  } else {
+    m_Visualization->SetZSlice(dims[2]-1);
   }
+
+  qvtkWidget->GetRenderWindow()->Render();
 }
 
 
@@ -679,14 +681,9 @@ void FibrinAnalysis::on_showDataOutlineCheckBox_toggled(bool show) {
 void FibrinAnalysis::on_cropIsosurfaceCheckBox_toggled(bool crop) {
   m_Visualization->SetCropIsosurface(crop);
   
-  // Read z-slice.
-  int dims[3];
-  m_DataModel->GetDimensions(dims);
-  int slice = zPlaneEdit->text().toInt()-1;
-  if (slice >= 0 && slice < dims[2]) {
-    m_Visualization->SetZSlice(slice);
-    this->qvtkWidget->GetRenderWindow()->Render();
-  }
+  // Read z-plane.
+  int plane = zPlaneEdit->text().toInt();
+  SetZPlane(plane);
 }
 
 
@@ -778,12 +775,8 @@ void FibrinAnalysis::on_applyButton_clicked() {
   double isoValue = isoValueEdit->text().toDouble();
   m_Visualization->SetIsoValue(isoValue);
 
-  int resampledDimensions[3];
-  m_DataModel->GetResampledDimensions(resampledDimensions);
-  int slice = zPlaneEdit->text().toInt()-1;
-  if (slice >= 0 && slice < resampledDimensions[2]) {
-    m_Visualization->SetZSlice(slice);
-  }
+  int plane = zPlaneEdit->text().toInt();
+  SetZPlane(plane);
 
   RefreshUI();
 }
@@ -907,8 +900,10 @@ void FibrinAnalysis::RefreshUI() {
   showZPlaneCheckbox->setChecked(m_Visualization->GetImagePlaneVisible());
 
   // Update slice slider
+  int resampledDims[3];
+  m_DataModel->GetResampledDimensions(resampledDims);
   zPlaneSlider->setMinValue(1);
-  zPlaneSlider->setMaxValue(dims[2]);
+  zPlaneSlider->setMaxValue(resampledDims[2]);
   int zSlice = m_Visualization->GetZSlice()+1;
   zPlaneSlider->setValue(zSlice);
   QString zPlaneString = QString().sprintf(intFormat, zSlice);
