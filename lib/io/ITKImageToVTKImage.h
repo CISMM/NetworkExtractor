@@ -11,8 +11,8 @@ template <class TImage>
 class ITKImageToVTKImage {
 	
 public:
-	ITKImageToVTKImage();
-	virtual ~ITKImageToVTKImage();
+  ITKImageToVTKImage();
+  virtual ~ITKImageToVTKImage();
 
   void SetInput(typename TImage::Pointer input);
 
@@ -23,9 +23,9 @@ public:
   void Update();
 	
 protected:
-  typename itk::VTKImageExport<TImage>::Pointer exporter;
+  typename itk::VTKImageExport<TImage>::Pointer m_Exporter;
 
-  vtkImageImport* importer;
+  vtkImageImport* m_Importer;
 	
 };
 
