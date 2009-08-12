@@ -1,3 +1,10 @@
+2009-08-12  Cory Quammen <cquammen@cs.unc.edu>
+
+   * ImagePlaneVisualizationPipeline.cxx: Fixed problems with update extent
+   not being correct after the resampled image dimensions change. Simple fix
+   by calling UpdateWholeExtent(), which forces an update of the image
+   dimensions, instead of Update(), which does not.
+
 2009-08-11  Cory Quammen <cquammen@cs.unc.edu>
 
    * ImagePlaneVisualizationPipeline.cxx: Added update of image input in the

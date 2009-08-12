@@ -9,7 +9,6 @@
 
 ImagePlaneVisualizationPipeline
 ::ImagePlaneVisualizationPipeline() {
-
   // Set up pipeline.
   m_ShiftScaler = vtkSmartPointer<vtkImageShiftScale>::New();
   m_ShiftScaler->SetOutputScalarTypeToUnsignedChar();
@@ -48,7 +47,7 @@ ImagePlaneVisualizationPipeline
     m_ShiftScaler->SetShift(0.0);
     m_ShiftScaler->SetScale(1.0);
   }
-  m_ShiftScaler->Update();
+  m_ShiftScaler->UpdateWholeExtent();
 }
 
 
@@ -76,7 +75,7 @@ ImagePlaneVisualizationPipeline
 void
 ImagePlaneVisualizationPipeline
 ::SetSliceNumber(int sliceNumber) {
-  m_ImageActor->GetInput()->Update();
+  m_ShiftScaler->UpdateWholeExtent();
   int* extent = m_ImageActor->GetInput()->GetWholeExtent();
   m_ImageActor->SetDisplayExtent(extent[0], extent[1],
 			       extent[2], extent[3],
