@@ -1,3 +1,12 @@
+2009-08-12  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAnalysis.cxx: Reordered setting of parameters from GUI so that
+   setting the voxel size occurs before updating the vesselness filter. This
+   prevents the vesselness filter from updating twice. Added reading/writing
+   of z-squish factor from/to the session file. Fixed problem where the number
+   of planes to keep above and below the image plane were not being set from
+   the GUI.
+
 2009-08-11  Cory Quammen <cquammen@cs.unc.edu>
 
    * FibrinAnalysis.h,.cxx: Factored out common code for bounds checking when

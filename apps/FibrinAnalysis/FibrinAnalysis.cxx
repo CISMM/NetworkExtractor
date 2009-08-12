@@ -102,14 +102,15 @@ FibrinAnalysis::FibrinAnalysis(QWidget* p)
   }
   this->imageDataView->setModel(m_TableModel);
 
-#if 0
-  connect(m_TableModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), 
-    this, SLOT(handle_tableModel_dataChanged(const QModelIndex&, const QModelIndex&)));
-#endif
-
   QCoreApplication::setOrganizationName("CISMM");
   QCoreApplication::setOrganizationDomain("cismm.org");
   QCoreApplication::setApplicationName("Fibrin Analysis");
+
+  QString windowTitle = 
+    QString().sprintf("Fibrin Analysis %d.%d.%d", FIBRIN_ANALYSIS_MAJOR_NUMBER,
+		    FIBRIN_ANALYSIS_MINOR_NUMBER,
+		    FIBRIN_ANALYSIS_REVISION_NUMBER);
+  setWindowTitle(windowTitle);
 
   // Restore GUI settings.
   this->readProgramSettings();
@@ -152,6 +153,8 @@ void FibrinAnalysis::on_actionOpenSession_triggered() {
   double doubleValue3[3];
   parser.GetValueAsDouble3("Image", "voxelSpacing", doubleValue3);
   m_DataModel->SetVoxelSpacing(doubleValue3);
+  double zSquishFactor = parser.GetValueAsDouble("Image", "zSquishFactor");
+  m_DataModel->SetZSquishFactor(zSquishFactor);
 
   // Set up visualization pipeline.
   m_Visualization->SetImageInputConnection(m_DataModel->GetImageOutputPort());
@@ -220,10 +223,11 @@ void FibrinAnalysis::on_actionSaveSession_triggered() {
   fprintf(fp, "; Written by Fibrin Analysis\n\n");
 
   fprintf(fp, "[Image]\n");
-  fprintf(fp, "fileName=%s\n\n", m_DataModel->GetImageFileName().c_str());
+  fprintf(fp, "fileName=%s\n", m_DataModel->GetImageFileName().c_str());
   double spacing[3];
   m_DataModel->GetVoxelSpacing(spacing);
   fprintf(fp, "voxelSpacing=%f %f %f\n", spacing[0], spacing[1], spacing[2]);
+  fprintf(fp, "zSquishFactor=%f\n\n", m_DataModel->GetZSquishFactor());
   
   fprintf(fp, "[MultiscaleFibernessFilter]\n");
   fprintf(fp, "alpha=%.3f\n", m_DataModel->GetMultiscaleFibernessAlphaCoefficient());
@@ -628,7 +632,7 @@ void FibrinAnalysis::on_azimuthEdit_textEdited(QString text) {
   double azimuth = text.toDouble();
   m_DataModel->SetReferenceDirectionAzimuth(azimuth);
   m_Visualization->SetDirectionArrowAzimuth(azimuth);
-  RefreshVisualization();
+  qvtkWidget->GetRenderWindow()->Render();
 }
 
 
@@ -636,7 +640,7 @@ void FibrinAnalysis::on_inclinationEdit_textEdited(QString text) {
   double inclination = text.toDouble();
   m_DataModel->SetReferenceDirectionInclination(inclination);
   m_Visualization->SetDirectionArrowInclination(inclination);
-  RefreshVisualization();
+  qvtkWidget->GetRenderWindow()->Render();
 }
 
 
@@ -726,27 +730,6 @@ void FibrinAnalysis::on_applyButton_clicked() {
   double filteredImageScaleFactor = this->filteredImageScaleEdit->text().toDouble();
   m_DataModel->SetFilteredImageScaleFactor(filteredImageScaleFactor);
 
-  ///////////////// Update image filters ////////////////
-  QString text = this->imageFilterComboBox->currentText();
-  if (text.toStdString() != m_FilterType) {
-    if (text.toStdString() == DataModel::NO_FILTER_STRING) {
-      m_DataModel->SetFilterToNone();
-    } else if (text.toStdString() == DataModel::FRANGI_FIBERNESS_FILTER_STRING) {
-      m_DataModel->SetFilterToFrangiFiberness();
-    } else if (text.toStdString() == DataModel::MULTISCALE_FIBERNESS_FILTER_STRING) {
-      m_DataModel->SetFilterToMultiscaleFiberness();
-    } else if (text.toStdString() == DataModel::MULTISCALE_FIBERNESS_THRESHOLD_FILTER_STRING) {
-      m_DataModel->SetFilterToMultiscaleFibernessThreshold();
-    } else if (text.toStdString() == DataModel::MULTISCALE_SKELETONIZATION_FILTER_STRING) {
-      m_DataModel->SetFilterToMultiscaleSkeletonization();
-    } else if (text.toStdString() == DataModel::JUNCTIONNESS_FILTER_STRING) {
-      m_DataModel->SetFilterToJunctionness();
-    } else if (text.toStdString() == DataModel::JUNCTIONNESS_LOCAL_MAX_FILTER_STRING) {
-      m_DataModel->SetFilterToJunctionnessLocalMax();
-    }
-    m_FilterType = text.toStdString();
-  }
-
   ///////////////// Update image spacing settings ////////////////
   int index = 5;
   int column = 1;
@@ -771,12 +754,36 @@ void FibrinAnalysis::on_applyButton_clicked() {
   zSquish = item->text().toDouble();
   m_DataModel->SetZSquishFactor(zSquish);
 
+  ///////////////// Update image filters ////////////////
+  QString text = this->imageFilterComboBox->currentText();
+  if (text.toStdString() != m_FilterType) {
+    if (text.toStdString() == DataModel::NO_FILTER_STRING) {
+      m_DataModel->SetFilterToNone();
+    } else if (text.toStdString() == DataModel::FRANGI_FIBERNESS_FILTER_STRING) {
+      m_DataModel->SetFilterToFrangiFiberness();
+    } else if (text.toStdString() == DataModel::MULTISCALE_FIBERNESS_FILTER_STRING) {
+      m_DataModel->SetFilterToMultiscaleFiberness();
+    } else if (text.toStdString() == DataModel::MULTISCALE_FIBERNESS_THRESHOLD_FILTER_STRING) {
+      m_DataModel->SetFilterToMultiscaleFibernessThreshold();
+    } else if (text.toStdString() == DataModel::MULTISCALE_SKELETONIZATION_FILTER_STRING) {
+      m_DataModel->SetFilterToMultiscaleSkeletonization();
+    } else if (text.toStdString() == DataModel::JUNCTIONNESS_FILTER_STRING) {
+      m_DataModel->SetFilterToJunctionness();
+    } else if (text.toStdString() == DataModel::JUNCTIONNESS_LOCAL_MAX_FILTER_STRING) {
+      m_DataModel->SetFilterToJunctionnessLocalMax();
+    }
+    m_FilterType = text.toStdString();
+  }
+
   ///////////////// Update visualization settings /////////////////
   double isoValue = isoValueEdit->text().toDouble();
   m_Visualization->SetIsoValue(isoValue);
 
   int plane = zPlaneEdit->text().toInt();
   SetZPlane(plane);
+
+  int keepPlanes = keepPlanesEdit->text().toInt();
+  m_Visualization->SetKeepPlanesAboveBelowImagePlane(keepPlanes);
 
   RefreshUI();
 }
@@ -802,8 +809,6 @@ void FibrinAnalysis::handle_tableModel_dataChanged(const QModelIndex& topLeft, c
     m_DataModel->SetZSquishFactor(value);
   }
 
-  m_DataModel->MarkPipelineAsModified();
-
   RefreshUI();
 }
 
@@ -814,10 +819,14 @@ void FibrinAnalysis::RefreshUI() {
   
   // Update window title
   QFileInfo fileInfo(m_DataModel->GetImageFileName().c_str());
-  QString windowTitle("Fibrin Analysis");
+  QString windowTitle = 
+    QString().sprintf("Fibrin Analysis %d.%d.%d", FIBRIN_ANALYSIS_MAJOR_NUMBER,
+		    FIBRIN_ANALYSIS_MINOR_NUMBER,
+		    FIBRIN_ANALYSIS_REVISION_NUMBER);
+					
   if (fileInfo.fileName() != "")
     windowTitle.append(tr(" - '").append(fileInfo.fileName()).append("'"));
-  this->setWindowTitle(windowTitle);
+  setWindowTitle(windowTitle);
 
   const char *decimalFormat = "%.3f";
   const char *intFormat = "%d";
