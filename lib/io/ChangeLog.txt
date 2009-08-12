@@ -1,5 +1,9 @@
 2009-08-12  Cory Quammen <cquammen@cs.unc.edu>
 
+   * XMLHelper.h,.cxx: Removed these unneeded files.
+
+2009-08-12  Cory Quammen <cquammen@cs.unc.edu>
+
    * ITKImageToVTKImage.h,.cxx: Renamed member variables to the m_VariableName
    format. Added call to UpdateLargestPossibleRegion() in ITK's VTKImageExporter
    and UpdateWholeExtent() in VTK's vtkImageImporter to fix errors caused when
