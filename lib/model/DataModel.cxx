@@ -57,8 +57,18 @@ DataModel
   m_ResampleFilter = ResampleFilterType::New();
   m_MinMaxFilter = MinMaxType::New();
 
+  // Resize the z-spacing filter.
+  m_SquishZSpacingFilter = ChangeInfoFilterType::New();
+  m_SquishZSpacingFilter->ChangeDirectionOff();
+  m_SquishZSpacingFilter->ChangeOriginOff();
+  m_SquishZSpacingFilter->ChangeRegionOff();
+  m_SquishZSpacingFilter->ChangeSpacingOn();
+  m_SquishZSpacingFilter->CenterImageOff();
+  m_SquishZSpacingFilter->SetInput(m_ResampleFilter->GetOutput());
+
   // Fiberness filters.
   m_HessianFilter = HessianFilterType::New();
+  m_HessianFilter->SetInput(m_SquishZSpacingFilter->GetOutput());
 
   m_EigenAnalysisFilter = HessianEigenAnalysisFilterType::New();
   m_EigenAnalysisFilter->SetInput(m_HessianFilter->GetOutput());
@@ -80,13 +90,14 @@ DataModel
   m_MultiscaleFibernessFilter->SetSigmaStepMethodToEquispaced();
   m_MultiscaleFibernessFilter->SetNumberOfSigmaSteps(11);
   m_MultiscaleFibernessFilter->SetHessianToMeasureFilter(m_HessianToVesselnessFilter);
+  m_MultiscaleFibernessFilter->SetInput(m_SquishZSpacingFilter->GetOutput());
 
   m_MultiscaleFibernessThresholdFilter = ThresholdFilterType::New();
-  m_MultiscaleFibernessThresholdFilter->SetInput(m_MultiscaleFibernessFilter->GetOutput());
   m_MultiscaleFibernessThresholdFilter->SetInsideValue(0.0);
   m_MultiscaleFibernessThresholdFilter->SetOutsideValue(1.0);
   m_MultiscaleFibernessThresholdFilter->SetLowerThreshold(0.0);
   m_MultiscaleFibernessThresholdFilter->SetUpperThreshold(0.0);
+  m_MultiscaleFibernessThresholdFilter->SetInput(m_MultiscaleFibernessFilter->GetOutput());
 
   m_SkeletonizationFilter = SkeletonizationFilterType::New();
   m_SkeletonizationFilter->SetInput(m_MultiscaleFibernessThresholdFilter->GetOutput());
@@ -206,6 +217,7 @@ DataModel
   ScalarFileReaderType::Pointer reader = ScalarFileReaderType::New();
   reader->SetFileName(fileName.c_str());
   reader->Update();
+
   SetImageData(reader->GetOutput());
 
   // Connect this image data to the various pipelines.
@@ -627,16 +639,13 @@ DataModel
   m_ResampleFilter->SetInput(m_ImageData);
   m_ResampleFilter->SetSize(m_ImageData->GetLargestPossibleRegion().GetSize());
   m_ResampleFilter->SetOutputSpacing(m_ImageData->GetSpacing());
-  m_ResampleFilter->Update();
-
-  m_HessianFilter->SetInput(m_ResampleFilter->GetOutput());
-  m_MultiscaleFibernessFilter->SetInput(m_ResampleFilter->GetOutput());
+  m_ResampleFilter->UpdateLargestPossibleRegion();
 
   // Send the original image data to VTK
-  m_InputImageITKToVTKFilter->SetInput(m_ResampleFilter->GetOutput());
+  m_InputImageITKToVTKFilter->SetInput(m_SquishZSpacingFilter->GetOutput());
 
   // Set filtered image data to input image initially.
-  m_FilteredImageITKToVTKFilter->SetInput(m_ResampleFilter->GetOutput());
+  m_FilteredImageITKToVTKFilter->SetInput(m_SquishZSpacingFilter->GetOutput());
 }
 
 
@@ -712,8 +721,9 @@ DataModel
     return;
   }
 
-  for (int i = 0; i < 3; i++)
+  for (int i = 0; i < 3; i++) {
     dimensions[i] = m_ResampleFilter->GetSize()[i];
+  }
 }
 
 
@@ -815,6 +825,9 @@ DataModel
 
   // All spacing changes go to the input image.
   m_ImageData->SetSpacing(spacing);
+
+  std::cout << "SetVoxelSpacing: " << spacing[0] << ", " << spacing[1] <<
+    ", " << spacing[2] << std::endl;
  
   // Then we update the resampled image, making the assumption that the size
   // of the voxels in the resampled image is cubic and matches the smallest
@@ -842,14 +855,11 @@ DataModel
   m_ResampleFilter->SetSize(resampledSize);
   m_ResampleFilter->SetOutputSpacing(resampledSpacing);
 
-  m_InputImageITKToVTKFilter->GetOutputPort()->GetProducer()->Modified();
-  m_FilteredImageITKToVTKFilter->GetOutputPort()->GetProducer()->Modified();
-  m_VectorImageITKToVTKFilter->GetOutputPort()->GetProducer()->Modified();
+  std::cout << "ResampledSpacing: " << resampledSpacing[0] << ", "
+	    << resampledSpacing[1] << ", " << resampledSpacing[2] << std::endl;
 
   m_InputImageITKToVTKFilter->Update();
   m_FilteredImageITKToVTKFilter->Update();
-
-  MarkPipelineAsModified();
 }
 
 
@@ -891,16 +901,34 @@ void
 DataModel
 ::GetVoxelSpacing(double spacing[3]) {
   if (!GetImageData()) {
-    spacing[0] = 0;
-    spacing[1] = 0;
-    spacing[2] = 0;
+    spacing[0] = 0.0;
+    spacing[1] = 0.0;
+    spacing[2] = 0.0;
     return;
   }
 
   itk::Vector<double> thisSpacing = GetImageData()->GetSpacing();
   spacing[0] = thisSpacing[0];
   spacing[1] = thisSpacing[1];
-  spacing[2] = thisSpacing[2]/m_ZSquishFactor;
+  spacing[2] = thisSpacing[2];
+}
+
+
+void
+DataModel
+::GetResampledVoxelSpacing(double spacing[3]) {
+  if (!GetImageData()) {
+    spacing[0] = 0.0;
+    spacing[1] = 0.0;
+    spacing[2] = 0.0;
+    return;
+  }
+
+  ResampleFilterType::SpacingType thisSpacing = 
+    m_ResampleFilter->GetOutputSpacing();
+  spacing[0] = thisSpacing[0];
+  spacing[1] = thisSpacing[1];
+  spacing[2] = thisSpacing[2];
 }
 
 
@@ -975,12 +1003,18 @@ DataModel
 void
 DataModel
 ::SetZSquishFactor(double squishFactor) {
-  double spacing[3];
-  GetVoxelSpacing(spacing);
-  spacing[2] /= m_ZSquishFactor;
-  SetVoxelSpacing(2, squishFactor*spacing[2]); 
-
   m_ZSquishFactor = squishFactor;
+
+  double spacing[3];
+  GetResampledVoxelSpacing(spacing);
+
+  spacing[2] *= m_ZSquishFactor;
+  std::cout << "SetZSquishFactor: " << spacing[0] << ", " <<
+    spacing[1] << ", " << spacing[2] << std::endl;
+
+  m_SquishZSpacingFilter->SetOutputSpacing(spacing);
+  std::cout << "Squished spacing: " << spacing[0] << ", " << spacing[1]
+	    << ", " << spacing[2] << std::endl;
 }
 
 
@@ -1084,27 +1118,6 @@ DataModel
   }
 
   fclose(fp);
-}
-
-
-void
-DataModel
-::MarkPipelineAsModified() {
-  m_ResampleFilter->Modified();
-  m_EigenAnalysisFilter->Modified();
-  m_HessianFilter->Modified();
-  m_FibernessFilter->Modified();
-  m_HessianToVesselnessFilter->Modified();
-  m_MultiscaleFibernessFilter->Modified();
-  m_MultiscaleFibernessThresholdFilter->Modified();
-  m_SkeletonizationFilter->Modified();
-  m_FibernessConnectedComponentsFilter->Modified();
-  m_MinMaxConnectedComponentsFilter->Modified();
-  m_JunctionnessFilter->Modified();
-  m_JunctionnessLocalMaxFilter->Modified();
-  m_InputImageITKToVTKFilter->Modified();
-  m_FilteredImageITKToVTKFilter->Modified();
-  m_VectorImageITKToVTKFilter->Modified();
 }
 
 

@@ -6,6 +6,7 @@
 #include <itkBinaryThresholdImageFilter.h>
 #include <itkBinaryThinningImageFilter.h>
 #include <itkCastImageFilter.h>
+#include <itkChangeInformationImageFilter.h>
 #include <itkCommand.h>
 #include <itkConnectedComponentImageFilter.h>
 #include <itkEigenValues3DToFrangiVesselnessMeasureImageFilter.h>
@@ -41,6 +42,7 @@ class DataModel {
   typedef float ComponentType;
   typedef itk::ResampleImageFilter<TImage, TImage, double> ResampleFilterType;
   typedef itk::MinimumMaximumImageCalculator<TImage> MinMaxType;
+  typedef itk::ChangeInformationImageFilter<TImage>  ChangeInfoFilterType;
   typedef itk::SymmetricSecondRankTensor<ComponentType, ::itk::GetImageDimension<TImage>::ImageDimension> HessianType;
   typedef itk::Image<HessianType, ::itk::GetImageDimension<TImage>::ImageDimension> HessianImageType;
   typedef itk::HessianRecursiveGaussianImageFilter<TImage, HessianImageType> HessianFilterType;
@@ -168,6 +170,7 @@ public:
   void SetVoxelYSpacing(double spacing);
   void SetVoxelZSpacing(double spacing);
   void GetVoxelSpacing(double spacing[3]);
+  void GetResampledVoxelSpacing(double spacing[3]);
 
   void GetImageCenter(double center[3]);
   double GetMaxImageSize();
@@ -188,8 +191,6 @@ public:
     double thresholdIncrement, std::string fileName);
   void ComputeVolumeFractionEstimateVsZData(double threshold, std::string fileName);
 
-  void MarkPipelineAsModified();
-
   void SetProgressCallback(ProgressCallback callback);
 
 protected:
@@ -204,6 +205,7 @@ protected:
 
   ResampleFilterType::Pointer                m_ResampleFilter;
   MinMaxType::Pointer                        m_MinMaxFilter;
+  ChangeInfoFilterType::Pointer              m_SquishZSpacingFilter;
   HessianEigenAnalysisFilterType::Pointer    m_EigenAnalysisFilter;
 
   HessianFilterType::Pointer                 m_HessianFilter;

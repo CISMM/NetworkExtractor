@@ -1,3 +1,12 @@
+2009-08-12  Cory Quammen <cquammen@cs.unc.edu>
+
+   * DataModel.h,.cxx: Added method GetResampledVoxelSpacing(). Added an
+   instance of ITK's ChangeInformationImageFilter to rescale the z-dimension of
+   the image. This filter sits in front of the vesselness filters. It enables
+   squishing the fibrin images to undo the expansion of fibers in z caused by 
+   the confocal microcope's PSF, providing more fiber-like objects. This z
+   compression is undone in subsequent analysis.
+
 2009-08-11  Cory Quammen <cquammen@cs.unc.edu>
 
    * DataModel.h,.cxx: Added image resampling filter to produce cubic voxels.
