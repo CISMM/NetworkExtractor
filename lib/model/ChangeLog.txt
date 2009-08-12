@@ -1,5 +1,9 @@
 2009-08-12  Cory Quammen <cquammen@cs.unc.edu>
 
+   * DataModel.cxx: Removed printfs.
+
+2009-08-12  Cory Quammen <cquammen@cs.unc.edu>
+
    * DataModel.h,.cxx: Added method GetResampledVoxelSpacing(). Added an
    instance of ITK's ChangeInformationImageFilter to rescale the z-dimension of
    the image. This filter sits in front of the vesselness filters. It enables

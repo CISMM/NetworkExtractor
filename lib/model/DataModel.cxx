@@ -826,9 +826,6 @@ DataModel
   // All spacing changes go to the input image.
   m_ImageData->SetSpacing(spacing);
 
-  std::cout << "SetVoxelSpacing: " << spacing[0] << ", " << spacing[1] <<
-    ", " << spacing[2] << std::endl;
- 
   // Then we update the resampled image, making the assumption that the size
   // of the voxels in the resampled image is cubic and matches the smallest
   // spacing in the input image.
@@ -848,15 +845,10 @@ DataModel
   for (int i = 0; i < 3; i++) {
     resampledSize[i] = static_cast<unsigned int>((size[i] * spacing[i]) / minSpacing);
   }
-  std:: cout << "Resampled size: " << resampledSize[0] << ", " 
-	     << resampledSize[1] << ", " << resampledSize[2] << std::endl;
 
   // Now set the size and spacing for the resampling filter.
   m_ResampleFilter->SetSize(resampledSize);
   m_ResampleFilter->SetOutputSpacing(resampledSpacing);
-
-  std::cout << "ResampledSpacing: " << resampledSpacing[0] << ", "
-	    << resampledSpacing[1] << ", " << resampledSpacing[2] << std::endl;
 
   m_InputImageITKToVTKFilter->Update();
   m_FilteredImageITKToVTKFilter->Update();
@@ -1009,12 +1001,7 @@ DataModel
   GetResampledVoxelSpacing(spacing);
 
   spacing[2] *= m_ZSquishFactor;
-  std::cout << "SetZSquishFactor: " << spacing[0] << ", " <<
-    spacing[1] << ", " << spacing[2] << std::endl;
-
   m_SquishZSpacingFilter->SetOutputSpacing(spacing);
-  std::cout << "Squished spacing: " << spacing[0] << ", " << spacing[1]
-	    << ", " << spacing[2] << std::endl;
 }
 
 
