@@ -1,4 +1,5 @@
 SET(filtersSrc
+  itk/itkBinaryThinningImageFilter3D.cxx
   itk/itkEigenValues3DToFrangiVesselnessMeasureImageFilter.cxx
   itk/itkEigenValues3DToSatoVesselnessMeasureImageFilter.cxx
   itk/itkEigenVectors3DToJunctionnessMeasureImageFilter.cxx

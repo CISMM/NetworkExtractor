@@ -1,3 +1,17 @@
+2009-08-14  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Added itkBinaryThinningImageFilter3D.cxx to list of
+   source files.
+
+   * itk/itkBinaryThinningImageFilter3D.h,.cxx: Imported class written by
+   Hanno Homann, Oxford University, Wolfson Medical Vision Lab, UK, which
+   implements the method described in T.C. Lee, R.L. Kashyap, and C.N. Chu.
+   Building skeleton models via 3-D medial surface/axis thinning algorithms.
+   Computer Vision, Graphics, and Image Processing, 56(6):462--478, 1994.
+   ITK's thinning algorithm operates only within 2D slices of 3D images,
+   unfortnately. Happily, the algorithm implemented in this class is very
+   fast (operates in seconds).
+
 2009-06-23  Cory Quammen <cquammen@cs.unc.edu>
 
    * itkEigenValues3DToFrangiVesselnessMeasureImageFilter.h,
