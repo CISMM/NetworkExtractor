@@ -4,7 +4,7 @@
 #include <string>
 
 #include <itkBinaryThresholdImageFilter.h>
-#include <itkBinaryThinningImageFilter.h>
+#include <itkBinaryThinningImageFilter3D.h>
 #include <itkCastImageFilter.h>
 #include <itkChangeInformationImageFilter.h>
 #include <itkCommand.h>
@@ -59,7 +59,7 @@ class DataModel {
   typedef itk::EigenVectors3DToJunctionnessImageFilter<EigenVectorImageType, TImage> JunctionnessFilterType;
   typedef itk::ValuedRegionalMaximaImageFilter<TImage, TImage> JunctionnessLocalMaxFilterType;
   typedef itk::BinaryThresholdImageFilter<TImage, TImage> ThresholdFilterType;
-  typedef itk::BinaryThinningImageFilter<TImage, TImage> SkeletonizationFilterType;
+  typedef itk::BinaryThinningImageFilter3D<TImage, TImage> SkeletonizationFilterType;
   typedef SkeletonizationFilterType::Pointer SkeletonizationFilterTypePointer;
 
   typedef int ConnectedComponentOutputType;

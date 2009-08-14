@@ -1,3 +1,8 @@
+2009-08-14  Cory Quammen <cquammen@cs.unc.edu>
+
+   * DataModel.cxx: Switched from itkBinaryThinningImageFilter to 
+   itkBinaryThinningImageFilter3D, which works in 3D (as the name suggests).
+
 2009-08-12  Cory Quammen <cquammen@cs.unc.edu>
 
    * DataModel.cxx: Removed printfs.
