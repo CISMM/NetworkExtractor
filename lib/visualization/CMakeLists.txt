@@ -1,5 +1,6 @@
 SET(visualizationSrc
   ArrowVisualizationPipeline.cxx
+  DVRIsosurfaceVisualizationPipeline.cxx
   ImagePlaneVisualizationPipeline.cxx
   IsosurfaceVisualizationPipeline.cxx
   OutlineVisualizationPipeline.cxx

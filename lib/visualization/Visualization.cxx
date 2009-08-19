@@ -4,7 +4,7 @@ Visualization
 ::Visualization() {
   m_ArrowVisualization   = new ArrowVisualizationPipeline();
   m_OutlineVisualization = new OutlineVisualizationPipeline();
-  m_IsoVisualization     = new IsosurfaceVisualizationPipeline();
+  m_IsoVisualization     = new DVRIsosurfaceVisualizationPipeline();
   m_IsoVisualization->SetColor(0.0, 1.0, 0.0);
   m_ImagePlaneVisualization = new ImagePlaneVisualizationPipeline();
 }
@@ -103,44 +103,6 @@ double
 Visualization
 ::GetIsoValue() {
   return m_IsoVisualization->GetIsoValue();
-}
-
-
-vtkAlgorithmOutput*
-Visualization
-::GetIsosurfaceOutputPort() {
-  return m_IsoVisualization->GetIsosurfaceOutputPort();
-}
-
-
-void
-Visualization
-::SetFastIsosurfaceRendering(bool toggle) {
-  if (toggle)
-    FastIsosurfaceRenderingOn();
-  else
-    FastIsosurfaceRenderingOff();
-}
-
-
-bool
-Visualization
-::GetFastIsosurfaceRendering() {
-  return m_IsoVisualization->GetFastRenderingOn();
-}
-
-
-void
-Visualization
-::FastIsosurfaceRenderingOn() {
-  m_IsoVisualization->FastRenderingOn();
-}
-
-
-void
-Visualization
-::FastIsosurfaceRenderingOff() {
-  m_IsoVisualization->FastRenderingOff();
 }
 
 

@@ -4,7 +4,7 @@
 #include "ArrowVisualizationPipeline.h"
 #include "OutlineVisualizationPipeline.h"
 #include "ImagePlaneVisualizationPipeline.h"
-#include "IsosurfaceVisualizationPipeline.h"
+#include "DVRIsosurfaceVisualizationPipeline.h"
 
 #include <vtkAlgorithmOutput.h>
 #include <vtkRenderer.h>
@@ -29,13 +29,6 @@ public:
 
   void SetIsoValue(double isoValue);
   double GetIsoValue();
-
-  vtkAlgorithmOutput* GetIsosurfaceOutputPort();
-
-  void SetFastIsosurfaceRendering(bool toggle);
-  bool GetFastIsosurfaceRendering();
-  void FastIsosurfaceRenderingOn();
-  void FastIsosurfaceRenderingOff();
 
   void SetImagePlaneVisible(bool show);
   bool GetImagePlaneVisible();
@@ -62,14 +55,10 @@ public:
   bool   GetDirectionArrowVisible();
 
 protected:
-
-  ArrowVisualizationPipeline* m_ArrowVisualization;
-
-  OutlineVisualizationPipeline* m_OutlineVisualization;
-
-  IsosurfaceVisualizationPipeline* m_IsoVisualization;
-
-  ImagePlaneVisualizationPipeline* m_ImagePlaneVisualization;
+  ArrowVisualizationPipeline*         m_ArrowVisualization;
+  OutlineVisualizationPipeline*       m_OutlineVisualization;
+  DVRIsosurfaceVisualizationPipeline* m_IsoVisualization;
+  ImagePlaneVisualizationPipeline*    m_ImagePlaneVisualization;
 };
 
 #endif // _VISUALIZATION_H_

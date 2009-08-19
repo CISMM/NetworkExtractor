@@ -15,9 +15,9 @@ public:
   ImagePlaneVisualizationPipeline();
   ~ImagePlaneVisualizationPipeline();
 
-  void SetInputConnection(vtkAlgorithmOutput* input);
+  virtual void SetInputConnection(vtkAlgorithmOutput* input);
 
-  void AddToRenderer(vtkRenderer* renderer);
+  virtual void AddToRenderer(vtkRenderer* renderer);
 
   void SetVisible(bool visible);
   bool GetVisible();

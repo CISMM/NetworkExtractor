@@ -1,3 +1,21 @@
+2009-08-19  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Added DVRIsosurfaceVisualizationPipeline.cxx to list of
+   source files.
+   
+   * DVRIsosurfaceVisualizationPipeline.h,.cxx: New class that renders 
+   isosurfaces with direct volume rendering. It's slower than geometry
+   rendering, but this should require less memory than isosurface extraction.
+   
+   * ImagePlaneVisualization.h,.cxx: Made methods SetInputConnection() and
+   AddToRenderer() virtual.
+   
+   * IsosurfaceVisualizationPipeline.cxx: Removed extra empty line.
+   
+   * Visualization.h,.cxx: Replaced IsosurfaceVisualizationPipeline class
+   with DVRIsosurfaceVisualizationPipeline. Removed some methods that are no 
+   longer needed.
+
 2009-08-12  Cory Quammen <cquammen@cs.unc.edu>
 
    * ImagePlaneVisualizationPipeline.cxx: Fixed problems with update extent

@@ -131,7 +131,6 @@ IsosurfaceVisualizationPipeline
   m_ZPlane = zPlane;
 
   UpdateClipping();
-
 }
 
 
