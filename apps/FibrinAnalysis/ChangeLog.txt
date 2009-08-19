@@ -1,3 +1,11 @@
+2009-08-19  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAnalysis.h,.cxx,.ui: Removed some stuff no longer needed for isosurface
+   extraction and rendering after switching to direct volume rendering (e.g.,
+   the "Fast Rendering" checkbox that controlled immediate mode rendering being
+   on or off). Also removed "this" keyword where possible and capitalized
+   method names.
+
 2009-08-12  Cory Quammen <cquammen@cs.unc.edu>
 
    * FibrinAnalysis.cxx: Reordered setting of parameters from GUI so that

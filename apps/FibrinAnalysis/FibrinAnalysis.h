@@ -29,11 +29,11 @@ public:
 protected:
   void closeEvent(QCloseEvent* event);
 
-  void writeProgramSettings();
-  void readProgramSettings();
+  void WriteProgramSettings();
+  void ReadProgramSettings();
 
-  int isoValueSliderPosition(double value);
-  double isoValueSliderValue(int position);
+  int IsoValueSliderPosition(double value);
+  double IsoValueSliderValue(int position);
 
 public slots:
 
