@@ -69,7 +69,6 @@ DVRIsosurfaceVisualizationPipeline
 }
 
 
-#if 0
 void
 DVRIsosurfaceVisualizationPipeline
 ::SetInputConnection(vtkAlgorithmOutput* input) {
@@ -81,11 +80,12 @@ DVRIsosurfaceVisualizationPipeline
   vtkImageData* originalImage 
     = vtkImageData::SafeDownCast(input->GetProducer()->GetOutputDataObject(0));
   double* scalarRange = originalImage->GetScalarRange();
-  //m_ShiftScaler->SetShift(-scalarRange[0]);
-  //m_ShiftScaler->SetScale(255.0 / (scalarRange[1] - scalarRange[0]));
+  m_DataMinimum = scalarRange[0];
+  m_DataMaximum = scalarRange[1];
+  m_ShiftScaler->SetShift(-m_DataMinimum);
+  m_ShiftScaler->SetScale(65535.0 / (m_DataMaximum - m_DataMinimum));
   m_ShiftScaler->UpdateWholeExtent();
 }
-#endif
 
 
 void
@@ -213,9 +213,16 @@ void
 DVRIsosurfaceVisualizationPipeline
 ::SetIsoValue(double isoValue) {
   m_IsoValue = isoValue;
-  double nodeValue[4];
 
-  m_RayCastFunction->SetIsoValue(isoValue);
+  // Scale this isovalue from data value to range [0,65535].
+  double dataRange = m_DataMaximum - m_DataMinimum;
+  double scaledIsoValue = 65535.0 * (isoValue - m_DataMinimum) / dataRange;
+
+  std::cout << "m_DataMinimum: " << m_DataMinimum << std::endl;
+  std::cout << "m_DataMaximum: " << m_DataMaximum << std::endl;
+  std::cout << "scaledIsoValue: " << scaledIsoValue << std::endl;
+
+  m_RayCastFunction->SetIsoValue(scaledIsoValue);
 }
 
 

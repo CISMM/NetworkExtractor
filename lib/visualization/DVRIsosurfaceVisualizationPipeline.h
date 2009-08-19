@@ -25,7 +25,7 @@ public:
   DVRIsosurfaceVisualizationPipeline();
   virtual ~DVRIsosurfaceVisualizationPipeline();
 
-  //virtual void SetInputConnection(vtkAlgorithmOutput* input);
+  virtual void SetInputConnection(vtkAlgorithmOutput* input);
 
   virtual void AddToRenderer(vtkRenderer* renderer);
 
@@ -54,6 +54,8 @@ protected:
   double m_IsoValue;
   int    m_ZPlane;
   int    m_DeltaZ;
+  double m_DataMinimum; // Min and max of input data
+  double m_DataMaximum;
 
   vtkSmartPointer<vtkImageShiftScale>       m_ShiftScaler;
   vtkSmartPointer<vtkImageClip>             m_ImageClip;

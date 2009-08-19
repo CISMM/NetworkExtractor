@@ -1,5 +1,11 @@
 2009-08-19  Cory Quammen <cquammen@cs.unc.edu>
 
+   * DVRIsosurfaceVisualizationPipeline.h,.cxx: Uncommented SetInputConnection()
+   and fixed it up so that the image is rescaled and converted to unsigned
+   shorts, which are needed by the volume renderer.
+
+2009-08-19  Cory Quammen <cquammen@cs.unc.edu>
+
    * CMakeLists.txt: Added DVRIsosurfaceVisualizationPipeline.cxx to list of
    source files.
    
