@@ -429,13 +429,24 @@ DataModel
 
   // Open file and write out the histogram.
   FILE *fp = fopen(fileName.c_str(), "w");
-  fprintf(fp, "Angle (deg.),Count\n");
+  fprintf(fp, "Angle (deg.),Count,Normalized Count,Expected Probability,Over-representation Ratio\n");
 
+  // First, sum up total counts for the histogram normalization
+  double countSum = 0.0;
   for (unsigned int i = 0; i < bins; i++) {
-    float angle = angleIncrement * static_cast<float>(i);
-    fprintf(fp, "%.2f, %d\n", angle, hist[i]);
+    countSum += static_cast<double>(hist[i]);
   }
 
+  for (unsigned int i = 0; i < bins; i++) {
+    double angleA = angleIncrement * static_cast<float>(i);
+    double angleB = angleIncrement * static_cast<float>(i+1);
+    double normalizedHist = static_cast<double>(hist[i]) / countSum;
+    double expectedHist   = cos(M_PI*angleA/180.0) - cos(M_PI*angleB/180.0);
+    double ratio = normalizedHist / expectedHist;
+    fprintf(fp, "%.2f, %d, %f, %f, %f\n", angleA, hist[i], normalizedHist,
+	    expectedHist, ratio);
+  }
+  
   fclose(fp);
 }
 
