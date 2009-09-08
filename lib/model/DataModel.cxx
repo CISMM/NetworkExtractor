@@ -972,13 +972,6 @@ void
 DataModel
 ::SetReferenceDirectionAzimuth(double azimuth) {
   m_RefDirectionAzimuth = azimuth;
-
-  double phi   = M_PI * m_RefDirectionAzimuth / 180.0;
-  double theta = M_PI * (90-m_RefDirectionInclination) / 180.0;
-  double rx = cos(phi) * sin(theta);
-  double ry = sin(phi) * sin(theta);
-  double rz = cos(theta);
-  std::cout << "r: " << rx << ", " << ry << ", " << rz << std::endl;
 }
 
 
