@@ -1,3 +1,8 @@
+2009-09-08  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAnalysis.cxx: Added notification to user that skeletonization filter
+   needs to be selected before saving data related to the skeleton.
+
 2009-08-19  Cory Quammen <cquammen@cs.unc.edu>
 
    * FibrinAnalysis.h,.cxx,.ui: Removed some stuff no longer needed for isosurface

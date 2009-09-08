@@ -313,11 +313,23 @@ void FibrinAnalysis::on_actionSaveFilteredImage_triggered() {
 
 
 void FibrinAnalysis::on_actionSaveFiberOrientationImage_triggered() {
-  QString fileName = QFileDialog::getSaveFileName(this, "Save Fiber Orientation Image", "", "VTK (*.vtk);;");
-  if (fileName == "")
-    return;
 
-  m_DataModel->SaveFiberOrientationImageFile(fileName.toStdString());
+  if (m_FilterType == DataModel::MULTISCALE_FIBERNESS_FILTER_STRING) {
+    QString fileName = QFileDialog::getSaveFileName(this, "Save Fiber Orientation Image", "", "VTK (*.vtk);;");
+    if (fileName == "")
+      return;
+
+    m_DataModel->SaveFiberOrientationImageFile(fileName.toStdString());
+
+  } else {
+
+    // Notify the user that skeletonization filter must be selected.
+    QMessageBox messageBox;
+    messageBox.setText("Error");
+    messageBox.setInformativeText("You must have the Multiscale Fiberness filter selected in the Image Analysis dock to save the fiber orientation image.");
+    messageBox.setStandardButtons(QMessageBox::Ok);
+    messageBox.exec();
+  }
 }
 
 
@@ -651,8 +663,7 @@ void FibrinAnalysis::on_showDirectionArrowCheckBox_toggled(bool state) {
 
 void FibrinAnalysis::on_saveAngleHistogram_clicked() {
   // Allow saving only when skeletonization filter is selected.
-  //if (m_FilterType == DataModel::MULTISCALE_SKELETONIZATION_FILTER_STRING) {
-  if (1) {
+  if (m_FilterType == DataModel::MULTISCALE_SKELETONIZATION_FILTER_STRING) {
     QString fileName = QFileDialog::getSaveFileName(this, "Save Fiber Angle Histogram", "", "CSV (*.csv);;");
     if (fileName == "")
       return;
