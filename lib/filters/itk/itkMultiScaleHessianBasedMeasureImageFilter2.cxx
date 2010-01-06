@@ -3,8 +3,8 @@
   Program:   Insight Segmentation & Registration Toolkit
   Module:    $RCSfile: itkMultiScaleHessianBasedMeasureImageFilter2.cxx,v $
   Language:  C++
-  Date:      $Date: 2009/06/23 20:13:28 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2010/01/06 04:10:30 $
+  Version:   $Revision: 1.4 $
 
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
@@ -182,26 +182,27 @@ MultiScaleHessianBasedMeasureImageFilter2
 {
   ImageRegionIterator<UpdateBufferType> oit(m_UpdateBuffer,m_UpdateBuffer->GetLargestPossibleRegion());
 
-  typename OutputImageType::Pointer scalesImage = static_cast<OutputImageType*>(this->ProcessObject::GetOutput(1));
-  ImageRegionIterator<OutputImageType> osit(scalesImage,scalesImage->GetLargestPossibleRegion());
-
-  typename HessianImageType::Pointer hessianImage = static_cast<HessianImageType*>(this->ProcessObject::GetOutput(2));
-  ImageRegionIterator<HessianImageType> ohit(hessianImage,hessianImage->GetLargestPossibleRegion());
-
-  typename EigenvectorImageType::Pointer eigenvectorImage = static_cast<EigenvectorImageType*>(this->ProcessObject::GetOutput(3));
-  ImageRegionIterator<EigenvectorImageType> oeit(eigenvectorImage,eigenvectorImage->GetLargestPossibleRegion());
+  ImageRegionIterator<OutputImageType>      osit; // Scales image iterator
+  ImageRegionIterator<HessianImageType>     ohit; // Hessian image iterator
+  ImageRegionIterator<EigenvectorImageType> oeit; // Eigenvector image iterator
 
   oit.GoToBegin();
   if (m_GenerateScalesOutput)
     {
+    typename OutputImageType::Pointer scalesImage = static_cast<OutputImageType*>(this->ProcessObject::GetOutput(1));
+    osit = ImageRegionIterator<OutputImageType>(scalesImage,scalesImage->GetLargestPossibleRegion());
     osit.GoToBegin();
     }
   if (m_GenerateHessianOutput)
     {
+    typename HessianImageType::Pointer hessianImage = static_cast<HessianImageType*>(this->ProcessObject::GetOutput(2));
+    ohit = ImageRegionIterator<HessianImageType>(hessianImage,hessianImage->GetLargestPossibleRegion());
     ohit.GoToBegin();
     }
   if (m_GenerateEigenvectorOutput)
     {
+    typename EigenvectorImageType::Pointer eigenvectorImage = static_cast<EigenvectorImageType*>(this->ProcessObject::GetOutput(3));
+    oeit = ImageRegionIterator<EigenvectorImageType>(eigenvectorImage,eigenvectorImage->GetLargestPossibleRegion());
     oeit.GoToBegin();
     }
 

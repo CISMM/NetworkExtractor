@@ -1,3 +1,11 @@
+2010-01-05  Cory Quammen <cquammen@cs.unc.edu>
+
+   * itk/itkMultiScaleHessianBasedMeasureImageFilter2.cxx: Fixed initialization
+   of image iterators so that they respect ITK's new assertion that a
+   requested iterator region be a valid region within the image over which
+   iteration occurs.
+
+
 2009-08-14  Cory Quammen <cquammen@cs.unc.edu>
 
    * CMakeLists.txt: Added itkBinaryThinningImageFilter3D.cxx to list of
