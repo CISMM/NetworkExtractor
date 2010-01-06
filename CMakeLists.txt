@@ -1,5 +1,8 @@
 PROJECT (FibrinAnalysis)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
+IF (COMMAND cmake_policy)
+  cmake_policy(SET CMP0003 NEW)
+ENDIF (COMMAND cmake_policy)
 
 # Set version information
 SET (FIBRIN_ANALYSIS_MAJOR_NUMBER "1")
@@ -38,6 +41,16 @@ ELSE(VTK_FOUND)
      "Cannot build without VTK.  Please set VTK_DIR.")
 ENDIF (VTK_FOUND)
 
+#######################################
+# Include Qt4
+#######################################
+FIND_PACKAGE(Qt4)
+IF (QT_FOUND)
+  INCLUDE(${QT_USE_FILE})
+ELSE (QT_FOUND)
+  MESSAGE(FATAL_ERROR
+     "Cannot find Qt 4, which is required.")
+ENDIF( QT_FOUND)
 
 #######################################
 # Personal filter library and support classes.

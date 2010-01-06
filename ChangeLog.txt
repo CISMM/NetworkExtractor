@@ -1,3 +1,11 @@
+2010-01-05  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMakeLists.txt: Added cmake_policy stuff that CMake complains is missing.
+   Added FIND_PACKAGE(Qt4) which is now required by either VTK in CVS or
+   CMake 2.8, which I am now using.
+
+   * README.txt: Added file with information regarding dependencies.
+
 2009-08-11  Cory Quammen <cquammen@cs.unc.edu>
 
    * CMakeLists.txt: Bumped version number to 1.1.
