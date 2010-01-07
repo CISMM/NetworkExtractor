@@ -1,4 +1,9 @@
 2010-01-07  Cory Quammen <cquammen@cs.unc.edu>
 
    * display_window.png, image_analysis_window.png, image_information_window.png,
+   tasks_window.png: Updated screen shots after renaming some UI widgets.
+
+2010-01-07  Cory Quammen <cquammen@cs.unc.edu>
+
+   * display_window.png, image_analysis_window.png, image_information_window.png,
    startup_screen.png, tasks_window.png: Initial check-in.
