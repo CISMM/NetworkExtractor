@@ -1,5 +1,11 @@
 2010-01-07  Cory Quammen <cquammen@cs.unc.edu>
 
+   * index.html: Fixed link to CISMM website. It was pointing to the
+   old CISMM web space which is apparently not redirecting correctly
+   to cismm.org (it forwards to cismm.org/cismm, which does not exist).
+
+2010-01-07  Cory Quammen <cquammen@cs.unc.edu>
+
    * manual.html: Fixed up some typos and made certain portions clearer.
 
 2010-01-07  Cory Quammen <cquammen@cs.unc.edu>
