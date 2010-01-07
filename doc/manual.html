@@ -44,6 +44,9 @@
     <li class="toch3"><a href="#display_window">Display Window</a></li>
     <li class="toch3"><a href="#tasks_window">Tasks Window</a></li>
     <li class="toch3"><a href="#image_information_window">Image Information Window</a></li>
+  <li class="toch2"><a href="#output_files">Output Files</a></li>
+    <li class="toch3"><a href="#centerline_voxels_and_orientations_file">Centerline voxels and orientations file</a></li>
+    <li class="toch3"><a href="#fiber_angle_histogram_file">Fiber angle histogram file</a></li>
   <li class="toch2"><a href="#version_history">Version History</a></li>
 
 </ul>
@@ -179,15 +182,6 @@ simulations:</p>
 
 <h3>View Menu</h3>
 
-<p>
-<!-- <span class="figure narrow">
-<img src="images/model_menu.png" alt="Model Menu"/><br/>
-The Model menu.
-</span> -->
-
-The model menu has options for adding and removing geometric models to
-the simulation.</p>
-
 <dl>
 
   <dt>Open View...</dt> <dd>Opens a file specifying camera settings
@@ -204,13 +198,7 @@ the simulation.</p>
 
 <h3>Window Menu</h3>
 
-<p>
-<!-- <span class="figure narrow">
-<img src="images/window_menu.png" alt="Window Menu"/><br/>
-The Window menu.
-</span> -->
-
-The Window menu primarily controls visibility of windows in the program:</p>
+<p>The Window menu primarily controls visibility of windows in the program:</p>
 
 <dl>
 
@@ -233,7 +221,7 @@ The Window menu primarily controls visibility of windows in the program:</p>
 manipulation of the camera. You can change the
 view of the specimen models by rotating, translating, and zooming in
 on the scene. Clicking and dragging while holding various mouse
-buttons enacts these camera transformations:
+buttons enacts these camera transformations:</p>
 
 <ul>
 
@@ -282,16 +270,72 @@ the output of the selected filter -- not just the raw image data --. It is typic
 used to scale the range of the image data to the range [0, 65535], the range of
 values representable by 16-bit TIF files.</li>
 </ul>
+
+<br/>
 </dd>
 
 <dt>Multiscale Fiberness</dt> <dd>
 
+<p>
+This filter is based on the paper Frangi, A., Niessen, W., Vincken, K., and Viergever, M.
+<a href="http://www.springerlink.com/content/a57784628587870p/">Multiscale vessel enhancement filtering</a>.
+Medical Image Computing and Computer-Assisted Intervention, 1998, pp. 130--137. The basic idea is to
+look at second derivatives of image intensities. For bright fibrous objects on a dark background,
+the second derivative along the fiber axis has low magnitude while the second derivatives
+in directions orthogonal to the fiber axis has large negative second derivatives that
+are approximately equal. This filter is designed so that voxels satisfying these criteria
+are assigned a high value and low values are assigned everywhere else.
+</p>
+
+<p>
+This filter searches for fibrous objects of different radii. It does so by taking the
+second derivative at different scales and keeps only the highest fiberness response from
+all the scales.
+</p>
+
+<p>There are several settings for this filter:</p>
+
+<ul>
+
+<li><em>Reject flat objects</em> - Weighting factor that controls how the filter
+differentiates fibrous objects from thin, flat objects. Higher values tend to reject
+flat objects. Setting this value to 0.5 typically works well.
+</li>
+
+<li><em>Reject round objects</em> - Weighting factor that controls how selective
+the fiberness filter is for fibrous objects versus sphere-like objects. Lower values tend
+to reject sphere-like objects. Setting this value to 0.5 typically works well.</li>
+
+<li><em>Reject low contrast objects</em> - Weighting factor that controls the how much
+brighter than background objects must be to be identified as fibrous. Higher values
+of this setting identify highly contrasting fibrous objects. This setting can be
+important to reduce occurrences of background noise being mis-identified as a
+fibrous object. A value of 50.0 typically works well for microscopy images.</li>
+
+<li><em>Fiber radius minimum (&mu;m)</em> - The minimum radius of fibrous objects
+to be identified by the filter specified in microns.</li>
+
+<li><em>Fiber radius maximum (&um;m)</em> - The maximum radius of fibrous objects
+to be identified by the filter specified in microns.</li>
+
+<li><em>Fiber scales</em> - The number of scales, including the minimum and maximum
+scales, that will be used to identify fibrous objects. This must be at least 2. The
+scale space is examined at scale <em>i*(fiber radius maximum - fiber radius minimum)/(fiber scales-1)</em> where <em>i</em>
+is the <em>i</em>th scale.</li>
+
+</ul>
+
+<br />
+
 </dd>
 
-<dt>Multiscale Fiberness Threshold</dt> <dd><p>This filter creates a binary image
+<dt>Multiscale Fiberness Threshold</dt> <dd>
+
+<p>This filter creates a binary image
 (one whose voxel values are restricted to 0 and 1) from the result of the multiscale
 fiberness filter. All voxels with values above the threshold are set to 1 and all
-the others are set to 0.</p>
+the others are set to 0.
+</p>
 
 <ul>
 
@@ -302,6 +346,8 @@ value to this isovalue will ensure that the statistics are taken on all fibrous 
 in the image.</li>
 
 </ul>
+
+<br />
 </dd>
 
 <dt>Skeletonization</dt> <dd><p>Roughly speaking, skeletonization is a 
@@ -313,7 +359,8 @@ A medial axis is also sometimes called a centerline. There are no
 settings for this filter.</p>
 
 <p>The algorithm used by this filter is from T.C. Lee, R.L. Kashyap, and C.N. Chu.
-Building skeleton models via 3-D medial surface/axis thinning algorithms. Computer Vision, Graphics, and Image Processing, 56(6):462--478, 1994.
+<a href="http://dx.doi.org/10.1006/cgip.1994.1042">Building skeleton models via 3-D medial surface/axis thinning algorithms</a>.
+Computer Vision, Graphics, and Image Processing, 56(6):462--478, 1994.
 The ITK filter implementation was written by Hanno Homann, Oxford University, Wolfson Medical Vision Lab, UK 
 and is available from the <a href="http://www.insight-journal.org/browse/publication/181">Insight Journal</a>.</p></dd>
 
@@ -333,25 +380,25 @@ The Display Window is where visualization settings can be changed.</p>
 
 <dl>
 
-<dt>Show Isosurface</dt> <dd>Toggles the visibility of the isosurface in the display panel.</dd>
+<dt>Show isosurface</dt> <dd>Toggles the visibility of the isosurface in the display panel.</dd>
 
 <dt>Isovalue</dt> <dd>Value that determines the isosurface contour.</dd>
 
-<dt>Show Image Plane</dt> <dd>Toggles the visibility of the image plane in the display panel.</dd>
+<dt>Show image plane</dt> <dd>Toggles the visibility of the image plane in the display panel.</dd>
 
-<dt>Z Plane</dt> <dd>Determines which slice of the resampled image with isotropic
+<dt>Z plane</dt> <dd>Determines which slice of the resampled image with isotropic
 voxels is displayed in the image plane.</dd>
 
-<dt>Crop Isosurface</dt> <dd>Toggles cropping of the isosurface to a subset of slices
+<dt>Crop isosurface</dt> <dd>Toggles cropping of the isosurface to a subset of slices
 centered about the slice displayed in the image plane. Turning this on can be useful
 for comparing the raw image data to the isosurface showing the filter results. </dd>
 
-<dt>Keep Planes Above/Below</dt> <dd>Specifies the number of image slices on each
+<dt>Keep planes above/below</dt> <dd>Specifies the number of image slices on each
 side of the slice displayed by the image plane through which the isosurface will be
 taken. The slab of slices defined by this setting is bounded by the boundaries of
 the image.</dd>
 
-<dt>Show Data Outline</dt> <dd>Toggles the visibility of an outline showing the
+<dt>Show data outline</dt> <dd>Toggles the visibility of an outline showing the
 bounding box of the image.</dd>
 
 </dl>
@@ -388,34 +435,14 @@ the reference direction and the xy-plane. If you select the <em>View</em>-&gt;<e
 this setting moves the tip of the reference direction above or below the screen plane. A positive
 value lifts the tip up in the z-direction while a negative value pushes it down.</dd>
 
-<dt>Show Direction Arrow</dt> <dd>Toggle the visibility of an arrow showing the reference direction.</dd>
+<dt>Show direction arrow</dt> <dd>Toggle the visibility of an arrow showing the reference direction.</dd>
 
-<dt>Histogram Bins</dt> <dd>Controls the number of bins in the angle histogram. </dd>
-
-</dl>
-
-<p>The angle histogram can be saved by clicking the <em>Save Angle Histogram</em> button. The file
-saved by this action is a comma-separated file that can be opened in popular spreadsheet software.
-This spreadsheet contains several columns of data, described below.</p>
-
-<dl>
-
-<dt>Angle (deg.)</dt> <dd>The minimum value in the histogram bin. The maximum value in the histogram bin is given by the next row in this column.
-The maximum angle on the last bin is 90 degrees.</dd>
-
-<dt>Count</dt> <dd>The number of image voxels in the histogram bin.</dd>
-
-<dt>Normalized Count</dt> <dd>The number of image voxels in the histogram bin divided by the total number of voxel values in the histogram.</dd>
-
-<dt>Expected Probability</dt> <dd>The expected normalized histogram value for an object with uniform randomly distributed orientation of fiber segments.</dd>
-
-<dt>Over-representation Ratio</dt> <dd>The normalized count divided by the expected probability. This gives an indication of whether and to what
-degree the orientations within a histogram bin are overrepresented. A value of 1.0 means the number of orientations of fiber segments falling
-into this bin is expected, a value below 1.0 means there are fewer fiber segments
-falling in this bin than expected, and a value above 1.0 means there are more fiber segments falling into the bin than expected
-for an object with uniform randomly distributed orientations.</dd>
+<dt>Histogram bins</dt> <dd>Controls the number of bins in the angle histogram. </dd>
 
 </dl>
+
+<p>The angle histogram can be saved by clicking the <em>Save angle histogram</em> button. See
+the Output file section below for details of the file contents.</p>
 
 <h3><a name="image_information_window"></a>Image Information Window</h3>
 
@@ -458,6 +485,72 @@ by the point-spread function. For confocal microscopes, a Z squish factor of 0.5
 <p>The <em>Apply</em> button will apply the editable settings as well as any setting changes in the <em>Image Analysis</em>
 and <em>Display</em> windows.</p>
 
+<h2><a name="output_files"></a>Output Files</h2>
+
+<p>Fibrin Analysis writes two kinds of files for reporting information about orientations of fibrous objects
+in images. There are two types of files:</p>
+
+<ul>
+
+<li>
+
+<a name="centerline_voxels_and_orientations_file"></a>
+
+<p><strong>Centerline voxels and orientations file</strong> - This file is produced when the <em>File</em> -&gt; <em>Save Fiber Orientation Data...</em>
+menu item is selected. To export this file, the <em>Skeletonization</em> filter in the <em>Image Analysis</em> window
+must be applied.</p>
+
+<p>This file is a comma-separated file that can be imported into popular spreadsheet programs. The file has six columns:</p>
+
+  <ul>
+  
+  <li><em>xPosition</em> - The x-coordinate of the fiber voxel.</li>
+  
+  <li><em>yPosition</em> - The y-coordinate of the fiber voxel.</li>
+  
+  <li><em>zPosition</em> - The z-coordinate of the fiber voxel.</li>
+  
+  <li><em>xDirection</em> - The x-component of the fiber orientation vector.</li>
+  
+  <li><em>yDirection</em> - The y-component of the fiber orientation vector.</li>
+  
+  <li><em>zDirection</em> - The z-component of the fiber orientation vector.</li>
+  
+  </ul>
+
+</li>
+
+<li>
+
+<a name="fiber_angle_histogram_file"></a>
+
+<p><strong>Fiber angle histogram file</strong> - This file is produced when the <em>Save angle histogram</em> button is
+clicked in the <em>Tasks Window</em>.</p>
+
+<p>This file is a comma-separated file that can be imported into popular spreadsheet programs. The file has six columns:</p>
+
+  <ul>
+
+  <li><em>Angle (deg.)</em> - The minimum value in the histogram bin. The maximum value in the histogram bin is given by the next row in this column.
+The maximum angle on the last bin is 90 degrees.</li>
+
+  <li><em>Count</em> - The number of image voxels in the histogram bin.</li>
+
+  <li><em>Normalized Count</em> - The number of image voxels in the histogram bin divided by the total number of voxel values in the histogram.</li>
+
+  <li><em>Expected Probability</em> - The expected normalized histogram value for an object with uniform randomly distributed orientation of fiber segments.</li>
+
+  <li><em>Over-representation Ratio</em> - The normalized count divided by the expected probability. This gives an indication of whether and to what
+  degree the orientations within a histogram bin are overrepresented. A value of 1.0 means the number of orientations of fiber segments falling
+  into this bin is expected, a value below 1.0 means there are fewer fiber segments
+  falling in this bin than expected, and a value above 1.0 means there are more fiber segments falling into the bin than expected
+  for an object with uniform randomly distributed orientations.</li>
+
+  </ul>
+
+</li>
+
+</ul>
 
 <h2><a name="version_history"></a>Version History</h2>
 
@@ -479,7 +572,7 @@ Simulator at each revision.</p>
 
 <ul>
 
-  <li>May crash on certain Macs.</li>
+  <li>May crash on some Macs for unclear reasons.</li>
 	
 </ul>
   
