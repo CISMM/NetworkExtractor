@@ -1,3 +1,9 @@
+2010-01-07  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMake/Win32Package.txt: Simplified some of the commands for including DLL
+   files. Added commands to install the user manual and create a shortcut to
+   it in the Start menu.
+
 2009-07-27  Cory Quammen <cquammen@cs.unc.edu>
 
    * CMake/Win32Package.txt: Updated file paths.
