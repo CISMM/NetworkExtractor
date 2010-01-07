@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Fibrin Analysis 1.1.0 - Manual</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<link href="styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+
+<div id="header">
+<h1>Fibrin Analysis 1.1.0</h1>
+</div>
+
+<div id="container">
+
+<div id="navbar">
+<ul>
+<li><a href="index.html">Home</a></li>
+<li><a href="download.html">Download</a></li>
+<li><a href="manual.html">Manual</a></li>
+<!--//<li><a href="version.html">Versions</a></li>-->
+<li><a href="about.html">About</a></li>
+<li><a href="contact.html">Contact Us</a></li>
+</ul>
+</div> <!-- end navbar -->
+
+<div id="content">
+
+<h1>Manual</h1>
+
+<h2>Table of Contents</h2>
+  
+<ul>
+
+  <li class="toch2"><a href="#introduction">Introduction</a></li>
+  <li class="toch2"><a href="#installation">Installation</a></li>
+  <li class="toch2"><a href="#program_window">Program Window</a></li>
+    <li class="toch3"><a href="#menubar">Menu Bar</a></li>
+    <li class="toch3"><a href="#visualization_panel">Visualization Panel</a></li>
+    <li class="toch3"><a href="#image_analysis_window">Image Analysis Window</a></li>
+    <li class="toch3"><a href="#display_window">Display Window</a></li>
+    <li class="toch3"><a href="#tasks_window">Tasks Window</a></li>
+    <li class="toch3"><a href="#image_information_window">Image Information Window</a></li>
+  <li class="toch2"><a href="#version_history">Version History</a></li>
+
+</ul>
+
+<h2><a name="introduction"></a>Introduction</h2>
+
+<p>Fibrin Analysis is a program developed to analyze images of fibrous objects, 
+specifically targeting confocal microscopy images of fibrin networks. The
+program has filters for segmenting fibrous objects and computing their approximate
+centerlines. In addition, the orientation of fibers running through centerline voxels
+can be estimated and exported to a spreadsheet file for further analysis.
+</p>
+
+<h2><a name="installation"></a>Installation</h2>
+
+<p> The Fibrin Analysis is currently available for Mac OS X and Microsoft Windows XP.</p>
+
+<h3>Installation instructions for Mac OS X</h3>
+
+<ul>
+
+<li>Download and save the Mac OS X installer <a href="download.html">here</a>.</li>
+<li>Double click the file Fibrin-Analysis-1.1.0-Darwin.dmg. This will mount and open a disk image entitled Fibrin-Analysis-1.1.0-Darwin.</li>
+<li>Drag the FibrinAnalysis 1.1.0 program to the Applications alias in the window that was opened.</li>
+<li>Unmount the Fibrin-Analysis-1.1.0-Darwin disk image by dragging the mounted volume to the trash.</li>
+<li>The program will now be in the Applications folder.</li>
+<li>You can optionally copy this documentation to your computer by dragging the User Manual folder somewhere on your system.</li>
+
+</ul>
+
+<h3>Installation instructions for Windows XP</h3>
+
+<ul>
+
+<li>Download the Windows XP installer <a href="download.html">here</a>.</li>
+<li>Either run the installer from your web browser or save the installer file and double-click it.</li>
+<li>Run the installer.</li>
+<li>Once installed, the program, documentation, and installer will be available under the Start Menu in All Programs -&gt; Fibrin Analysis 1.1.0.</li>
+
+</ul>
+
+<h2><a name="program_window"></a>Program Window</h2>
+
+<p>
+<span class="figure">
+<a href="images/startup_screen.png"><img src="images/startup_screen.png" width="300" alt="Program window after startup"/></a><br/>
+The program window after startup.
+</span>
+
+The program window is shown on the right. At
+the top of the window is a standard menu bar. Below the menu
+bar is the <em>Visualization panel</em> for viewing image data
+and segmentation results. Rotating, translating, and scaling the
+visualization interactively is done by clicking and dragging the mouse 
+within this panel. Four docked windows on the left-hand
+side of the window contain control panels for interacting with the
+program. The <em>Image Analysis</em> window contains a control panel
+for changing settings for the image analysis algorithms. The <em>Display</em>
+window contains controls for changing the visualization of the image data.
+The <em>Tasks</em> window contains buttons for performing various
+analysis tasks. Finally, the <em>Image Information</em> window 
+displays information about the image and enables changing of certain settings
+such as image pixel size. These windows can be undocked from the main 
+program window by clicking and dragging in the window's title bar.</p>
+
+<h2><a name="menubar"></a>Menu Bar</h2>
+
+<p>The menu bar in Fibrin Analysis contains three menus that
+provide commands useful to creating loading data, saving results,
+modifying the viewpoint of the visualization, and controlling visibility
+of the control panel windows. Each menu is described in more detail below.</p>
+
+<h3>File Menu</h3>
+
+<p>
+<!-- <span class="figure narrow">
+<img src="images/file_menu.png" width="135" height="162" alt="File Menu"/><br/>
+The File menu.
+</span> -->
+
+The File Menu features typical options for creating and saving
+simulations:</p>
+
+<dl>
+  
+  <dt>Open Image...</dt> <dd>Opens an image file. Supported file
+  formats are: multi-layer TIF, VTK, and LSM. The 
+  <a href="http://www.loci.wisc.edu/bio-formats/imagej">LOCI Bio-Formats plug-in</a>
+  for <a href="http://rsbweb.nih.gov/ij/">ImageJ</a>
+  can be used to convert many microscopy file formats into TIF files.
+  Series of TIF images defining a 3D image cannot currently
+  be opened.</dd>
+
+  <dt>Save Filtered Image...</dt> <dd>Saves the result of the
+  currently selected image filter in the <em>Filter Settings</em> control
+  panel in the <em>Image Analysis</em> window as a 16-bit TIF file.
+  Use the <em>Filtered image intensity scale</em> setting in the
+  <em>Image Analysis</em> window to adjust the filtered image intensities
+  to the range [0,65535], the valid range for 16-bit TIF images.</dd>
+
+  <dt>Save Fiber Orientation Data...</dt> <dd>Saves a vector image
+  containing the estimated fiber orientation at each pixel in the image.
+  The number of slices (z-dimension of the image) may be larger than
+  the input image if the <em>Z slice spacing</em> is different from the
+  <em>X dimension (pixels)</em> or <em>Y dimension (pixels)</em>. In that
+  case, the image will be resampled to produce isotropic voxels. This
+  reduces directional bias in fiber orientation statistics.</dd>
+
+  <dt>Open Session...</dt> <dd>Opens a session file that contains
+  control panel settings. If an image was open when the session file
+  was saved, then this menu item will open that same image.</dd>
+
+  <dt>Save Session...</dt> <dd>Saves a session file that contains
+  control panel settings.</dd>
+  
+  <dt>Save Picture...</dt> <dd>Saves a screen shot of the visualization
+  panel.</dd>
+  
+  <dt>Save Rotation Animation...</dt> <dd>Saves a series of PNG files
+  that constitutes a rotating animation of the items in the visualization
+  panel.</dd>
+  
+  <dt>Save Geometry...</dt> <dd>Saves a VTK file that contains the
+  geometry of an isosurface from a filtered version of the loaded
+  image. The filter is the one selected in the <em>Filter Settings</em> control
+  panel in the <em>Image Analysis</em> window. The isovalue is the one
+  in the <em>Display Settings</em> control panel in the <em>Display</em>
+  window. </dd>
+  
+  <dt>Exit</dt> <dd>Exit the program.</dd>
+
+</dl>
+
+<h3>View Menu</h3>
+
+<p>
+<!-- <span class="figure narrow">
+<img src="images/model_menu.png" alt="Model Menu"/><br/>
+The Model menu.
+</span> -->
+
+The model menu has options for adding and removing geometric models to
+the simulation.</p>
+
+<dl>
+
+  <dt>Open View...</dt> <dd>Opens a file specifying camera settings
+  for the visualization panel.</dd>
+
+  <dt>Save View...</dt> <dd>Saves a file with the current settings
+  of the camera in the visualization panel.</dd>
+
+  <dt>Reset View</dt> <dd>Resets the camera so that the image is
+  centered and scaled to fit in the panel and looking down the
+  negative z-axis.</dd>
+
+</dl>
+
+<h3>Window Menu</h3>
+
+<p>
+<!-- <span class="figure narrow">
+<img src="images/window_menu.png" alt="Window Menu"/><br/>
+The Window menu.
+</span> -->
+
+The Window menu primarily controls visibility of windows in the program:</p>
+
+<dl>
+
+  <dt>About Fibrin Analysis</dt> <dd>Shows a window containing information about
+  the program.</dd>
+
+  <dt>Image Analysis Window</dt> <dd>Toggle the visibility of the <em>Image Analysis</em> window.</dd>
+
+  <dt>Display Window</dt> <dd>Toggle the visibility of the <em>Display</em> window.</dd>
+  
+  <dt>Tasks Window</dt> <dd>Toggle the visibility of the <em>Tasks</em> window.</dd>
+  
+  <dt>Image Information Window</dt> <dd>Toggle the visibility of the <em>Image Information</em> window.</dd>
+
+</dl>
+
+<h3><a name="visualization_panel"></a>Visualization Panel</h3>
+
+<p>Clicking and dragging within the <em>Visualization Panel</em> causes 
+manipulation of the camera. You can change the
+view of the specimen models by rotating, translating, and zooming in
+on the scene. Clicking and dragging while holding various mouse
+buttons enacts these camera transformations:
+
+<ul>
+
+  <li><strong>Left mouse button</strong> - Causes rotation of the scene</li>
+
+  <li><strong>Middle mouse button</strong> - Causes translation of the scene</li>
+
+  <li><strong>Right mouse button</strong> - Causes zooming in on the scene</li>
+
+</ul>
+
+<h3><a name="image_analysis_window"></a>Image Analysis Window</h3>
+
+<p>
+<span class="figure">
+<img src="images/image_analysis_window.png" width="320" alt="Image Analysis Window"/><br/>
+The Image Analysis Window.
+</span>
+
+The <em>Image Analysis Window</em> controls which filter is applied to the image. The available filters,
+explained below, are connected in a pipeline. That is, the result of a filter in the list is
+fed into the subsequent filter. You can switch between filters to examine results at intermediate
+steps of the full image analysis pipeline in the visualization panel. The filter results are
+displayed only as an isosurface; the raw image data is displayed in the image plane. For example, switching to the 
+<em>Multiscale Fiberness</em> filter will display the filter results via the isosurface in the
+display window. You can then adjust filter parameters based on how well the isosurface
+appears to account for fibrous objects in the image.<br /> <br />
+
+In addition to determining what the isosurface shows, the selected filter also specifies which data is saved 
+when the <em>Save Filtered Image...</em> menu item is chosen in the <em>File</em> menu.</p>
+
+<p>
+Each filter in the <em>Image Filter</em> list depends on all of the filters above it. To minimize
+clutter in the interface, only the settings for the selected filter and those that it depends on
+are displayed. Each filter and its settings are explained below.
+</p>
+
+<dl>
+
+<dt>No filter</dt> <dd><p>No filter is applied to the image. The raw image data is displayed in the
+visualization panel.</p>
+<ul>
+
+<li><em>Filtered image intensity scale</em> - This value is a scale factor applied to 
+the output of the selected filter -- not just the raw image data --. It is typically
+used to scale the range of the image data to the range [0, 65535], the range of
+values representable by 16-bit TIF files.</li>
+</ul>
+</dd>
+
+<dt>Multiscale Fiberness</dt> <dd>
+
+</dd>
+
+<dt>Multiscale Fiberness Threshold</dt> <dd><p>This filter creates a binary image
+(one whose voxel values are restricted to 0 and 1) from the result of the multiscale
+fiberness filter. All voxels with values above the threshold are set to 1 and all
+the others are set to 0.</p>
+
+<ul>
+
+<li><em>Fiberness threshold</em> - The threshold value. One stategy to determine
+this value is to adjust the isovalue in the <em>Display Window</em> so that the
+isosurface overlaps fibrous objects in the image adequately. Setting the threshold
+value to this isovalue will ensure that the statistics are taken on all fibrous objects 
+in the image.</li>
+
+</ul>
+</dd>
+
+<dt>Skeletonization</dt> <dd><p>Roughly speaking, skeletonization is a 
+process of repeatedly removing voxels from a set of connected voxels until 
+a thin "curve" one voxel wide is left. For a fibrous object, the resulting 
+set of voxels, called the <a href="http://en.wikipedia.org/wiki/Topological_skeleton">
+topological skeleton</a>, approximates the medial axis of the object.
+A medial axis is also sometimes called a centerline. There are no
+settings for this filter.</p>
+
+<p>The algorithm used by this filter is from T.C. Lee, R.L. Kashyap, and C.N. Chu.
+Building skeleton models via 3-D medial surface/axis thinning algorithms. Computer Vision, Graphics, and Image Processing, 56(6):462--478, 1994.
+The ITK filter implementation was written by Hanno Homann, Oxford University, Wolfson Medical Vision Lab, UK 
+and is available from the <a href="http://www.insight-journal.org/browse/publication/181">Insight Journal</a>.</p></dd>
+
+</dl>
+
+
+
+<h3><a name="display_window"></a>Display Window</h3>
+
+<p>
+<span class="figure">
+<img src="images/display_window.png" width="320" alt="Display Window"/><br/>
+The Display Window.
+</span>
+
+The Display Window is where visualization settings can be changed.</p>
+
+<dl>
+
+<dt>Show Isosurface</dt> <dd>Toggles the visibility of the isosurface in the display panel.</dd>
+
+<dt>Isovalue</dt> <dd>Value that determines the isosurface contour.</dd>
+
+<dt>Show Image Plane</dt> <dd>Toggles the visibility of the image plane in the display panel.</dd>
+
+<dt>Z Plane</dt> <dd>Determines which slice of the resampled image with isotropic
+voxels is displayed in the image plane.</dd>
+
+<dt>Crop Isosurface</dt> <dd>Toggles cropping of the isosurface to a subset of slices
+centered about the slice displayed in the image plane. Turning this on can be useful
+for comparing the raw image data to the isosurface showing the filter results. </dd>
+
+<dt>Keep Planes Above/Below</dt> <dd>Specifies the number of image slices on each
+side of the slice displayed by the image plane through which the isosurface will be
+taken. The slab of slices defined by this setting is bounded by the boundaries of
+the image.</dd>
+
+<dt>Show Data Outline</dt> <dd>Toggles the visibility of an outline showing the
+bounding box of the image.</dd>
+
+</dl>
+
+<h3><a name="tasks_window"></a>Tasks Window</h3>
+
+<p>
+<span class="figure">
+<img src="images/tasks_window.png" width="320" alt="Tasks Window"/><br/>
+The Tasks Window.
+</span>
+
+This window provides controls for carrying out certain analysis tasks in the program.<br /><br />
+The <em>Fiber Angle Histogram</em> task saves statistics of the fiber orientations. The histogram
+is of angles formed between a reference direction and the orientation of voxel-sized segments along
+fibers. Orientations of fiber segments are specified by 3D vectors. The program considers a vector <em>v</em> and
+<em>-v</em> to have equivalent orientations. All orientation vectors are processed so that they point in a
+set of directions defining a hemisphere. The hemisphere is defined by the plane orthogonal to the reference
+direction. The re-orientation process ensures that angles between a fiber segment and the reference direction are
+in the range [0, 90] degrees.<br /> <br />
+
+The reference direction is specified by the <em>Azimuth</em> and <em>Inclination</em>, defined below.
+</p>
+
+<dl>
+
+<dt>Azimuth</dt> <dd>The azimuth, specified in degrees, controls the spin angle about the z-axis.
+A setting of 0 degrees, aligns the reference direction with the x-axis. If you select the 
+<em>View</em>-&gt;<em>Reset View</em> option, the arrow will point to the right on the screen.
+A setting of 90 degrees will point the reference direction up on the screen.</dd>
+
+<dt>Inclination</dt> <dd>The inclination, also specified in degrees, controls the angle between
+the reference direction and the xy-plane. If you select the <em>View</em>-&gt;<em>Reset View</em> option,
+this setting moves the tip of the reference direction above or below the screen plane. A positive
+value lifts the tip up in the z-direction while a negative value pushes it down.</dd>
+
+<dt>Show Direction Arrow</dt> <dd>Toggle the visibility of an arrow showing the reference direction.</dd>
+
+<dt>Histogram Bins</dt> <dd>Controls the number of bins in the angle histogram. </dd>
+
+</dl>
+
+<p>The angle histogram can be saved by clicking the <em>Save Angle Histogram</em> button. The file
+saved by this action is a comma-separated file that can be opened in popular spreadsheet software.
+This spreadsheet contains several columns of data, described below.</p>
+
+<dl>
+
+<dt>Angle (deg.)</dt> <dd>The minimum value in the histogram bin. The maximum value in the histogram bin is given by the next row in this column.
+The maximum angle on the last bin is 90 degrees.</dd>
+
+<dt>Count</dt> <dd>The number of image voxels in the histogram bin.</dd>
+
+<dt>Normalized Count</dt> <dd>The number of image voxels in the histogram bin divided by the total number of voxel values in the histogram.</dd>
+
+<dt>Expected Probability</dt> <dd>The expected normalized histogram value for an object with uniform randomly distributed orientation of fiber segments.</dd>
+
+<dt>Over-representation Ratio</dt> <dd>The normalized count divided by the expected probability. This gives an indication of whether and to what
+degree the orientations within a histogram bin are overrepresented. A value of 1.0 means the number of orientations of fiber segments falling
+into this bin is expected, a value below 1.0 means there are fewer fiber segments
+falling in this bin than expected, and a value above 1.0 means there are more fiber segments falling into the bin than expected
+for an object with uniform randomly distributed orientations.</dd>
+
+</dl>
+
+<h3><a name="image_information_window"></a>Image Information Window</h3>
+
+<p>
+<span class="figure">
+<img src="images/image_information_window.png" width="320" alt="Image Information Window"/><br/>
+The Image Information Window.
+</span>
+
+The Image Information Window displays information about the image loaded into the program. The last
+four settings are editable while the others are not.</p>
+
+<dl>
+
+<dt>Intensity minimum</dt> <dd>Minimum intensity value in the filtered image.</dd>
+
+<dt>Intensity maximum</dt> <dd>Maximum intensity value in the filtered image.</dd>
+
+<dt>X dimension (pixels)</dt> <dd>Dimension of image in the x-direction (how many pixels).</dd>
+
+<dt>Y dimension (pixels)</dt> <dd>Dimension of image in the y-direction (how many pixels).</dd>
+
+<dt>Z dimension (slices)</dt> <dd>Dimension of image in the z-direction (how many slices).</dd>
+
+<dt>X pixel size (&mu;m)</dt> <dd>The size of the pixel, or spacing between pixels, in the x-direction (voxel x-spacing). <em>Editable</em></dd>
+
+<dt>Y pixel size (&mu;m)</dt> <dd>The size of the pixel, or spacing between pixels, in the y-direction (voxel y-spacing). <em>Editable</em></dd>
+
+<dt>Z slice spacing (&mu;m)</dt> <dd>The spacing between slices in the image (voxel z-spacing). <em>Editable</em></dd>
+
+<dt>Z squish factor</dt> <dd>This value specifies a scale factor for the z-spacing of the image that is not the same as the
+Z slice spacing. The squish factor is meant as a way to correct for the apparent elongation of objects in the z-direction
+in images from confocal microscopes. This elongation is an artifact caused by the point-spread function of the microscope.
+Setting the Z squish factor to a value below 1.0 will compress the image in the z-dimension, essentially undoing the elongation caused
+by the point-spread function. For confocal microscopes, a Z squish factor of 0.5 works well. <em>Editable</em>
+</dd>
+
+</dl>
+
+<p>The <em>Apply</em> button will apply the editable settings as well as any setting changes in the <em>Image Analysis</em>
+and <em>Display</em> windows.</p>
+
+
+<h2><a name="version_history"></a>Version History</h2>
+
+<p>The sections below outline the changes made to the Microscope
+Simulator at each revision.</p>
+
+<h3><a name="v1.1.0"></a>Version 1.1.0</h3>
+
+<p>Changes from previous release</p>
+
+<ul>
+  
+  <li>Added export of statistics on fiber segment orientations.</li>
+  <li>Added display of reference direction.</li>
+
+</ul>
+
+<p>Known issues</p>
+
+<ul>
+
+  <li>May crash on certain Macs.</li>
+	
+</ul>
+  
+<h3><a name="v1.0.0"></a>Version 1.0.0</h3>
+
+<p>Changes from previous release</p>
+<ul>
+  
+  <li>Initial version.</li>
+  
+</ul>
+
+<p>Known issues</p>
+
+<ul>
+
+  <li>None.</li>
+
+</ul>
+
+			
+</div> <!-- end content -->
+</div> <!-- end container -->
+
+<div id="footer">
+<p>Fibrin Analysis<br/>
+by Cory Quammen</p>
+<div class="validation">
+<a href="http://validator.w3.org/check/referer">xhtml</a> | 
+<a href="http://jigsaw.w3.org/css-validator/check/referer">css</a>
+</div>
+</div> <!-- end footer -->
+
+</body>
+</html>

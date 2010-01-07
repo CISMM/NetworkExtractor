@@ -1,0 +1,4 @@
+2010-01-07  Cory Quammen <cquammen@cs.unc.edu>
+
+   * styles.cxx, index.html, about.html, contact.html, download.html,
+   manual.html, index.html: Inititial check-in.
