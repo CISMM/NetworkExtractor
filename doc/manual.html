@@ -53,8 +53,8 @@
 
 <h2><a name="introduction"></a>Introduction</h2>
 
-<p>Fibrin Analysis is a program developed to analyze images of fibrous objects, 
-specifically targeting confocal microscopy images of fibrin networks. The
+<p>Fibrin Analysis is a program developed to analyze images of fibrous objects and is 
+specifically targetted to confocal microscopy images of fibrin networks. The
 program has filters for segmenting fibrous objects and computing their approximate
 centerlines. In addition, the orientation of fibers running through centerline voxels
 can be estimated and exported to a spreadsheet file for further analysis.
@@ -69,7 +69,7 @@ can be estimated and exported to a spreadsheet file for further analysis.
 <ul>
 
 <li>Download and save the Mac OS X installer <a href="download.html">here</a>.</li>
-<li>Double click the file Fibrin-Analysis-1.1.0-Darwin.dmg. This will mount and open a disk image entitled Fibrin-Analysis-1.1.0-Darwin.</li>
+<li>Double-click the file Fibrin-Analysis-1.1.0-Darwin.dmg. This will mount and open a disk image entitled Fibrin-Analysis-1.1.0-Darwin.</li>
 <li>Drag the FibrinAnalysis 1.1.0 program to the Applications alias in the window that was opened.</li>
 <li>Unmount the Fibrin-Analysis-1.1.0-Darwin disk image by dragging the mounted volume to the trash.</li>
 <li>The program will now be in the Applications folder.</li>
@@ -115,25 +115,19 @@ program window by clicking and dragging in the window's title bar.</p>
 <h2><a name="menubar"></a>Menu Bar</h2>
 
 <p>The menu bar in Fibrin Analysis contains three menus that
-provide commands useful to creating loading data, saving results,
+provide commands useful for loading data, saving results,
 modifying the viewpoint of the visualization, and controlling visibility
 of the control panel windows. Each menu is described in more detail below.</p>
 
 <h3>File Menu</h3>
 
-<p>
-<!-- <span class="figure narrow">
-<img src="images/file_menu.png" width="135" height="162" alt="File Menu"/><br/>
-The File menu.
-</span> -->
-
-The File Menu features typical options for creating and saving
-simulations:</p>
+<p>The File Menu features commands for loading and saving
+data:</p>
 
 <dl>
   
   <dt>Open Image...</dt> <dd>Opens an image file. Supported file
-  formats are: multi-layer TIF, VTK, and LSM. The 
+  formats are: multi-layer (3D) TIF, VTK, and LSM. The 
   <a href="http://www.loci.wisc.edu/bio-formats/imagej">LOCI Bio-Formats plug-in</a>
   for <a href="http://rsbweb.nih.gov/ij/">ImageJ</a>
   can be used to convert many microscopy file formats into TIF files.
@@ -148,12 +142,14 @@ simulations:</p>
   to the range [0,65535], the valid range for 16-bit TIF images.</dd>
 
   <dt>Save Fiber Orientation Data...</dt> <dd>Saves a vector image
-  containing the estimated fiber orientation at each pixel in the image.
+  containing the estimated fiber orientation at each voxel in the image.
   The number of slices (z-dimension of the image) may be larger than
   the input image if the <em>Z slice spacing</em> is different from the
   <em>X dimension (pixels)</em> or <em>Y dimension (pixels)</em>. In that
   case, the image will be resampled to produce isotropic voxels. This
-  reduces directional bias in fiber orientation statistics.</dd>
+  reduces directional bias in fiber orientation statistics. See the section
+  <a href="#centerline_voxels_and_orientations_file">Centerline voxels and
+  orientations file</a> for details on the file contents.</dd>
 
   <dt>Open Session...</dt> <dd>Opens a session file that contains
   control panel settings. If an image was open when the session file
@@ -166,7 +162,7 @@ simulations:</p>
   panel.</dd>
   
   <dt>Save Rotation Animation...</dt> <dd>Saves a series of PNG files
-  that constitutes a rotating animation of the items in the visualization
+  containing a rotating animation of the items in the visualization
   panel.</dd>
   
   <dt>Save Geometry...</dt> <dd>Saves a VTK file that contains the
@@ -191,8 +187,8 @@ simulations:</p>
   of the camera in the visualization panel.</dd>
 
   <dt>Reset View</dt> <dd>Resets the camera so that the image is
-  centered and scaled to fit in the panel and looking down the
-  negative z-axis.</dd>
+  centered and scaled to fit in the panel and looking towards the
+  bottom z-slice of the image.</dd>
 
 </dl>
 
@@ -220,7 +216,7 @@ simulations:</p>
 <p>Clicking and dragging within the <em>Visualization Panel</em> causes 
 manipulation of the camera. You can change the
 view of the specimen models by rotating, translating, and zooming in
-on the scene. Clicking and dragging while holding various mouse
+on the scene. Clicking and dragging while holding different mouse
 buttons enacts these camera transformations:</p>
 
 <ul>
@@ -250,12 +246,12 @@ displayed only as an isosurface; the raw image data is displayed in the image pl
 display window. You can then adjust filter parameters based on how well the isosurface
 appears to account for fibrous objects in the image.<br /> <br />
 
-In addition to determining what the isosurface shows, the selected filter also specifies which data is saved 
+In addition to determining what the isosurface shows, the selected filter also specifies which data are saved 
 when the <em>Save Filtered Image...</em> menu item is chosen in the <em>File</em> menu.</p>
 
 <p>
 Each filter in the <em>Image Filter</em> list depends on all of the filters above it. To minimize
-clutter in the interface, only the settings for the selected filter and those that it depends on
+clutter in the interface, only the settings for the selected filter and those on which it depends
 are displayed. Each filter and its settings are explained below.
 </p>
 
@@ -266,7 +262,7 @@ visualization panel.</p>
 <ul>
 
 <li><em>Filtered image intensity scale</em> - This value is a scale factor applied to 
-the output of the selected filter -- not just the raw image data --. It is typically
+the output of the selected filter, not just the raw image data. It is typically
 used to scale the range of the image data to the range [0, 65535], the range of
 values representable by 16-bit TIF files.</li>
 </ul>
@@ -282,9 +278,9 @@ This filter is based on the paper Frangi, A., Niessen, W., Vincken, K., and Vier
 Medical Image Computing and Computer-Assisted Intervention, 1998, pp. 130--137. The basic idea is to
 look at second derivatives of image intensities. For bright fibrous objects on a dark background,
 the second derivative along the fiber axis has low magnitude while the second derivatives
-in directions orthogonal to the fiber axis has large negative second derivatives that
+in directions orthogonal to the fiber axis have large negative second derivatives that
 are approximately equal. This filter is designed so that voxels satisfying these criteria
-are assigned a high value and low values are assigned everywhere else.
+are assigned a high value and low values are assigned to every other voxel.
 </p>
 
 <p>
@@ -394,8 +390,8 @@ centered about the slice displayed in the image plane. Turning this on can be us
 for comparing the raw image data to the isosurface showing the filter results. </dd>
 
 <dt>Keep planes above/below</dt> <dd>Specifies the number of image slices on each
-side of the slice displayed by the image plane through which the isosurface will be
-taken. The slab of slices defined by this setting is bounded by the boundaries of
+side of the image plane through which the isosurface will be
+taken. The slab of slices defined by this setting is bounded by the extent of
 the image.</dd>
 
 <dt>Show data outline</dt> <dd>Toggles the visibility of an outline showing the
@@ -414,7 +410,7 @@ The Tasks Window.
 This window provides controls for carrying out certain analysis tasks in the program.<br /><br />
 The <em>Fiber Angle Histogram</em> task saves statistics of the fiber orientations. The histogram
 is of angles formed between a reference direction and the orientation of voxel-sized segments along
-fibers. Orientations of fiber segments are specified by 3D vectors. The program considers a vector <em>v</em> and
+fibers. Orientations of fiber segments are specified by 3D vectors. The program considers vectors <em>v</em> and
 <em>-v</em> to have equivalent orientations. All orientation vectors are processed so that they point in a
 set of directions defining a hemisphere. The hemisphere is defined by the plane orthogonal to the reference
 direction. The re-orientation process ensures that angles between a fiber segment and the reference direction are
@@ -426,14 +422,14 @@ The reference direction is specified by the <em>Azimuth</em> and <em>Inclination
 <dl>
 
 <dt>Azimuth</dt> <dd>The azimuth, specified in degrees, controls the spin angle about the z-axis.
-A setting of 0 degrees, aligns the reference direction with the x-axis. If you select the 
-<em>View</em>-&gt;<em>Reset View</em> option, the arrow will point to the right on the screen.
-A setting of 90 degrees will point the reference direction up on the screen.</dd>
+A setting of 0 degrees, aligns the reference direction with the x-axis. That is, when you select the 
+<em>View</em>-&gt;<em>Reset View</em> option, the arrow will point to the right on the screen when this
+setting is 0. A setting of 90 degrees will point the reference direction up on the screen.</dd>
 
 <dt>Inclination</dt> <dd>The inclination, also specified in degrees, controls the angle between
 the reference direction and the xy-plane. If you select the <em>View</em>-&gt;<em>Reset View</em> option,
 this setting moves the tip of the reference direction above or below the screen plane. A positive
-value lifts the tip up in the z-direction while a negative value pushes it down.</dd>
+value lifts the tip up in the z-direction (toward you) while a negative value pushes it down (away from you).</dd>
 
 <dt>Show direction arrow</dt> <dd>Toggle the visibility of an arrow showing the reference direction.</dd>
 
@@ -442,7 +438,8 @@ value lifts the tip up in the z-direction while a negative value pushes it down.
 </dl>
 
 <p>The angle histogram can be saved by clicking the <em>Save angle histogram</em> button. See
-the Output file section below for details of the file contents.</p>
+the <a href="#fiber_angle_histogram_file">Fiber angle histogram file section</a> below for details
+of the file contents.</p>
 
 <h3><a name="image_information_window"></a>Image Information Window</h3>
 

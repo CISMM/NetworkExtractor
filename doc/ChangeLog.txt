@@ -1,5 +1,9 @@
 2010-01-07  Cory Quammen <cquammen@cs.unc.edu>
 
+   * manual.html: Fixed up some typos and made certain portions clearer.
+
+2010-01-07  Cory Quammen <cquammen@cs.unc.edu>
+
    * manual.html: Completed this version of the manual.
 
 2010-01-07  Cory Quammen <cquammen@cs.unc.edu>
