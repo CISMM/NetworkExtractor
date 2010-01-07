@@ -76,7 +76,7 @@
      <x>0</x>
      <y>0</y>
      <width>952</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -168,8 +168,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>329</width>
-          <height>514</height>
+          <width>321</width>
+          <height>439</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -203,7 +203,7 @@
             <item>
              <widget class="QLabel" name="imageFilterLabel">
               <property name="text">
-               <string>Image Filter:</string>
+               <string>Image filter:</string>
               </property>
              </widget>
             </item>
@@ -317,13 +317,13 @@
                <item row="0" column="0">
                 <widget class="QLabel" name="fibernessAlphaCoefficientLabel">
                  <property name="toolTip">
-                  <string>Weight factor that controls how selective the fiberness filter is for non-round objects. Typically 0.5 is a good value.</string>
+                  <string>Weight factor that controls how the filter rejects flat objects as fibrous. Higher values tend to reject flat objects. Typically 0.5 is a good value.</string>
                  </property>
                  <property name="layoutDirection">
                   <enum>Qt::LeftToRight</enum>
                  </property>
                  <property name="text">
-                  <string>Fiberness alpha coefficient:</string>
+                  <string>Reject flat objects:</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -333,24 +333,24 @@
                <item row="0" column="1">
                 <widget class="QLineEdit" name="fibernessAlphaCoefficientEdit">
                  <property name="toolTip">
-                  <string>Weight factor that controls how selective the fiberness filter is for non-round objects. Typically 0.5 is a good value.</string>
+                  <string>Weight factor that controls how the filter rejects flat objects as fibrous. Higher values tend to reject flat objects. Typically 0.5 is a good value.</string>
                  </property>
                 </widget>
                </item>
                <item row="1" column="0">
                 <widget class="QLabel" name="fibernessBetaCoefficientLabel">
                  <property name="toolTip">
-                  <string>Weight factor that controls how selective the fiberness filter is for non-flat objects. Typically 0.5 is a good value.</string>
+                  <string>Weight factor that controls how the filter rejects non-round objects as fibrous. Lower values tend to reject round objects. Typically 0.5 is a good value.</string>
                  </property>
                  <property name="text">
-                  <string>Fiberness beta coefficient:</string>
+                  <string>Reject round objects:</string>
                  </property>
                 </widget>
                </item>
                <item row="1" column="1">
                 <widget class="QLineEdit" name="fibernessBetaCoefficientEdit">
                  <property name="toolTip">
-                  <string>Weight factor that controls how selective the fiberness filter is for non-flat objects. Typically 0.5 is a good value.</string>
+                  <string>Weight factor that controls how the filter rejects non-round objects as fibrous. Lower values tend to reject round objects. Typically 0.5 is a good value.</string>
                  </property>
                 </widget>
                </item>
@@ -360,7 +360,7 @@
                   <string>Weight factor that controls how selective the fiberness filter is for contrast. Higher values mean only fibers in high-contrast areas will be identified. Typically 50.0 is a good value.</string>
                  </property>
                  <property name="text">
-                  <string>Fiberness gamma coefficient:</string>
+                  <string>Reject low contrast objects:</string>
                  </property>
                 </widget>
                </item>
@@ -607,9 +607,9 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>-203</y>
-          <width>344</width>
-          <height>349</height>
+          <y>0</y>
+          <width>321</width>
+          <height>304</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -673,7 +673,7 @@
                   <string>Show/hide the isosurface.</string>
                  </property>
                  <property name="text">
-                  <string>Show Isosurface</string>
+                  <string>Show isosurface</string>
                  </property>
                  <property name="checked">
                   <bool>true</bool>
@@ -752,7 +752,7 @@
                   <string>Show/hide the image plane.</string>
                  </property>
                  <property name="text">
-                  <string>Show Image Plane</string>
+                  <string>Show image plane</string>
                  </property>
                  <property name="checked">
                   <bool>true</bool>
@@ -771,7 +771,7 @@
                      <enum>Qt::LeftToRight</enum>
                     </property>
                     <property name="text">
-                     <string>Z Plane:</string>
+                     <string>Z plane:</string>
                     </property>
                    </widget>
                   </item>
@@ -831,7 +831,7 @@
                   <string>Enable/disable cropping of the isosurface so that it is only shown above and below the image plane by some distance.</string>
                  </property>
                  <property name="text">
-                  <string>Crop Isosurface</string>
+                  <string>Crop isosurface</string>
                  </property>
                 </widget>
                </item>
@@ -850,7 +850,7 @@
                   <string>Keep this number of planes above and below the image plane when computing the isosurface.</string>
                  </property>
                  <property name="text">
-                  <string>Keep Planes Above/Below:</string>
+                  <string>Keep planes above/below:</string>
                  </property>
                 </widget>
                </item>
@@ -867,7 +867,7 @@
                   <string>Show/hide an outline around the image data.</string>
                  </property>
                  <property name="text">
-                  <string>Show Data Outline</string>
+                  <string>Show data outline</string>
                  </property>
                  <property name="checked">
                   <bool>true</bool>
@@ -971,8 +971,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>329</width>
-          <height>187</height>
+          <width>321</width>
+          <height>163</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_11">
@@ -1029,7 +1029,7 @@
             <item>
              <widget class="QCheckBox" name="showDirectionArrowCheckBox">
               <property name="text">
-               <string>Show Direction Arrow</string>
+               <string>Show direction arrow</string>
               </property>
               <property name="checked">
                <bool>false</bool>
@@ -1062,7 +1062,7 @@
             <item>
              <widget class="QPushButton" name="saveAngleHistogram">
               <property name="text">
-               <string>Save Angle Histogram</string>
+               <string>Save angle histogram</string>
               </property>
              </widget>
             </item>

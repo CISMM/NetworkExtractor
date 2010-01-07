@@ -1,3 +1,7 @@
+2010-01-07  Cory Quammen <cquammen@cs.unc.edu>
+
+   * FibrinAnalysis.ui: Clarified names of some settings.
+
 2009-09-08  Cory Quammen <cquammen@cs.unc.edu>
 
    * FibrinAnalysis.cxx: Added notification to user that skeletonization filter
