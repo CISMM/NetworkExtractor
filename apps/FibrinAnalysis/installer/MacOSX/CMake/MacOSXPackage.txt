@@ -43,6 +43,11 @@ FOREACH( LIBRARY ${VTK_LIBRARIES} )
   )
 ENDFOREACH( LIBRARY )
 
+FILE( GLOB DOCS "${FibrinAnalysis_SOURCE_DIR}/doc/*.html" "${FibrinAnalysis_SOURCE_DIR}/doc/*.css" )
+INSTALL( FILES ${DOCS} DESTINATION "../../../User Manual" )
+FILE( GLOB IMGS "${FibrinAnalysis_SOURCE_DIR}/doc/images/*.png" )
+INSTALL( FILES ${IMGS} DESTINATION "../../../User Manual/images" )
+
 # This is a GPL library dependency. Newer versions of VTK should not have this dependency,
 # so remove this in the future.
 FILE( GLOB HISTORY_LIBS /usr/local/lib/libhistory*.dylib )
