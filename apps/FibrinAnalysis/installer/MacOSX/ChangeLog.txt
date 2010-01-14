@@ -1,3 +1,8 @@
+2010-01-14  Cory Quammen <cquammen@cs.unc.edu>
+
+   * CMake/MacOSXPackage.txt: Added Qt frameworks that are apparently now
+   linked to the executable.
+
 2010-01-07  Cory Quammen <cquammen@cs.unc.edu>
 
    * CMake/MacOSXPackage.txt: Included documentation in installer.
