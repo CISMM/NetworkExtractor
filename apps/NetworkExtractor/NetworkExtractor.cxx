@@ -6,12 +6,13 @@
 #pragma warning( disable : 4996 )
 #endif
 
-#include <qapplication.h>
-#include <qerrormessage.h>
-#include <qfiledialog.h>
-#include <qmessagebox.h>
-#include <qsettings.h>
-#include <qvariant.h>
+#include <QApplication>
+#include <QCloseEvent>
+#include <QErrorMessage>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QSettings>
+#include <QVariant>
 
 #include <vtkActor.h>
 #include <vtkCamera.h>
@@ -47,13 +48,15 @@ void ProgressCallback(float progress, const char* processName) {
 // Constructor
 NetworkExtractor::NetworkExtractor(QWidget* p) 
  : QMainWindow(p) {
-  setupUi(this);
+
+  gui = new Ui_MainWindow();
+  gui->setupUi(this);
 
   m_FilterType = DataModel::NO_FILTER_STRING;
 
   // QT/VTK interact
   m_Renderer = vtkRenderer::New();
-  qvtkWidget->GetRenderWindow()->AddRenderer(m_Renderer);
+  gui->qvtkWidget->GetRenderWindow()->AddRenderer(m_Renderer);
 
   // Instantiate data model.
   m_DataModel = new DataModel();
@@ -63,13 +66,13 @@ NetworkExtractor::NetworkExtractor(QWidget* p)
   m_Visualization = new Visualization();
   m_Visualization->SetDirectionArrowVisible(false);
 
-  imageFilterComboBox->addItem(QString(DataModel::NO_FILTER_STRING.c_str()));
-  //imageFilterComboBox->addItem(QString(DataModel::FRANGI_FIBERNESS_FILTER_STRING.c_str()));
-  imageFilterComboBox->addItem(QString(DataModel::MULTISCALE_FIBERNESS_FILTER_STRING.c_str()));
-  imageFilterComboBox->addItem(QString(DataModel::MULTISCALE_FIBERNESS_THRESHOLD_FILTER_STRING.c_str()));
-  imageFilterComboBox->addItem(QString(DataModel::MULTISCALE_SKELETONIZATION_FILTER_STRING.c_str()));
-  //imageFilterComboBox->addItem(QString(DataModel::JUNCTIONNESS_FILTER_STRING.c_str()));
-  //imageFilterComboBox->addItem(QString(DataModel::JUNCTIONNESS_LOCAL_MAX_FILTER_STRING.c_str()));
+  gui->imageFilterComboBox->addItem(QString(DataModel::NO_FILTER_STRING.c_str()));
+  //gui->imageFilterComboBox->addItem(QString(DataModel::FRANGI_FIBERNESS_FILTER_STRING.c_str()));
+  gui->imageFilterComboBox->addItem(QString(DataModel::MULTISCALE_FIBERNESS_FILTER_STRING.c_str()));
+  gui->imageFilterComboBox->addItem(QString(DataModel::MULTISCALE_FIBERNESS_THRESHOLD_FILTER_STRING.c_str()));
+  gui->imageFilterComboBox->addItem(QString(DataModel::MULTISCALE_SKELETONIZATION_FILTER_STRING.c_str()));
+  //gui->imageFilterComboBox->addItem(QString(DataModel::JUNCTIONNESS_FILTER_STRING.c_str()));
+  //gui->imageFilterComboBox->addItem(QString(DataModel::JUNCTIONNESS_LOCAL_MAX_FILTER_STRING.c_str()));
 
   // Create and populate table model.
   int LEFT_COLUMN = 0;
@@ -100,7 +103,7 @@ NetworkExtractor::NetworkExtractor(QWidget* p)
       item->setEditable(false);
     m_TableModel->setItem(i, RIGHT_COLUMN, item);
   }
-  imageDataView->setModel(m_TableModel);
+  gui->imageDataView->setModel(m_TableModel);
 
   QCoreApplication::setOrganizationName("CISMM");
   QCoreApplication::setOrganizationDomain("cismm.org");
@@ -200,7 +203,7 @@ void NetworkExtractor::on_actionOpenSession_triggered() {
   m_Renderer->ResetCamera();
   
   // Render
-  qvtkWidget->GetRenderWindow()->Render();
+  gui->qvtkWidget->GetRenderWindow()->Render();
 }
 
 
@@ -272,8 +275,8 @@ void NetworkExtractor::on_actionOpenImage_triggered() {
   double max = m_DataModel->GetFilteredDataMaximum();
   double isoValue = 0.5*(min + max);
   QString isoValueString = QString().sprintf("%.4f", isoValue);
-  isoValueEdit->setText(isoValueString);
-  isoValueSlider->setValue(this->IsoValueSliderPosition(isoValue));
+  gui->isoValueEdit->setText(isoValueString);
+  gui->isoValueSlider->setValue(this->IsoValueSliderPosition(isoValue));
 
   // Set up visualization pipeline.
   m_Visualization->SetImageInputConnection(m_DataModel->GetImageOutputPort());
@@ -287,7 +290,7 @@ void NetworkExtractor::on_actionOpenImage_triggered() {
   m_Renderer->ResetCamera();
   
   // Render
-  qvtkWidget->GetRenderWindow()->Render();
+  gui->qvtkWidget->GetRenderWindow()->Render();
 }
 
 
@@ -297,7 +300,7 @@ void NetworkExtractor::OpenFile(std::string fileName) {
   
   // Set status bar with info about the file.
   QString imageInfo("Loaded image '"); imageInfo.append(fileName.c_str()); imageInfo.append("'.");
-  statusbar->showMessage(imageInfo);
+  gui->statusbar->showMessage(imageInfo);
 }
 
 
@@ -306,7 +309,7 @@ void NetworkExtractor::on_actionSaveFilteredImage_triggered() {
   if (fileName == "")
     return;
 
-  float scaleFactor = this->filteredImageScaleEdit->text().toDouble();
+  float scaleFactor = gui->filteredImageScaleEdit->text().toDouble();
   m_DataModel->SaveFilteredImageFile(fileName.toStdString(), m_FilterType, scaleFactor);
 
 }
@@ -360,7 +363,7 @@ void NetworkExtractor::on_actionSavePicture_triggered() {
     return;
 
   vtkWindowToImageFilter* capturer = vtkWindowToImageFilter::New();
-  capturer->SetInput(this->qvtkWidget->GetRenderWindow());
+  capturer->SetInput(gui->qvtkWidget->GetRenderWindow());
 
   vtkPNGWriter* writer = vtkPNGWriter::New();
   writer->SetInputConnection(capturer->GetOutputPort());
@@ -383,7 +386,7 @@ void NetworkExtractor::on_actionSaveRotationAnimation_triggered() {
   std::cout << extension.toStdString() << std::endl;
   
   vtkWindowToImageFilter* capturer = vtkWindowToImageFilter::New();
-  capturer->SetInput(this->qvtkWidget->GetRenderWindow());
+  capturer->SetInput(gui->qvtkWidget->GetRenderWindow());
 
   vtkPNGWriter* writer = vtkPNGWriter::New();
   writer->SetInputConnection(capturer->GetOutputPort());
@@ -402,7 +405,7 @@ void NetworkExtractor::on_actionSaveRotationAnimation_triggered() {
 
     camera->Azimuth(angleIncrement);
     m_Renderer->ResetCameraClippingRange();
-    qvtkWidget->GetRenderWindow()->Render();
+    gui->qvtkWidget->GetRenderWindow()->Render();
 
     float progress = static_cast<float>(i) / static_cast<float>(frames);
     this->UpdateProgress(progress);
@@ -431,19 +434,7 @@ void NetworkExtractor::on_actionSaveGeometry_triggered() {
 
 
 void NetworkExtractor::on_actionExit_triggered() {
-  // Ask if user really wants to quit.
-  QMessageBox messageBox;
-  messageBox.setText("Do you really want to exit?");
-  messageBox.setInformativeText("If you exit now, all settings will be lost.");
-  messageBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-  messageBox.setDefaultButton(QMessageBox::Cancel);
-  int selected = messageBox.exec();
-
-  if (selected == QMessageBox::Ok) {
-    WriteProgramSettings();
-    qApp->exit();
-  }
-
+  Exit();
 }
 
 
@@ -453,7 +444,7 @@ void NetworkExtractor::on_actionResetView_triggered() {
   camera->SetPosition(0, 0, 1);
   camera->SetViewUp(0, 1, 0);
   m_Renderer->ResetCamera();
-  qvtkWidget->GetRenderWindow()->Render();
+  gui->qvtkWidget->GetRenderWindow()->Render();
 }
 
 
@@ -480,7 +471,7 @@ void NetworkExtractor::on_actionOpenView_triggered() {
   camera->SetViewUp(values);
 
   m_Renderer->ResetCameraClippingRange();
-  qvtkWidget->GetRenderWindow()->Render();
+  gui->qvtkWidget->GetRenderWindow()->Render();
 }
 
 
@@ -527,62 +518,62 @@ void NetworkExtractor::on_actionAboutNetworkExtractor_triggered() {
 
 
 void NetworkExtractor::on_imageFilterComboBox_currentIndexChanged(QString filterText) {
-  fibernessSettingsWidget->setVisible(false);
-  multiscaleFibernessSettingsWidget->setVisible(false);
-  multiscaleFibernessThresholdSettingsWidget->setVisible(false);
-  junctionnessSettingsWidget->setVisible(false);
-  junctionnessLocalMaxSettingsWidget->setVisible(false);
+  gui->fibernessSettingsWidget->setVisible(false);
+  gui->multiscaleFibernessSettingsWidget->setVisible(false);
+  gui->multiscaleFibernessThresholdSettingsWidget->setVisible(false);
+  gui->junctionnessSettingsWidget->setVisible(false);
+  gui->junctionnessLocalMaxSettingsWidget->setVisible(false);
 
   if (filterText.toStdString() == DataModel::NO_FILTER_STRING) {
 
   } else if (filterText.toStdString() == DataModel::FRANGI_FIBERNESS_FILTER_STRING) {
-    fibernessSettingsWidget->setVisible(true);
+    gui->fibernessSettingsWidget->setVisible(true);
   } else if (filterText.toStdString() == DataModel::MULTISCALE_FIBERNESS_FILTER_STRING) {
-    multiscaleFibernessSettingsWidget->setVisible(true);
+    gui->multiscaleFibernessSettingsWidget->setVisible(true);
   } else if (filterText.toStdString() == DataModel::MULTISCALE_FIBERNESS_THRESHOLD_FILTER_STRING) {
-    multiscaleFibernessSettingsWidget->setVisible(true);
-    multiscaleFibernessThresholdSettingsWidget->setVisible(true);
+    gui->multiscaleFibernessSettingsWidget->setVisible(true);
+    gui->multiscaleFibernessThresholdSettingsWidget->setVisible(true);
   } else if (filterText.toStdString() == DataModel::MULTISCALE_SKELETONIZATION_FILTER_STRING) {
-    multiscaleFibernessSettingsWidget->setVisible(true);
-    multiscaleFibernessThresholdSettingsWidget->setVisible(true);
+    gui->multiscaleFibernessSettingsWidget->setVisible(true);
+    gui->multiscaleFibernessThresholdSettingsWidget->setVisible(true);
   } else if (filterText.toStdString() == DataModel::JUNCTIONNESS_FILTER_STRING) {
-    fibernessSettingsWidget->setVisible(true);
-    junctionnessSettingsWidget->setVisible(true);
+    gui->fibernessSettingsWidget->setVisible(true);
+    gui->junctionnessSettingsWidget->setVisible(true);
   } else if (filterText.toStdString() == DataModel::JUNCTIONNESS_LOCAL_MAX_FILTER_STRING) {
-    fibernessSettingsWidget->setVisible(true);
-    junctionnessSettingsWidget->setVisible(true);
-    junctionnessLocalMaxSettingsWidget->setVisible(true);
+    gui->fibernessSettingsWidget->setVisible(true);
+    gui->junctionnessSettingsWidget->setVisible(true);
+    gui->junctionnessLocalMaxSettingsWidget->setVisible(true);
   }
 }
 
 
 void NetworkExtractor::on_showIsosurfaceCheckBox_toggled(bool show) {
   m_Visualization->SetIsosurfaceVisible(show);
-  qvtkWidget->GetRenderWindow()->Render();
+  gui->qvtkWidget->GetRenderWindow()->Render();
 }
 
 
 void NetworkExtractor::on_isoValueEdit_textEdited(QString text) {
   int value = static_cast<int>(text.toDouble());
-  isoValueSlider->setValue(this->IsoValueSliderPosition(value));
+  gui->isoValueSlider->setValue(this->IsoValueSliderPosition(value));
 }
 
 
 void NetworkExtractor::on_isoValueSlider_sliderMoved(int value) {
   QString text = QString().sprintf("%.3f", this->IsoValueSliderValue(value));
-  isoValueEdit->setText(text);
+  gui->isoValueEdit->setText(text);
 }
 
 
 void NetworkExtractor::on_showZPlaneCheckbox_toggled(bool show) {
   m_Visualization->SetImagePlaneVisible(show);
-  qvtkWidget->GetRenderWindow()->Render();
+  gui->qvtkWidget->GetRenderWindow()->Render();
 }
 
 
 void NetworkExtractor::on_zPlaneEdit_textEdited(QString text) {
   int value = static_cast<int>(text.toDouble());
-  zPlaneSlider->setValue(value);
+  gui->zPlaneSlider->setValue(value);
 
   SetZPlane(value);
 }
@@ -590,7 +581,7 @@ void NetworkExtractor::on_zPlaneEdit_textEdited(QString text) {
 
 void NetworkExtractor::on_zPlaneSlider_sliderMoved(int value) {
   QString text = QString().sprintf("%d", value);
-  zPlaneEdit->setText(text);
+  gui->zPlaneEdit->setText(text);
 
   SetZPlane(value);
 }
@@ -608,7 +599,7 @@ void NetworkExtractor::SetZPlane(int plane) {
     m_Visualization->SetZSlice(dims[2]-1);
   }
 
-  qvtkWidget->GetRenderWindow()->Render();
+  gui->qvtkWidget->GetRenderWindow()->Render();
 }
 
 
@@ -643,7 +634,7 @@ void NetworkExtractor::on_azimuthEdit_textEdited(QString text) {
   double azimuth = text.toDouble();
   m_DataModel->SetReferenceDirectionAzimuth(azimuth);
   m_Visualization->SetDirectionArrowAzimuth(azimuth);
-  qvtkWidget->GetRenderWindow()->Render();
+  gui->qvtkWidget->GetRenderWindow()->Render();
 }
 
 
@@ -651,7 +642,7 @@ void NetworkExtractor::on_inclinationEdit_textEdited(QString text) {
   double inclination = text.toDouble();
   m_DataModel->SetReferenceDirectionInclination(inclination);
   m_Visualization->SetDirectionArrowInclination(inclination);
-  qvtkWidget->GetRenderWindow()->Render();
+  gui->qvtkWidget->GetRenderWindow()->Render();
 }
 
 
@@ -668,9 +659,9 @@ void NetworkExtractor::on_saveAngleHistogram_clicked() {
     if (fileName == "")
       return;
 
-    double azimuth = azimuthEdit->text().toDouble();
-    double inclination = inclinationEdit->text().toDouble();
-    unsigned int bins = histogramBinsEdit->text().toUInt();
+    double azimuth = gui->azimuthEdit->text().toDouble();
+    double inclination = gui->inclinationEdit->text().toDouble();
+    unsigned int bins = gui->histogramBinsEdit->text().toUInt();
     m_DataModel->SaveFiberAngleHistogram
       (fileName.toStdString(), azimuth, inclination, bins);
 
@@ -688,7 +679,7 @@ void NetworkExtractor::on_saveAngleHistogram_clicked() {
 
 void NetworkExtractor::on_showDataOutlineCheckBox_toggled(bool show) {
   m_Visualization->SetShowOutline(show);
-  qvtkWidget->GetRenderWindow()->Render();
+  gui->qvtkWidget->GetRenderWindow()->Render();
 }
 
 
@@ -696,7 +687,7 @@ void NetworkExtractor::on_cropIsosurfaceCheckBox_toggled(bool crop) {
   m_Visualization->SetCropIsosurface(crop);
   
   // Read z-plane.
-  int plane = zPlaneEdit->text().toInt();
+  int plane = gui->zPlaneEdit->text().toInt();
   SetZPlane(plane);
 }
 
@@ -704,40 +695,40 @@ void NetworkExtractor::on_cropIsosurfaceCheckBox_toggled(bool crop) {
 void NetworkExtractor::on_applyButton_clicked() {
 
   // Read fiber diameter.
-  double fiberDiameter = this->fiberDiameterEdit->text().toDouble();
+  double fiberDiameter = gui->fiberDiameterEdit->text().toDouble();
   m_DataModel->SetFiberDiameter(fiberDiameter);
 
-  double fibernessAlphaCoef = this->fibernessAlphaCoefficientEdit->text().toDouble();
+  double fibernessAlphaCoef = gui->fibernessAlphaCoefficientEdit->text().toDouble();
   m_DataModel->SetMultiscaleFibernessAlphaCoefficient(fibernessAlphaCoef);
 
-  double fibernessBetaCoef = this->fibernessBetaCoefficientEdit->text().toDouble();
+  double fibernessBetaCoef = gui->fibernessBetaCoefficientEdit->text().toDouble();
   m_DataModel->SetMultiscaleFibernessBetaCoefficient(fibernessBetaCoef);
 
-  double fibernessGammaCoef = this->fibernessGammaCoefficientEdit->text().toDouble();
+  double fibernessGammaCoef = gui->fibernessGammaCoefficientEdit->text().toDouble();
   m_DataModel->SetMultiscaleFibernessGammaCoefficient(fibernessGammaCoef);
 
-  double fibernessScaleMinimum = this->fibernessScaleMinimumEdit->text().toDouble();
+  double fibernessScaleMinimum = gui->fibernessScaleMinimumEdit->text().toDouble();
   m_DataModel->SetMultiscaleFibernessMinimumScale(fibernessScaleMinimum);
 
-  double fibernessScaleMaximum = this->fibernessScaleMaximumEdit->text().toDouble();
+  double fibernessScaleMaximum = gui->fibernessScaleMaximumEdit->text().toDouble();
   m_DataModel->SetMultiscaleFibernessMaximumScale(fibernessScaleMaximum);
 
-  double fibernessNumberOfScales = this->fibernessNumberOfScalesEdit->text().toInt();
+  double fibernessNumberOfScales = gui->fibernessNumberOfScalesEdit->text().toInt();
   m_DataModel->SetMultiscaleFibernessNumberOfScales(fibernessNumberOfScales);
 
-  double fibernessThreshold = this->fibernessThresholdEdit->text().toDouble();
+  double fibernessThreshold = gui->fibernessThresholdEdit->text().toDouble();
   m_DataModel->SetMultiscaleFibernessThreshold(fibernessThreshold);
 
-  double junctionProbeDiameter = this->junctionProbeDiameterEdit->text().toDouble();
+  double junctionProbeDiameter = gui->junctionProbeDiameterEdit->text().toDouble();
   m_DataModel->SetJunctionProbeDiameter(junctionProbeDiameter);
 
-  double junctionFibernessThreshold = this->junctionFibernessThresholdEdit->text().toDouble();
+  double junctionFibernessThreshold = gui->junctionFibernessThresholdEdit->text().toDouble();
   m_DataModel->SetJunctionFibernessThreshold(junctionFibernessThreshold);
 
-  double junctionnessLocalMaxHeight = this->junctionnessLocalMaxHeightEdit->text().toDouble();
+  double junctionnessLocalMaxHeight = gui->junctionnessLocalMaxHeightEdit->text().toDouble();
   m_DataModel->SetJunctionnessLocalMaxHeight(junctionnessLocalMaxHeight);
 
-  double filteredImageScaleFactor = this->filteredImageScaleEdit->text().toDouble();
+  double filteredImageScaleFactor = gui->filteredImageScaleEdit->text().toDouble();
   m_DataModel->SetFilteredImageScaleFactor(filteredImageScaleFactor);
 
   ///////////////// Update image spacing settings ////////////////
@@ -765,7 +756,7 @@ void NetworkExtractor::on_applyButton_clicked() {
   m_DataModel->SetZSquishFactor(zSquish);
 
   ///////////////// Update image filters ////////////////
-  QString text = this->imageFilterComboBox->currentText();
+  QString text = gui->imageFilterComboBox->currentText();
   if (text.toStdString() != m_FilterType) {
     if (text.toStdString() == DataModel::NO_FILTER_STRING) {
       m_DataModel->SetFilterToNone();
@@ -786,13 +777,13 @@ void NetworkExtractor::on_applyButton_clicked() {
   }
 
   ///////////////// Update visualization settings /////////////////
-  double isoValue = isoValueEdit->text().toDouble();
+  double isoValue = gui->isoValueEdit->text().toDouble();
   m_Visualization->SetIsoValue(isoValue);
 
-  int plane = zPlaneEdit->text().toInt();
+  int plane = gui->zPlaneEdit->text().toInt();
   SetZPlane(plane);
 
-  int keepPlanes = keepPlanesEdit->text().toInt();
+  int keepPlanes = gui->keepPlanesEdit->text().toInt();
   m_Visualization->SetKeepPlanesAboveBelowImagePlane(keepPlanes);
 
   RefreshUI();
@@ -842,43 +833,43 @@ void NetworkExtractor::RefreshUI() {
   const char *intFormat = "%d";
 
   QString fiberDiameter = QString().sprintf(decimalFormat, m_DataModel->GetFiberDiameter());
-  fiberDiameterEdit->setText(fiberDiameter);
+  gui->fiberDiameterEdit->setText(fiberDiameter);
 
   QString fibernessAlphaCoef = QString().sprintf(decimalFormat, m_DataModel->GetMultiscaleFibernessAlphaCoefficient());
-  fibernessAlphaCoefficientEdit->setText(fibernessAlphaCoef);
+  gui->fibernessAlphaCoefficientEdit->setText(fibernessAlphaCoef);
 
   QString fibernessBetaCoef = QString().sprintf(decimalFormat, m_DataModel->GetMultiscaleFibernessBetaCoefficient());
-  fibernessBetaCoefficientEdit->setText(fibernessBetaCoef);
+  gui->fibernessBetaCoefficientEdit->setText(fibernessBetaCoef);
 
   QString fibernessGammaCoef = QString().sprintf(decimalFormat, m_DataModel->GetMultiscaleFibernessGammaCoefficient());
-  fibernessGammaCoefficientEdit->setText(fibernessGammaCoef);
+  gui->fibernessGammaCoefficientEdit->setText(fibernessGammaCoef);
 
   QString fibernessScaleMinimum = QString().sprintf(decimalFormat, m_DataModel->GetMultiscaleFibernessMinimumScale());
-  fibernessScaleMinimumEdit->setText(fibernessScaleMinimum);
+  gui->fibernessScaleMinimumEdit->setText(fibernessScaleMinimum);
 
   QString fibernessScaleMaximum = QString().sprintf(decimalFormat, m_DataModel->GetMultiscaleFibernessMaximumScale());
-  fibernessScaleMaximumEdit->setText(fibernessScaleMaximum);
+  gui->fibernessScaleMaximumEdit->setText(fibernessScaleMaximum);
 
   QString fibernessScales = QString().sprintf(intFormat, m_DataModel->GetMultiscaleFibernessNumberOfScales());
-  fibernessNumberOfScalesEdit->setText(fibernessScales);
+  gui->fibernessNumberOfScalesEdit->setText(fibernessScales);
 
   QString fibernessThreshold = QString().sprintf(decimalFormat, m_DataModel->GetMultiscaleFibernessThreshold());
-  fibernessThresholdEdit->setText(fibernessThreshold);
+  gui->fibernessThresholdEdit->setText(fibernessThreshold);
   
   QString junctionProbeFilterDiameter = QString().sprintf(decimalFormat, m_DataModel->GetJunctionProbeDiameter());
-  junctionProbeDiameterEdit->setText(junctionProbeFilterDiameter);
+  gui->junctionProbeDiameterEdit->setText(junctionProbeFilterDiameter);
 
   QString junctionFibernessThreshold = QString().sprintf(decimalFormat, m_DataModel->GetJunctionFibernessThreshold());
-  junctionFibernessThresholdEdit->setText(junctionFibernessThreshold);
+  gui->junctionFibernessThresholdEdit->setText(junctionFibernessThreshold);
 
   QString junctionnessLocalMaxHeight = QString().sprintf(decimalFormat, m_DataModel->GetJunctionnessLocalMaxHeight());
-  junctionnessLocalMaxHeightEdit->setText(junctionnessLocalMaxHeight);
+  gui->junctionnessLocalMaxHeightEdit->setText(junctionnessLocalMaxHeight);
 
   QString filteredImageScaleFactor = QString().sprintf(decimalFormat, m_DataModel->GetFilteredImageScaleFactor());
-  filteredImageScaleEdit->setText(filteredImageScaleFactor);
+  gui->filteredImageScaleEdit->setText(filteredImageScaleFactor);
 
-  azimuthEdit->setText(QString().sprintf(decimalFormat, m_DataModel->GetReferenceDirectionAzimuth()));
-  inclinationEdit->setText(QString().sprintf(decimalFormat, m_DataModel->GetReferenceDirectionInclination()));
+  gui->azimuthEdit->setText(QString().sprintf(decimalFormat, m_DataModel->GetReferenceDirectionAzimuth()));
+  gui->inclinationEdit->setText(QString().sprintf(decimalFormat, m_DataModel->GetReferenceDirectionInclination()));
 
   QString dataMin = QString().sprintf(decimalFormat, m_DataModel->GetFilteredDataMinimum());
   m_TableModel->item(0, 1)->setText(dataMin);
@@ -909,31 +900,31 @@ void NetworkExtractor::RefreshUI() {
     QString().sprintf(decimalFormat, m_DataModel->GetZSquishFactor());    
   m_TableModel->item(8, 1)->setText(zSquishFactor);
 
-  showIsosurfaceCheckBox->setChecked(m_Visualization->GetIsosurfaceVisible());
+  gui->showIsosurfaceCheckBox->setChecked(m_Visualization->GetIsosurfaceVisible());
 
   double isoValue = m_Visualization->GetIsoValue();
   QString isoValueString = QString().sprintf(decimalFormat, isoValue);
-  isoValueEdit->setText(isoValueString);
-  isoValueSlider->setValue(this->IsoValueSliderPosition(isoValue));
+  gui->isoValueEdit->setText(isoValueString);
+  gui->isoValueSlider->setValue(this->IsoValueSliderPosition(isoValue));
 
-  showZPlaneCheckbox->setChecked(m_Visualization->GetImagePlaneVisible());
+  gui->showZPlaneCheckbox->setChecked(m_Visualization->GetImagePlaneVisible());
 
   // Update slice slider
   int resampledDims[3];
   m_DataModel->GetResampledDimensions(resampledDims);
-  zPlaneSlider->setMinValue(1);
-  zPlaneSlider->setMaxValue(resampledDims[2]);
+  gui->zPlaneSlider->setMinValue(1);
+  gui->zPlaneSlider->setMaxValue(resampledDims[2]);
   int zSlice = m_Visualization->GetZSlice()+1;
-  zPlaneSlider->setValue(zSlice);
+  gui->zPlaneSlider->setValue(zSlice);
   QString zPlaneString = QString().sprintf(intFormat, zSlice);
-  zPlaneEdit->setText(zPlaneString);
+  gui->zPlaneEdit->setText(zPlaneString);
 
   // Update cropping widgets
-  cropIsosurfaceCheckBox->setChecked(m_Visualization->GetCropIsosurface());
+  gui->cropIsosurfaceCheckBox->setChecked(m_Visualization->GetCropIsosurface());
   QString keepPlanesString = QString().sprintf(intFormat, m_Visualization->GetKeepPlanesAboveBelowImagePlane());
-  keepPlanesEdit->setText(keepPlanesString);
+  gui->keepPlanesEdit->setText(keepPlanesString);
 
-  showDataOutlineCheckBox->setChecked(m_Visualization->GetShowOutline());
+  gui->showDataOutlineCheckBox->setChecked(m_Visualization->GetShowOutline());
 
   RefreshVisualization();
 }
@@ -957,19 +948,38 @@ void NetworkExtractor::RefreshVisualization() {
     m_Visualization->AddToRenderer(m_Renderer);
   }
 
-  qvtkWidget->GetRenderWindow()->GetInteractor()->SetDesiredUpdateRate(4.0);
-  qvtkWidget->GetRenderWindow()->Render();
+  gui->qvtkWidget->GetRenderWindow()->GetInteractor()->SetDesiredUpdateRate(4.0);
+  gui->qvtkWidget->GetRenderWindow()->Render();
 }
 
 
 void NetworkExtractor::UpdateProgress(float progress) const {
   int progressValue = static_cast<int>(progress*100.0);
-  progressBar->setValue(progressValue);
+  gui->progressBar->setValue(progressValue);
 }
 
 
 void NetworkExtractor::closeEvent(QCloseEvent* event) {
-  WriteProgramSettings();
+  Exit();
+
+  // If we made it past the call above, the user clicked cancel.
+  event->ignore();
+}
+
+
+void NetworkExtractor::Exit() {
+  // Ask if user really wants to quit.
+  QMessageBox messageBox;
+  messageBox.setText("Do you really want to exit?");
+  messageBox.setInformativeText("If you exit now, all settings will be lost.");
+  messageBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+  messageBox.setDefaultButton(QMessageBox::Cancel);
+  int selected = messageBox.exec();
+
+  if (selected == QMessageBox::Ok) {
+    WriteProgramSettings();
+    qApp->exit();
+  }
 }
 
 
@@ -977,23 +987,9 @@ void NetworkExtractor::WriteProgramSettings() {
   QSettings settings;
 
   settings.beginGroup("MainWindow");
-  settings.setValue("size", this->size());
-  settings.setValue("pos", this->pos());
+  settings.setValue("WindowSettings", saveState());
+  settings.setValue("Geometry", saveGeometry());
   settings.endGroup();
-
-  QList<QDockWidget*> widgets = this->findChildren<QDockWidget*>();
-  QListIterator<QDockWidget*> iterator(widgets);
-  while (iterator.hasNext()) {
-    QDockWidget* dockWidget = iterator.next();
-    settings.beginGroup(dockWidget->objectName());
-    settings.setValue("size", dockWidget->size());
-    settings.setValue("pos", dockWidget->pos());
-    settings.setValue("visible", dockWidget->isVisible());
-    settings.setValue("floating", dockWidget->isFloating());
-    settings.setValue("dockArea", this->dockWidgetArea(dockWidget));
-    settings.endGroup();
-  }
-
 }
 
 
@@ -1001,30 +997,16 @@ void NetworkExtractor::ReadProgramSettings() {
   QSettings settings;
 
   settings.beginGroup("MainWindow");
-  resize(settings.value("size", QSize(1000, 743)).toSize());
-  move(settings.value("pos", QPoint(0, 0)).toPoint());
+  restoreState(settings.value("WindowSettings").toByteArray());
+  restoreGeometry(settings.value("Geometry").toByteArray());
   settings.endGroup();
-
-  QList<QDockWidget*> widgets = this->findChildren<QDockWidget*>();
-  QListIterator<QDockWidget*> iterator(widgets);
-  while (iterator.hasNext()) {
-    QDockWidget* dockWidget = iterator.next();
-    settings.beginGroup(dockWidget->objectName());
-    dockWidget->resize(settings.value("size", QSize(340, 200)).toSize());
-    dockWidget->move(settings.value("pos", QPoint(0, 0)).toPoint());
-    dockWidget->setVisible(settings.value("visible", true).toBool());
-    dockWidget->setFloating(settings.value("floating", false).toBool());
-    addDockWidget(static_cast<Qt::DockWidgetArea>(settings.value("dockArea", Qt::LeftDockWidgetArea).toUInt()), dockWidget);
-    settings.endGroup();
-  }
-
 }
 
 
 int NetworkExtractor::IsoValueSliderPosition(double value) {
   double dataMin = m_DataModel->GetFilteredDataMinimum();
   double dataMax = m_DataModel->GetFilteredDataMaximum();
-  double sliderMax = static_cast<double>(this->isoValueSlider->maximum());
+  double sliderMax = static_cast<double>(gui->isoValueSlider->maximum());
   return static_cast<int>(sliderMax*((value-dataMin)/(dataMax-dataMin)));
 }
 
@@ -1032,7 +1014,7 @@ int NetworkExtractor::IsoValueSliderPosition(double value) {
 double NetworkExtractor::IsoValueSliderValue(int position) {
   double dataMin = m_DataModel->GetFilteredDataMinimum();
   double dataMax = m_DataModel->GetFilteredDataMaximum();
-  double sliderMax = static_cast<double>(this->isoValueSlider->maximum());
+  double sliderMax = static_cast<double>(gui->isoValueSlider->maximum());
   return (static_cast<double>(position) / sliderMax) 
     * (dataMax - dataMin) + dataMin;
 }

@@ -1,9 +1,10 @@
 #ifndef _NETWORK_EXTRACTOR_QT_H_
 #define _NETWORK_EXTRACTOR_QT_H_
 
-#include <qerrormessage.h>
-#include <qmainwindow.h>
-#include <qstandarditemmodel.h>
+#include <QErrorMessage>
+#include <QMainWindow>
+#include <QStandardItemModel>
+
 #include "ui_NetworkExtractor.h"
 
 #include "DataModel.h"
@@ -14,7 +15,7 @@
 class vtkRenderer;
 
 
-class NetworkExtractor : public QMainWindow, private Ui_MainWindow
+class NetworkExtractor : public QMainWindow
 {
     Q_OBJECT
 
@@ -27,10 +28,14 @@ public:
   void UpdateProgress(float progress) const;
 
 protected:
-  void closeEvent(QCloseEvent* event);
+  Ui_MainWindow* gui;
 
+  void Exit();
   void WriteProgramSettings();
   void ReadProgramSettings();
+
+  // Override the closeEvent handler.
+  void closeEvent(QCloseEvent* event);
 
   int IsoValueSliderPosition(double value);
   double IsoValueSliderValue(int position);
