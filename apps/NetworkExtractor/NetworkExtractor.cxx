@@ -1,4 +1,4 @@
-#include "FibrinAnalysis.h"
+#include "NetworkExtractor.h"
 #include "ConfigurationFileParser.h"
 #include "Version.h"
 
@@ -45,7 +45,7 @@ void ProgressCallback(float progress, const char* processName) {
 
 
 // Constructor
-FibrinAnalysis::FibrinAnalysis(QWidget* p) 
+NetworkExtractor::NetworkExtractor(QWidget* p) 
  : QMainWindow(p) {
   setupUi(this);
 
@@ -104,12 +104,12 @@ FibrinAnalysis::FibrinAnalysis(QWidget* p)
 
   QCoreApplication::setOrganizationName("CISMM");
   QCoreApplication::setOrganizationDomain("cismm.org");
-  QCoreApplication::setApplicationName("Fibrin Analysis");
+  QCoreApplication::setApplicationName("Network Extractor");
 
   QString windowTitle = 
-    QString().sprintf("Fibrin Analysis %d.%d.%d", FIBRIN_ANALYSIS_MAJOR_NUMBER,
-		    FIBRIN_ANALYSIS_MINOR_NUMBER,
-		    FIBRIN_ANALYSIS_REVISION_NUMBER);
+    QString().sprintf("Network Extractor %d.%d.%d", NETWORK_EXTRACTOR_MAJOR_NUMBER,
+		    NETWORK_EXTRACTOR_MINOR_NUMBER,
+		    NETWORK_EXTRACTOR_REVISION_NUMBER);
   setWindowTitle(windowTitle);
 
   // Restore GUI settings.
@@ -121,14 +121,14 @@ FibrinAnalysis::FibrinAnalysis(QWidget* p)
 
 
 // Destructor
-FibrinAnalysis::~FibrinAnalysis() {
+NetworkExtractor::~NetworkExtractor() {
   delete m_DataModel;
   delete m_Visualization;
   delete m_TableModel;
 }
 
 
-void FibrinAnalysis::on_actionOpenSession_triggered() {
+void NetworkExtractor::on_actionOpenSession_triggered() {
   QString fileName =
     QFileDialog::getOpenFileName(this, tr("Open Session File"), tr(""),
 				 tr("Session File (*.fas);;"));
@@ -204,7 +204,7 @@ void FibrinAnalysis::on_actionOpenSession_triggered() {
 }
 
 
-void FibrinAnalysis::on_actionSaveSession_triggered() {
+void NetworkExtractor::on_actionSaveSession_triggered() {
   QString fileName = 
     QFileDialog::getSaveFileName(this, tr("Save Session File"), tr(""), 
 				 tr("Session File (*.fas);;"));
@@ -218,7 +218,7 @@ void FibrinAnalysis::on_actionSaveSession_triggered() {
     return;
   }
 
-  fprintf(fp, "; Written by Fibrin Analysis\n\n");
+  fprintf(fp, "; Written by Network Extractor\n\n");
 
   fprintf(fp, "[Image]\n");
   fprintf(fp, "fileName=%s\n", m_DataModel->GetImageFileName().c_str());
@@ -255,7 +255,7 @@ void FibrinAnalysis::on_actionSaveSession_triggered() {
 
 
 // Action to be taken upon file open 
-void FibrinAnalysis::on_actionOpenImage_triggered() {
+void NetworkExtractor::on_actionOpenImage_triggered() {
 
   // Locate file.
   QString fileName = QFileDialog::getOpenFileName(this, "Open Image Data", "", "TIF Images (*.tif);;VTK Images (*.vtk);;LSM Images (*.lsm);;");
@@ -291,7 +291,7 @@ void FibrinAnalysis::on_actionOpenImage_triggered() {
 }
 
 
-void FibrinAnalysis::OpenFile(std::string fileName) {
+void NetworkExtractor::OpenFile(std::string fileName) {
   std::cout << "Loading file '" << fileName << "'" << std::endl;
   m_DataModel->LoadImageFile(fileName);
   
@@ -301,7 +301,7 @@ void FibrinAnalysis::OpenFile(std::string fileName) {
 }
 
 
-void FibrinAnalysis::on_actionSaveFilteredImage_triggered() {
+void NetworkExtractor::on_actionSaveFilteredImage_triggered() {
   QString fileName = QFileDialog::getSaveFileName(this, "Save Filtered Image", "", "TIF Images (*.tif);;VTK (*.vtk);;");
   if (fileName == "")
     return;
@@ -312,7 +312,7 @@ void FibrinAnalysis::on_actionSaveFilteredImage_triggered() {
 }
 
 
-void FibrinAnalysis::on_actionSaveFiberOrientationImage_triggered() {
+void NetworkExtractor::on_actionSaveFiberOrientationImage_triggered() {
 
   if (m_FilterType == DataModel::MULTISCALE_FIBERNESS_FILTER_STRING) {
     QString fileName = QFileDialog::getSaveFileName(this, "Save Fiber Orientation Image", "", "VTK (*.vtk);;");
@@ -333,7 +333,7 @@ void FibrinAnalysis::on_actionSaveFiberOrientationImage_triggered() {
 }
 
 
-void FibrinAnalysis::on_actionSaveFiberOrientationData_triggered() {
+void NetworkExtractor::on_actionSaveFiberOrientationData_triggered() {
 
   // Allow saving only when skeletonization filter is selected.
   if (m_FilterType == DataModel::MULTISCALE_SKELETONIZATION_FILTER_STRING) {
@@ -354,7 +354,7 @@ void FibrinAnalysis::on_actionSaveFiberOrientationData_triggered() {
 }
 
 
-void FibrinAnalysis::on_actionSavePicture_triggered() {
+void NetworkExtractor::on_actionSavePicture_triggered() {
   QString fileName = QFileDialog::getSaveFileName(this, "Save Picture", "", "PNG (*.png);;");
   if (fileName == "")
     return;
@@ -372,7 +372,7 @@ void FibrinAnalysis::on_actionSavePicture_triggered() {
 }
 
 
-void FibrinAnalysis::on_actionSaveRotationAnimation_triggered() {
+void NetworkExtractor::on_actionSaveRotationAnimation_triggered() {
   QString fileName = QFileDialog::getSaveFileName(this, "Save Rotation Animation", "", "PNG (*.png);;");
   if (fileName == "")
     return;
@@ -414,7 +414,7 @@ void FibrinAnalysis::on_actionSaveRotationAnimation_triggered() {
 }
 
 
-void FibrinAnalysis::on_actionSaveGeometry_triggered() {
+void NetworkExtractor::on_actionSaveGeometry_triggered() {
   QString fileName = QFileDialog::getSaveFileName(this, "Save Geometry", "", "VTK (*.vtk);;");
   if (fileName == "")
     return;
@@ -430,7 +430,7 @@ void FibrinAnalysis::on_actionSaveGeometry_triggered() {
 }
 
 
-void FibrinAnalysis::on_actionExit_triggered() {
+void NetworkExtractor::on_actionExit_triggered() {
   // Ask if user really wants to quit.
   QMessageBox messageBox;
   messageBox.setText("Do you really want to exit?");
@@ -447,7 +447,7 @@ void FibrinAnalysis::on_actionExit_triggered() {
 }
 
 
-void FibrinAnalysis::on_actionResetView_triggered() {
+void NetworkExtractor::on_actionResetView_triggered() {
   vtkCamera* camera = m_Renderer->GetActiveCamera();
   camera->SetFocalPoint(0, 0, 0);
   camera->SetPosition(0, 0, 1);
@@ -457,7 +457,7 @@ void FibrinAnalysis::on_actionResetView_triggered() {
 }
 
 
-void FibrinAnalysis::on_actionOpenView_triggered() {
+void NetworkExtractor::on_actionOpenView_triggered() {
   QString fileName = 
     QFileDialog::getOpenFileName(this, tr("Open Camera View File"), tr(""), 
 				 tr("View Files (*.view);;"));
@@ -484,7 +484,7 @@ void FibrinAnalysis::on_actionOpenView_triggered() {
 }
 
 
-void FibrinAnalysis::on_actionSaveView_triggered() {
+void NetworkExtractor::on_actionSaveView_triggered() {
 
   QString fileName = QFileDialog::getSaveFileName(this, 
     "Save Camera View File", "", "View files (*.view);;");
@@ -496,7 +496,7 @@ void FibrinAnalysis::on_actionSaveView_triggered() {
     m_ErrorDialog.showMessage(tr("Could not write view file ").append(fileName));
   }
 
-  fprintf(fp, "; Written by Fibrin Analysis\n\n");
+  fprintf(fp, "; Written by Network Extractor\n\n");
   fprintf(fp, "[Camera]\n");
 
   double* position = m_Renderer->GetActiveCamera()->GetPosition();
@@ -512,21 +512,21 @@ void FibrinAnalysis::on_actionSaveView_triggered() {
 }
 
 
-void FibrinAnalysis::on_actionAboutFibrinAnalysis_triggered() {
+void NetworkExtractor::on_actionAboutNetworkExtractor_triggered() {
   QString version = QString().sprintf("%d.%d.%d", 
-				      FIBRIN_ANALYSIS_MAJOR_NUMBER,
-				      FIBRIN_ANALYSIS_MINOR_NUMBER,
-				      FIBRIN_ANALYSIS_REVISION_NUMBER);
+				      NETWORK_EXTRACTOR_MAJOR_NUMBER,
+				      NETWORK_EXTRACTOR_MINOR_NUMBER,
+				      NETWORK_EXTRACTOR_REVISION_NUMBER);
   QChar copyright(169);
-  QString title = QString("About Fibrin Analysis ").append(version);
-  QString text  = QString("Fibrin Analysis ").append(version).append("\n");
-  text.append(copyright).append(" 2009, UNC CISMM\n\n");
+  QString title = QString("About Network Extractor ").append(version);
+  QString text  = QString("Network Extractor ").append(version).append("\n");
+  text.append(copyright).append(" 2009-10, UNC CISMM\n\n");
   text.append("Developed by Cory Quammen");
   QMessageBox::about(this, title, text);
 }
 
 
-void FibrinAnalysis::on_imageFilterComboBox_currentIndexChanged(QString filterText) {
+void NetworkExtractor::on_imageFilterComboBox_currentIndexChanged(QString filterText) {
   fibernessSettingsWidget->setVisible(false);
   multiscaleFibernessSettingsWidget->setVisible(false);
   multiscaleFibernessThresholdSettingsWidget->setVisible(false);
@@ -556,31 +556,31 @@ void FibrinAnalysis::on_imageFilterComboBox_currentIndexChanged(QString filterTe
 }
 
 
-void FibrinAnalysis::on_showIsosurfaceCheckBox_toggled(bool show) {
+void NetworkExtractor::on_showIsosurfaceCheckBox_toggled(bool show) {
   m_Visualization->SetIsosurfaceVisible(show);
   qvtkWidget->GetRenderWindow()->Render();
 }
 
 
-void FibrinAnalysis::on_isoValueEdit_textEdited(QString text) {
+void NetworkExtractor::on_isoValueEdit_textEdited(QString text) {
   int value = static_cast<int>(text.toDouble());
   isoValueSlider->setValue(this->IsoValueSliderPosition(value));
 }
 
 
-void FibrinAnalysis::on_isoValueSlider_sliderMoved(int value) {
+void NetworkExtractor::on_isoValueSlider_sliderMoved(int value) {
   QString text = QString().sprintf("%.3f", this->IsoValueSliderValue(value));
   isoValueEdit->setText(text);
 }
 
 
-void FibrinAnalysis::on_showZPlaneCheckbox_toggled(bool show) {
+void NetworkExtractor::on_showZPlaneCheckbox_toggled(bool show) {
   m_Visualization->SetImagePlaneVisible(show);
   qvtkWidget->GetRenderWindow()->Render();
 }
 
 
-void FibrinAnalysis::on_zPlaneEdit_textEdited(QString text) {
+void NetworkExtractor::on_zPlaneEdit_textEdited(QString text) {
   int value = static_cast<int>(text.toDouble());
   zPlaneSlider->setValue(value);
 
@@ -588,7 +588,7 @@ void FibrinAnalysis::on_zPlaneEdit_textEdited(QString text) {
 }
 
 
-void FibrinAnalysis::on_zPlaneSlider_sliderMoved(int value) {
+void NetworkExtractor::on_zPlaneSlider_sliderMoved(int value) {
   QString text = QString().sprintf("%d", value);
   zPlaneEdit->setText(text);
 
@@ -596,7 +596,7 @@ void FibrinAnalysis::on_zPlaneSlider_sliderMoved(int value) {
 }
 
 
-void FibrinAnalysis::SetZPlane(int plane) {
+void NetworkExtractor::SetZPlane(int plane) {
   int dims[3];
   m_DataModel->GetResampledDimensions(dims);
   plane--;
@@ -613,7 +613,7 @@ void FibrinAnalysis::SetZPlane(int plane) {
 
 
 #if 0
-void FibrinAnalysis::on_saveConnectedComponentsData_clicked() {
+void NetworkExtractor::on_saveConnectedComponentsData_clicked() {
   QString fileName = QFileDialog::getSaveFileName(this, 
     "Save Connected Component vs. Threshold Data", "", "TXT (*.txt);;");
   if (fileName == "")
@@ -627,7 +627,7 @@ void FibrinAnalysis::on_saveConnectedComponentsData_clicked() {
 }
 
 
-void FibrinAnalysis::on_saveVolumeFractionEstimateData_clicked() {
+void NetworkExtractor::on_saveVolumeFractionEstimateData_clicked() {
   QString fileName = QFileDialog::getSaveFileName(this, 
     "Save Volume Fraction Estimate vs. Z Data", "", "TXT (*.txt);;");
   if (fileName == "")
@@ -639,7 +639,7 @@ void FibrinAnalysis::on_saveVolumeFractionEstimateData_clicked() {
 #endif
 
 
-void FibrinAnalysis::on_azimuthEdit_textEdited(QString text) {
+void NetworkExtractor::on_azimuthEdit_textEdited(QString text) {
   double azimuth = text.toDouble();
   m_DataModel->SetReferenceDirectionAzimuth(azimuth);
   m_Visualization->SetDirectionArrowAzimuth(azimuth);
@@ -647,7 +647,7 @@ void FibrinAnalysis::on_azimuthEdit_textEdited(QString text) {
 }
 
 
-void FibrinAnalysis::on_inclinationEdit_textEdited(QString text) {
+void NetworkExtractor::on_inclinationEdit_textEdited(QString text) {
   double inclination = text.toDouble();
   m_DataModel->SetReferenceDirectionInclination(inclination);
   m_Visualization->SetDirectionArrowInclination(inclination);
@@ -655,13 +655,13 @@ void FibrinAnalysis::on_inclinationEdit_textEdited(QString text) {
 }
 
 
-void FibrinAnalysis::on_showDirectionArrowCheckBox_toggled(bool state) {
+void NetworkExtractor::on_showDirectionArrowCheckBox_toggled(bool state) {
   m_Visualization->SetDirectionArrowVisible(state);
   RefreshVisualization();
 }
 
 
-void FibrinAnalysis::on_saveAngleHistogram_clicked() {
+void NetworkExtractor::on_saveAngleHistogram_clicked() {
   // Allow saving only when skeletonization filter is selected.
   if (m_FilterType == DataModel::MULTISCALE_SKELETONIZATION_FILTER_STRING) {
     QString fileName = QFileDialog::getSaveFileName(this, "Save Fiber Angle Histogram", "", "CSV (*.csv);;");
@@ -686,13 +686,13 @@ void FibrinAnalysis::on_saveAngleHistogram_clicked() {
 }
 
 
-void FibrinAnalysis::on_showDataOutlineCheckBox_toggled(bool show) {
+void NetworkExtractor::on_showDataOutlineCheckBox_toggled(bool show) {
   m_Visualization->SetShowOutline(show);
   qvtkWidget->GetRenderWindow()->Render();
 }
 
 
-void FibrinAnalysis::on_cropIsosurfaceCheckBox_toggled(bool crop) {
+void NetworkExtractor::on_cropIsosurfaceCheckBox_toggled(bool crop) {
   m_Visualization->SetCropIsosurface(crop);
   
   // Read z-plane.
@@ -701,7 +701,7 @@ void FibrinAnalysis::on_cropIsosurfaceCheckBox_toggled(bool crop) {
 }
 
 
-void FibrinAnalysis::on_applyButton_clicked() {
+void NetworkExtractor::on_applyButton_clicked() {
 
   // Read fiber diameter.
   double fiberDiameter = this->fiberDiameterEdit->text().toDouble();
@@ -799,7 +799,7 @@ void FibrinAnalysis::on_applyButton_clicked() {
 }
 
 
-void FibrinAnalysis::handle_tableModel_dataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight) {
+void NetworkExtractor::handle_tableModel_dataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight) {
   if (topLeft != bottomRight) {
     return;
   }
@@ -823,16 +823,16 @@ void FibrinAnalysis::handle_tableModel_dataChanged(const QModelIndex& topLeft, c
 }
 
 
-void FibrinAnalysis::RefreshUI() {
+void NetworkExtractor::RefreshUI() {
 
   ///////////////// Update GUI /////////////////
   
   // Update window title
   QFileInfo fileInfo(m_DataModel->GetImageFileName().c_str());
   QString windowTitle = 
-    QString().sprintf("Fibrin Analysis %d.%d.%d", FIBRIN_ANALYSIS_MAJOR_NUMBER,
-		    FIBRIN_ANALYSIS_MINOR_NUMBER,
-		    FIBRIN_ANALYSIS_REVISION_NUMBER);
+    QString().sprintf("Network Extractor %d.%d.%d", NETWORK_EXTRACTOR_MAJOR_NUMBER,
+		    NETWORK_EXTRACTOR_MINOR_NUMBER,
+		    NETWORK_EXTRACTOR_REVISION_NUMBER);
 					
   if (fileInfo.fileName() != "")
     windowTitle.append(tr(" - '").append(fileInfo.fileName()).append("'"));
@@ -939,7 +939,7 @@ void FibrinAnalysis::RefreshUI() {
 }
 
 
-void FibrinAnalysis::RefreshVisualization() {
+void NetworkExtractor::RefreshVisualization() {
 
   ///////////////// Update visualization stuff /////////////////
   m_Renderer->RemoveAllViewProps();
@@ -962,18 +962,18 @@ void FibrinAnalysis::RefreshVisualization() {
 }
 
 
-void FibrinAnalysis::UpdateProgress(float progress) const {
+void NetworkExtractor::UpdateProgress(float progress) const {
   int progressValue = static_cast<int>(progress*100.0);
   progressBar->setValue(progressValue);
 }
 
 
-void FibrinAnalysis::closeEvent(QCloseEvent* event) {
+void NetworkExtractor::closeEvent(QCloseEvent* event) {
   WriteProgramSettings();
 }
 
 
-void FibrinAnalysis::WriteProgramSettings() {
+void NetworkExtractor::WriteProgramSettings() {
   QSettings settings;
 
   settings.beginGroup("MainWindow");
@@ -997,7 +997,7 @@ void FibrinAnalysis::WriteProgramSettings() {
 }
 
 
-void FibrinAnalysis::ReadProgramSettings() {
+void NetworkExtractor::ReadProgramSettings() {
   QSettings settings;
 
   settings.beginGroup("MainWindow");
@@ -1021,7 +1021,7 @@ void FibrinAnalysis::ReadProgramSettings() {
 }
 
 
-int FibrinAnalysis::IsoValueSliderPosition(double value) {
+int NetworkExtractor::IsoValueSliderPosition(double value) {
   double dataMin = m_DataModel->GetFilteredDataMinimum();
   double dataMax = m_DataModel->GetFilteredDataMaximum();
   double sliderMax = static_cast<double>(this->isoValueSlider->maximum());
@@ -1029,7 +1029,7 @@ int FibrinAnalysis::IsoValueSliderPosition(double value) {
 }
 
 
-double FibrinAnalysis::IsoValueSliderValue(int position) {
+double NetworkExtractor::IsoValueSliderValue(int position) {
   double dataMin = m_DataModel->GetFilteredDataMinimum();
   double dataMax = m_DataModel->GetFilteredDataMaximum();
   double sliderMax = static_cast<double>(this->isoValueSlider->maximum());

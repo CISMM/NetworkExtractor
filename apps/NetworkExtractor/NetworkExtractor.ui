@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Fibrin Analysis</string>
+   <string>Network Extractor</string>
   </property>
   <property name="autoFillBackground">
    <bool>false</bool>
@@ -111,7 +111,7 @@
     <property name="title">
      <string>Window</string>
     </property>
-    <addaction name="actionAboutFibrinAnalysis"/>
+    <addaction name="actionAboutNetworkExtractor"/>
     <addaction name="separator"/>
     <addaction name="actionShowImageAnalysisWindow"/>
     <addaction name="actionShowDisplayWindow"/>
@@ -1345,9 +1345,9 @@
     <string>Open Session...</string>
    </property>
   </action>
-  <action name="actionAboutFibrinAnalysis">
+  <action name="actionAboutNetworkExtractor">
    <property name="text">
-    <string>About Fibrin Analysis</string>
+    <string>About Network Analysis</string>
    </property>
   </action>
  </widget>

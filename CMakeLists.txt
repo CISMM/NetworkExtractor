@@ -1,17 +1,17 @@
-PROJECT (FibrinAnalysis)
+PROJECT (NetworkExtractor)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 IF (COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
 ENDIF (COMMAND cmake_policy)
 
 # Set version information
-SET (FIBRIN_ANALYSIS_MAJOR_NUMBER "1")
-SET (FIBRIN_ANALYSIS_MINOR_NUMBER "1")
-SET (FIBRIN_ANALYSIS_REVISION_NUMBER "0")
-SET (FIBRIN_ANALYSIS_VERSION_STRING "${FIBRIN_ANALYSIS_MAJOR_NUMBER}.${FIBRIN_ANALYSIS_MINOR_NUMBER}.${FIBRIN_ANALYSIS_REVISION_NUMBER}")
+SET (NETWORK_EXTRACTOR_MAJOR_NUMBER "1")
+SET (NETWORK_EXTRACTOR_MINOR_NUMBER "1")
+SET (NETWORK_EXTRACTOR_REVISION_NUMBER "0")
+SET (NETWORK_EXTRACTOR_VERSION_STRING "${NETWORK_EXTRACTOR_MAJOR_NUMBER}.${NETWORK_EXTRACTOR_MINOR_NUMBER}.${NETWORK_EXTRACTOR_REVISION_NUMBER}")
 
-SET (EXECUTABLE_OUTPUT_PATH "${FibrinAnalysis_BINARY_DIR}/bin")
-SET (LIBRARY_OUTPUT_PATH "${FibrinAnalysis_BINARY_DIR}/lib")
+SET (EXECUTABLE_OUTPUT_PATH "${NetworkExtractor_BINARY_DIR}/bin")
+SET (LIBRARY_OUTPUT_PATH "${NetworkExtractor_BINARY_DIR}/lib")
 
 OPTION (CMAKE_VERBOSE_MAKEFILE  "Enable/Disable verbose compiler output" ON)
 OPTION (CMAKE_COLOR_MAKEFILE "Enable/Disable color cues when building" ON)
@@ -55,24 +55,24 @@ ENDIF( QT_FOUND)
 #######################################
 # Personal filter library and support classes.
 #
-# FibrinAnalysis is split up into several logical groups.
+# NetworkExtractor is split up into several logical groups.
 # apps      - a place for various applications related to the main application
 #######################################
 INCLUDE_DIRECTORIES (
-    ${FibrinAnalysis_SOURCE_DIR}/lib
-    ${FibrinAnalysis_SOURCE_DIR}/lib/filters
-    ${FibrinAnalysis_SOURCE_DIR}/lib/filters/itk
-    ${FibrinAnalysis_SOURCE_DIR}/lib/io
-    ${FibrinAnalysis_SOURCE_DIR}/lib/model
-    ${FibrinAnalysis_SOURCE_DIR}/lib/visualization
-    ${FibrinAnalysis_BINARY_DIR}/lib)
+    ${NetworkExtractor_SOURCE_DIR}/lib
+    ${NetworkExtractor_SOURCE_DIR}/lib/filters
+    ${NetworkExtractor_SOURCE_DIR}/lib/filters/itk
+    ${NetworkExtractor_SOURCE_DIR}/lib/io
+    ${NetworkExtractor_SOURCE_DIR}/lib/model
+    ${NetworkExtractor_SOURCE_DIR}/lib/visualization
+    ${NetworkExtractor_BINARY_DIR}/lib)
 ADD_SUBDIRECTORY(apps)
 ADD_SUBDIRECTORY(lib)
 
 #######################################
 # Testing components
 #######################################
-#OPTION (BUILD_IT_TESTS "Include FibrinAnalysis unit tests" ON)
+#OPTION (BUILD_IT_TESTS "Include NetworkExtractor unit tests" ON)
 #IF (BUILD_IT_TESTS)
 #    SUBDIRS(TestSuite Tests)
 #ENDIF (BUILD_IT_TESTS)

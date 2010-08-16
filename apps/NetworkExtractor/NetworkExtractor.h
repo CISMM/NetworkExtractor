@@ -1,10 +1,10 @@
-#ifndef _FIBRIN_ANALYSIS_QT_H_
-#define _FIBRIN_ANALYSIS_QT_H_
+#ifndef _NETWORK_EXTRACTOR_QT_H_
+#define _NETWORK_EXTRACTOR_QT_H_
 
 #include <qerrormessage.h>
 #include <qmainwindow.h>
 #include <qstandarditemmodel.h>
-#include "ui_FibrinAnalysis.h"
+#include "ui_NetworkExtractor.h"
 
 #include "DataModel.h"
 #include "Visualization.h"
@@ -14,15 +14,15 @@
 class vtkRenderer;
 
 
-class FibrinAnalysis : public QMainWindow, private Ui_MainWindow
+class NetworkExtractor : public QMainWindow, private Ui_MainWindow
 {
     Q_OBJECT
 
 public:
 
   // Constructor/Destructor
-  FibrinAnalysis(QWidget* parent = 0);
-  virtual ~FibrinAnalysis();
+  NetworkExtractor(QWidget* parent = 0);
+  virtual ~NetworkExtractor();
 
   void UpdateProgress(float progress) const;
 
@@ -58,7 +58,7 @@ public slots:
   virtual void on_actionOpenView_triggered();
   virtual void on_actionSaveView_triggered();
 
-  virtual void on_actionAboutFibrinAnalysis_triggered();
+  virtual void on_actionAboutNetworkExtractor_triggered();
 
   virtual void on_imageFilterComboBox_currentIndexChanged(QString filterText);
 
@@ -114,4 +114,4 @@ private:
 };
 
 
-#endif // _FIBRIN_ANALYSIS_QT_H_
+#endif // _NETWORK_EXTRACTOR_QT_H_

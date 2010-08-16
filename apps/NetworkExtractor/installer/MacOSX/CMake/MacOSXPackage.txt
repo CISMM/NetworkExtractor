@@ -41,7 +41,7 @@ FOREACH( PLUGIN ${QT_IMAGEFORMAT_PLUGINS} )
 ENDFOREACH( PLUGIN )
 
 INSTALL( FILES
-  "${FibrinAnalysis_SOURCE_DIR}/apps/FibrinAnalysis/installer/MacOSX/qt.conf"
+  "${NetworkExtractor_SOURCE_DIR}/apps/NetworkExtractor/installer/MacOSX/qt.conf"
   DESTINATION ./
 )
 
@@ -63,9 +63,9 @@ FOREACH( LIBRARY ${ITK_LIBRARIES} )
   )
 ENDFOREACH( LIBRARY )
 
-FILE( GLOB DOCS "${FibrinAnalysis_SOURCE_DIR}/doc/*.html" "${FibrinAnalysis_SOURCE_DIR}/doc/*.css" )
+FILE( GLOB DOCS "${NetworkExtractor_SOURCE_DIR}/doc/*.html" "${NetworkExtractor_SOURCE_DIR}/doc/*.css" )
 INSTALL( FILES ${DOCS} DESTINATION "../../../User Manual" )
-FILE( GLOB IMGS "${FibrinAnalysis_SOURCE_DIR}/doc/images/*.png" )
+FILE( GLOB IMGS "${NetworkExtractor_SOURCE_DIR}/doc/images/*.png" )
 INSTALL( FILES ${IMGS} DESTINATION "../../../User Manual/images" )
 
 # This is a GPL library dependency. Newer versions of VTK should not have this dependency,
@@ -80,13 +80,13 @@ ENDFOREACH( LIBRARY )
 
 
 SET( CPACK_GENERATOR "Bundle" )
-SET( CPACK_BUNDLE_PLIST "${FibrinAnalysis_BINARY_DIR}/apps/FibrinAnalysis/installer/MacOSX/Info.plist" )
-SET( FIBRIN_ANALYSIS_PROGRAM_NAME_WITH_VERSION "FibrinAnalysis ${FIBRIN_ANALYSIS_VERSION_STRING}" )
-CONFIGURE_FILE( "${FibrinAnalysis_SOURCE_DIR}/apps/FibrinAnalysis/installer/MacOSX/Info.plist" 
+SET( CPACK_BUNDLE_PLIST "${NetworkExtractor_BINARY_DIR}/apps/NetworkExtractor/installer/MacOSX/Info.plist" )
+SET( NETWORK_EXTRACTOR_PROGRAM_NAME_WITH_VERSION "NetworkExtractor ${NETWORK_EXTRACTOR_VERSION_STRING}" )
+CONFIGURE_FILE( "${NetworkExtractor_SOURCE_DIR}/apps/NetworkExtractor/installer/MacOSX/Info.plist" 
   "${CPACK_BUNDLE_PLIST}" )
-SET( CPACK_BUNDLE_STARTUP_COMMAND "FibrinAnalysis" )
-SET( CPACK_BUNDLE_ICON "${FibrinAnalysis_SOURCE_DIR}/apps/FibrinAnalysis/installer/MacOSX/FibrinAnalysis.icns" )
-SET( CPACK_BUNDLE_STARTUP_COMMAND "${FibrinAnalysis_SOURCE_DIR}/apps/FibrinAnalysis/installer/MacOSX/startup.sh" )
-SET( CPACK_BUNDLE_NAME "FibrinAnalysis ${FIBRIN_ANALYSIS_VERSION_STRING}" )
+SET( CPACK_BUNDLE_STARTUP_COMMAND "NetworkExtractor" )
+SET( CPACK_BUNDLE_ICON "${NetworkExtractor_SOURCE_DIR}/apps/NetworkExtractor/installer/MacOSX/NetworkExtractor.icns" )
+SET( CPACK_BUNDLE_STARTUP_COMMAND "${NetworkExtractor_SOURCE_DIR}/apps/NetworkExtractor/installer/MacOSX/startup.sh" )
+SET( CPACK_BUNDLE_NAME "NetworkExtractor ${NETWORK_EXTRACTOR_VERSION_STRING}" )
 
-SET( CPACK_PACKAGE_ICON "${FibrinAnalysis_SOURCE_DIR}/apps/FibrinAnalysis/installer/MacOSX/FibrinAnalysis.icns" )
+SET( CPACK_PACKAGE_ICON "${NetworkExtractor_SOURCE_DIR}/apps/NetworkExtractor/installer/MacOSX/NetworkExtractor.icns" )

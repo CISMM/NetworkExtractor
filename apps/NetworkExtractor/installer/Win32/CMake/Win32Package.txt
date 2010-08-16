@@ -21,9 +21,9 @@ FILE( GLOB ITKDLLS "${ITK_LIBRARY_DIRS}/release/ITKCommon.dll" )
 INSTALL( FILES ${ITKDLLS} DESTINATION bin )
 
 # Documentation
-FILE( GLOB DOCS "${FibrinAnalysis_SOURCE_DIR}/doc/*.html" "${FibrinAnalysis_SOURCE_DIR}/doc/*.css" )
+FILE( GLOB DOCS "${NetworkExtractor_SOURCE_DIR}/doc/*.html" "${NetworkExtractor_SOURCE_DIR}/doc/*.css" )
 INSTALL( FILES ${DOCS} DESTINATION docs )
-FILE( GLOB IMGS "${FibrinAnalysis_SOURCE_DIR}/doc/images/*.png" )
+FILE( GLOB IMGS "${NetworkExtractor_SOURCE_DIR}/doc/images/*.png" )
 INSTALL( FILES ${IMGS} DESTINATION docs/images )
 
 
@@ -40,9 +40,9 @@ SET( CPACK_NSIS_URL_INFO_ABOUT "http://www.cismm.org" )
 SET( CPACK_NSIS_CONTACT "cquammen@cs.unc.edu" )
 
 # Both of these need to be set or neither of them is set.
-SET( CPACK_NSIS_MUI_ICON "${FibrinAnalysis_SOURCE_DIR}/apps/FibrinAnalysis/installer/Win32/Win32Icon.ico" )
-SET( CPACK_NSIS_MUI_UNIICON "${FibrinAnalysis_SOURCE_DIR}/apps/FibrinAnalysis/installer/Win32/ModernUninstallFull.ico" )
-SET( CPACK_NSIS_INSTALLED_ICON_NAME "BIN\\\\FibrinAnalysis.exe" )
+SET( CPACK_NSIS_MUI_ICON "${NetworkExtractor_SOURCE_DIR}/apps/NetworkExtractor/installer/Win32/Win32Icon.ico" )
+SET( CPACK_NSIS_MUI_UNIICON "${NetworkExtractor_SOURCE_DIR}/apps/NetworkExtractor/installer/Win32/ModernUninstallFull.ico" )
+SET( CPACK_NSIS_INSTALLED_ICON_NAME "BIN\\\\NetworkExtractor.exe" )
 SET( CPACK_NSIS_MENU_LINKS
-  "docs/index.html" "Fibrin Analysis User Manual"
+  "docs/index.html" "Network Extractor User Manual"
   )

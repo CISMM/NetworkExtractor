@@ -1,1 +1,1 @@
-ADD_SUBDIRECTORY( FibrinAnalysis )
+ADD_SUBDIRECTORY( NetworkExtractor )

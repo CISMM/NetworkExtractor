@@ -32,7 +32,7 @@
 #include "ITKImageToVTKImage.h"
 #include "Types.h"
 
-// This is the data model for the Fibrin Analysis library.
+// This is the data model for the Network Extractor library.
 class DataModel {
 
   typedef Float3DImageType TImage;

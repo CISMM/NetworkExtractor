@@ -14,7 +14,7 @@ ENDIF(QT_USE_FILE)
 
 SET (QtGuiSrcs
   Main.cxx
-  FibrinAnalysis.cxx
+  NetworkExtractor.cxx
 )
 
 # Use the include path and library for Qt that is used by VTK.
@@ -25,13 +25,13 @@ INCLUDE_DIRECTORIES(
 )
 
 SET(UIS
-  FibrinAnalysis.ui
+  NetworkExtractor.ui
 )
-SET (FibrinAppHeaders
-  FibrinAnalysis.h
+SET (NetworkExtractorHeaders
+  NetworkExtractor.h
 )
 QT4_WRAP_UI(UIHeaders ${UIS})
-QT4_WRAP_CPP(MOCSrcs ${FibrinAppHeaders} )
+QT4_WRAP_CPP(MOCSrcs ${NetworkExtractorHeaders} )
 ADD_DEFINITIONS(-DQT_GUI_LIBS -DQT_CORE_LIB -DQT3_SUPPORT)
 SET_SOURCE_FILES_PROPERTIES(${QtGuiSrcs} PROPERTIES
                           OBJECT_DEPENDS "${UIHeaders}")
@@ -47,12 +47,12 @@ IF (${CMAKE_BUILD_TOOL} MATCHES "devenv")
 ENDIF (${CMAKE_BUILD_TOOL} MATCHES "devenv")
 
 IF ( WIN32 )
-  SET( WinResources "${FibrinAnalysis_SOURCE_DIR}/apps/FibrinAnalysis/installer/Win32/icon.rc" )
+  SET( WinResources "${NetworkExtractor_SOURCE_DIR}/apps/NetworkExtractor/installer/Win32/icon.rc" )
 ENDIF ( WIN32 )
 
-ADD_EXECUTABLE( FibrinAnalysis ${QtGuiSrcs} ${UISrcs} ${MOCSrcs} ${WinResources} )
+ADD_EXECUTABLE( NetworkExtractor ${QtGuiSrcs} ${UISrcs} ${MOCSrcs} ${WinResources} )
 
-TARGET_LINK_LIBRARIES( FibrinAnalysis
+TARGET_LINK_LIBRARIES( NetworkExtractor
   QVTK
   ${QT_LIBRARIES}
   vtksys
@@ -74,22 +74,22 @@ TARGET_LINK_LIBRARIES( FibrinAnalysis
 )
 
 # Set package properties
-SET( CPACK_PACKAGE_NAME "Fibrin-Analysis" )
+SET( CPACK_PACKAGE_NAME "Network-Extractor" )
 SET( CPACK_PACKAGE_VENDOR "University of North Carolina CISMM" )
-SET( CPACK_PACKAGE_EXECUTABLES "FibrinAnalysis;Fibrin Analysis ${FIBRIN_ANALYSIS_VERSION_STRING}" )
-SET( CPACK_PACKAGE_DESCRIPTION_SUMMARY "Fibrin Analysis" )
-SET( CPACK_PACKAGE_VERSION "${FIBRIN_ANALYSIS_VERSION_STRING}" )
-SET( CPACK_PACKAGE_VERSION_MAJOR "${FIBRIN_ANALYSIS_MAJOR_NUMBER}" )
-SET( CPACK_PACKAGE_VERSION_MINOR "${FIBRIN_ANALYSIS_MINOR_NUMBER}" )
-SET( CPACK_PACKAGE_VERSION_PATCH "${FIBRIN_ANALYSIS_REVISION_NUMBER}" )
-SET( CPACK_PACKAGE_INSTALL_DIRECTORY "Fibrin Analysis ${FIBRIN_ANALYSIS_VERSION_STRING}" )
-SET( CPACK_PACKAGE_INSTALL_REGISTRY_KEY "Fibrin Analysis ${FIBRIN_ANALYSIS_VERSION_STRING}" )
-SET( CPACK_RESOURCE_FILE_LICENSE "${FibrinAnalysis_SOURCE_DIR}/apps/FibrinAnalysis/installer/licenses/FibrinAnalysis-license.txt" )
-SET( CPACK_RESOURCE_FILE_README  "${FibrinAnalysis_SOURCE_DIR}/apps/FibrinAnalysis/installer/licenses/README.txt" )
+SET( CPACK_PACKAGE_EXECUTABLES "NetworkExtractor;Network Extractor ${NETWORK_EXTRACTOR_VERSION_STRING}" )
+SET( CPACK_PACKAGE_DESCRIPTION_SUMMARY "Network Extractor" )
+SET( CPACK_PACKAGE_VERSION "${NETWORK_EXTRACTOR_VERSION_STRING}" )
+SET( CPACK_PACKAGE_VERSION_MAJOR "${NETWORK_EXTRACTOR_MAJOR_NUMBER}" )
+SET( CPACK_PACKAGE_VERSION_MINOR "${NETWORK_EXTRACTOR_MINOR_NUMBER}" )
+SET( CPACK_PACKAGE_VERSION_PATCH "${NETWORK_EXTRACTOR_REVISION_NUMBER}" )
+SET( CPACK_PACKAGE_INSTALL_DIRECTORY "Network Extractor ${NETWORK_EXTRACTOR_VERSION_STRING}" )
+SET( CPACK_PACKAGE_INSTALL_REGISTRY_KEY "Network Extractor ${NETWORK_EXTRACTOR_VERSION_STRING}" )
+SET( CPACK_RESOURCE_FILE_LICENSE "${NetworkExtractor_SOURCE_DIR}/apps/NetworkExtractor/installer/licenses/NetworkExtractor-license.txt" )
+SET( CPACK_RESOURCE_FILE_README  "${NetworkExtractor_SOURCE_DIR}/apps/NetworkExtractor/installer/licenses/README.txt" )
 
-INCLUDE( ${FibrinAnalysis_SOURCE_DIR}/apps/FibrinAnalysis/installer/CMakeLists.txt )
+INCLUDE( ${NetworkExtractor_SOURCE_DIR}/apps/NetworkExtractor/installer/CMakeLists.txt )
 
-INSTALL( TARGETS FibrinAnalysis
+INSTALL( TARGETS NetworkExtractor
   RUNTIME DESTINATION bin
 )
 
