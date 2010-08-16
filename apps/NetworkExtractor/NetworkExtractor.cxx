@@ -971,7 +971,7 @@ void NetworkExtractor::Exit() {
   // Ask if user really wants to quit.
   QMessageBox messageBox;
   messageBox.setText("Do you really want to exit?");
-  messageBox.setInformativeText("If you exit now, all settings will be lost.");
+  messageBox.setInformativeText("If you exit now, all unsaved settings will be lost.");
   messageBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
   messageBox.setDefaultButton(QMessageBox::Cancel);
   int selected = messageBox.exec();
