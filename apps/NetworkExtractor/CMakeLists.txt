@@ -46,11 +46,18 @@ IF (${CMAKE_BUILD_TOOL} MATCHES "devenv")
   SET (QtGuiSrcs ${QtGuiSrcs} ${UIS})
 ENDIF (${CMAKE_BUILD_TOOL} MATCHES "devenv")
 
+# Workaround for rc.exe in Visual Studio 2005 being unable to handle many /I arguments.
 IF ( WIN32 )
-  SET( WinResources "${NetworkExtractor_SOURCE_DIR}/apps/NetworkExtractor/installer/Win32/icon.rc" )
+  SET( WinIcon icon.res )
+  ADD_CUSTOM_COMMAND( OUTPUT icon.res COMMAND rc.exe /fo icon.res ${CMAKE_CURRENT_SOURCE_DIR}/installer/Win32/icon.rc )
 ENDIF ( WIN32 )
 
-ADD_EXECUTABLE( NetworkExtractor ${QtGuiSrcs} ${UISrcs} ${MOCSrcs} ${WinResources} )
+ADD_EXECUTABLE( NetworkExtractor 
+  ${WinIcon}
+  ${QtGuiSrcs}
+  ${UISrcs}
+  ${MOCSrcs}
+)
 
 TARGET_LINK_LIBRARIES( NetworkExtractor
   QVTK
@@ -76,14 +83,14 @@ TARGET_LINK_LIBRARIES( NetworkExtractor
 # Set package properties
 SET( CPACK_PACKAGE_NAME "Network-Extractor" )
 SET( CPACK_PACKAGE_VENDOR "University of North Carolina CISMM" )
-SET( CPACK_PACKAGE_EXECUTABLES "NetworkExtractor;Network Extractor ${NETWORK_EXTRACTOR_VERSION_STRING}" )
+SET( CPACK_PACKAGE_EXECUTABLES "NetworkExtractor;Network Extractor ${NetworkExtractor_VERSION_STRING}" )
 SET( CPACK_PACKAGE_DESCRIPTION_SUMMARY "Network Extractor" )
-SET( CPACK_PACKAGE_VERSION "${NETWORK_EXTRACTOR_VERSION_STRING}" )
-SET( CPACK_PACKAGE_VERSION_MAJOR "${NETWORK_EXTRACTOR_MAJOR_NUMBER}" )
-SET( CPACK_PACKAGE_VERSION_MINOR "${NETWORK_EXTRACTOR_MINOR_NUMBER}" )
-SET( CPACK_PACKAGE_VERSION_PATCH "${NETWORK_EXTRACTOR_REVISION_NUMBER}" )
-SET( CPACK_PACKAGE_INSTALL_DIRECTORY "Network Extractor ${NETWORK_EXTRACTOR_VERSION_STRING}" )
-SET( CPACK_PACKAGE_INSTALL_REGISTRY_KEY "Network Extractor ${NETWORK_EXTRACTOR_VERSION_STRING}" )
+SET( CPACK_PACKAGE_VERSION "${NetworkExtractor_VERSION_STRING}" )
+SET( CPACK_PACKAGE_VERSION_MAJOR "${NetworkExtractor_MAJOR_NUMBER}" )
+SET( CPACK_PACKAGE_VERSION_MINOR "${NetworkExtractor_MINOR_NUMBER}" )
+SET( CPACK_PACKAGE_VERSION_PATCH "${NetworkExtractor_REVISION_NUMBER}" )
+SET( CPACK_PACKAGE_INSTALL_DIRECTORY "Network Extractor ${NetworkExtractor_VERSION_STRING}" )
+SET( CPACK_PACKAGE_INSTALL_REGISTRY_KEY "Network Extractor ${NetworkExtractor_VERSION_STRING}" )
 SET( CPACK_RESOURCE_FILE_LICENSE "${NetworkExtractor_SOURCE_DIR}/apps/NetworkExtractor/installer/licenses/NetworkExtractor-license.txt" )
 SET( CPACK_RESOURCE_FILE_README  "${NetworkExtractor_SOURCE_DIR}/apps/NetworkExtractor/installer/licenses/README.txt" )
 
