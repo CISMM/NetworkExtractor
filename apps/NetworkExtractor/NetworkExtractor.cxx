@@ -422,14 +422,18 @@ void NetworkExtractor::on_actionSaveGeometry_triggered() {
   if (fileName == "")
     return;
 
-  // TODO - replace the isosurface generation below
-#if 0
+  vtkSmartPointer<vtkContourFilter> isosurfaceFilter = 
+    vtkSmartPointer<vtkContourFilter>::New();
+  isosurfaceFilter->SetInputConnection(m_DataModel->GetImageOutputPort());
+  isosurfaceFilter->SetNumberOfContours(1);
+  isosurfaceFilter->SetValue(0, m_Visualization->GetIsoValue());
+  isosurfaceFilter->Update();
+
   vtkPolyDataWriter* writer = vtkPolyDataWriter::New();
-  writer->SetInputConnection(m_Visualization->GetIsosurfaceOutputPort());
+  writer->SetInputConnection(isosurfaceFilter->GetOutputPort());
   writer->SetFileName(fileName.toStdString().c_str());
   writer->Write();
   writer->Delete();
-#endif
 }
 
 
