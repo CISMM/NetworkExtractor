@@ -16,21 +16,38 @@ INSTALL( FILES ${QTDLLS} DESTINATION bin )
 FILE( GLOB VTKDLLS "${VTK_LIBRARY_DIRS}/release/vtk*.dll" )
 INSTALL( FILES ${VTKDLLS} DESTINATION bin )
 
+# libxml2 DLL
+# First, find which one VTK was built with
+FILE( READ "${VTK_LIBRARY_DIRS}/../CMakeCache.txt" VTK_CMAKE_CACHE )
+STRING( REGEX REPLACE ".*LIBXML2_LIBRARIES:FILEPATH=([^\n]+).*" "\\1" LIBXML2_DLL ${VTK_CMAKE_CACHE} )
+STRING( REPLACE ".lib" ".dll" LIBXML2_DLL ${LIBXML2_DLL} )
+INSTALL( FILES "${LIBXML2_DLL}" DESTINATION bin )
+
 # ITK DLLs
 FILE( GLOB ITKDLLS "${ITK_LIBRARY_DIRS}/release/ITKCommon.dll" )
 INSTALL( FILES ${ITKDLLS} DESTINATION bin )
 
 # Documentation
-FILE( GLOB DOCS "${NetworkExtractor_SOURCE_DIR}/doc/*.html" "${NetworkExtractor_SOURCE_DIR}/doc/*.css" )
-INSTALL( FILES ${DOCS} DESTINATION docs )
-FILE( GLOB IMGS "${NetworkExtractor_SOURCE_DIR}/doc/images/*.png" )
-INSTALL( FILES ${IMGS} DESTINATION docs/images )
+SET( USER_GUIDE_NAME "NetworkExtractor-${NetworkExtractor_VERSION_STRING}-UserGuide.pdf" )
+SET( USER_GUIDE_FILE   "${NetworkExtractor_BINARY_DIR}/docs/${USER_GUIDE_NAME}" )
+IF ( EXISTS "${USER_GUIDE_FILE}" )
 
+  INSTALL( FILES
+  "${NetworkExtractor_BINARY_DIR}/docs/${USER_GUIDE_NAME}"
+    DESTINATION . )
+  SET( CPACK_NSIS_MENU_LINKS 
+    "${USER_GUIDE_NAME}" "Network Extractor ${NetworkExtractor_VERSION_STRING} User Guide" 
+    "http://www.cismm.org/downloads/?dl_cat=5" "Network Extractor Download Site"
+    "http://www.cismm.org/" "CISMM Web Site"
+  )
 
-# Change the default installation directory. To make this work you MUST replace
-# all occurences of $PROGRAMFILES with @CPACK_INSTALL_DIRECTORY@ in
-# C:\Program Files\CMake 2.6\share\cmake-2.6\Modules\NSIS.template.in.
-SET( CPACK_INSTALL_DIRECTORY "C:\\\\NSRG\\\\bin" )
+ELSE ( EXISTS "${USER_GUIDE_FILE}" )
+
+  MESSAGE( WARNING "Could not find the user guide PDF file. Please generate it by running LaTeX on ${NetworkExtractor_BINARY_DIR}/docs/NetworkExtractor-${NetworkExtractor_VERSION_STRING}-UserGuide.tex" )
+
+ENDIF ( EXISTS "${USER_GUIDE_FILE}" )
+
+SET( CPACK_INSTALL_DIRECTORY "$PROGRAMFILES\\\\CISMM" )
 
 # Save time by just using the NSIS generator
 SET( CPACK_GENERATOR "NSIS" )
@@ -43,6 +60,3 @@ SET( CPACK_NSIS_CONTACT "cquammen@cs.unc.edu" )
 SET( CPACK_NSIS_MUI_ICON "${NetworkExtractor_SOURCE_DIR}/apps/NetworkExtractor/installer/Win32/Win32Icon.ico" )
 SET( CPACK_NSIS_MUI_UNIICON "${NetworkExtractor_SOURCE_DIR}/apps/NetworkExtractor/installer/Win32/ModernUninstallFull.ico" )
 SET( CPACK_NSIS_INSTALLED_ICON_NAME "BIN\\\\NetworkExtractor.exe" )
-SET( CPACK_NSIS_MENU_LINKS
-  "docs/index.html" "Network Extractor User Manual"
-  )
