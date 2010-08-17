@@ -5,10 +5,10 @@ IF (COMMAND cmake_policy)
 ENDIF (COMMAND cmake_policy)
 
 # Set version information
-SET (NETWORK_EXTRACTOR_MAJOR_NUMBER "1")
-SET (NETWORK_EXTRACTOR_MINOR_NUMBER "0")
-SET (NETWORK_EXTRACTOR_REVISION_NUMBER "0")
-SET (NETWORK_EXTRACTOR_VERSION_STRING "${NETWORK_EXTRACTOR_MAJOR_NUMBER}.${NETWORK_EXTRACTOR_MINOR_NUMBER}.${NETWORK_EXTRACTOR_REVISION_NUMBER}")
+SET (NetworkExtractor_MAJOR_NUMBER "1")
+SET (NetworkExtractor_MINOR_NUMBER "0")
+SET (NetworkExtractor_REVISION_NUMBER "0")
+SET (NetworkExtractor_VERSION_STRING "${NetworkExtractor_MAJOR_NUMBER}.${NetworkExtractor_MINOR_NUMBER}.${NetworkExtractor_REVISION_NUMBER}")
 
 SET (EXECUTABLE_OUTPUT_PATH "${NetworkExtractor_BINARY_DIR}/bin")
 SET (LIBRARY_OUTPUT_PATH "${NetworkExtractor_BINARY_DIR}/lib")
@@ -66,13 +66,18 @@ INCLUDE_DIRECTORIES (
     ${NetworkExtractor_SOURCE_DIR}/lib/model
     ${NetworkExtractor_SOURCE_DIR}/lib/visualization
     ${NetworkExtractor_BINARY_DIR}/lib)
+
+#######################################
+# Applications
+#######################################
 ADD_SUBDIRECTORY(apps)
+
+#######################################
+# Library
+#######################################
 ADD_SUBDIRECTORY(lib)
 
 #######################################
-# Testing components
+# Documentation
 #######################################
-#OPTION (BUILD_IT_TESTS "Include NetworkExtractor unit tests" ON)
-#IF (BUILD_IT_TESTS)
-#    SUBDIRS(TestSuite Tests)
-#ENDIF (BUILD_IT_TESTS)
+ADD_SUBDIRECTORY(docs)
