@@ -30,8 +30,15 @@ QT 4.5.3
 
 Obtain from ftp://ftp.qt.nokia.com/qt/source/qt-all-opensource-src-4.5.3.zip
 
+You need to compile inside the Visual Studio Tools/Command Line so that it can find NMake.
+
 Configure with:
 
 configure -platform win32-msvc2005 -no-webkit -no-dbus -no-phonon -debug-and-release -opensource -shared
 
 The -no-webkit, -no-dbus, and -no-phonon options are not required.
+
+Build with:
+
+nmake
+nmake install
