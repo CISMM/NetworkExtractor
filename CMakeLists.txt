@@ -7,7 +7,7 @@ ENDIF (COMMAND cmake_policy)
 # Set version information
 SET (NetworkExtractor_MAJOR_NUMBER "1")
 SET (NetworkExtractor_MINOR_NUMBER "0")
-SET (NetworkExtractor_REVISION_NUMBER "0")
+SET (NetworkExtractor_REVISION_NUMBER "1")
 SET (NetworkExtractor_VERSION_STRING "${NetworkExtractor_MAJOR_NUMBER}.${NetworkExtractor_MINOR_NUMBER}.${NetworkExtractor_REVISION_NUMBER}")
 
 SET (EXECUTABLE_OUTPUT_PATH "${NetworkExtractor_BINARY_DIR}/bin")
