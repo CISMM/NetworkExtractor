@@ -10,3 +10,5 @@ Network Extractor is developed and maintained by the Center for Computer Integra
 ## Legalese
 The Network Extractor is FREE to download, install, and use, and is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY, without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
+![Fiber Isosurface](FAFibernessIsosurface.png)
+
